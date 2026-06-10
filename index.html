@@ -1383,8 +1383,10 @@ function showScreen(name){
 ================================================ */
 function renderFeatured(places){
   const el=document.getElementById('featured-cards');
-  if(!places.length){el.innerHTML='<p style="padding:10px;font-size:13px;color:var(--muted)">Nenhum lugar encontrado.</p>';return;}
-  el.innerHTML=places.slice(0,12).map(p=>{
+  // Garante que só entra no destaque lugares com foto — sem exceção
+  const comFoto = places.filter(p => photoUrl(p));
+  if(!comFoto.length){el.innerHTML='<p style="padding:10px;font-size:13px;color:var(--muted)">Nenhum lugar encontrado.</p>';return;}
+  el.innerHTML=comFoto.slice(0,12).map(p=>{
     const c=cfg(p.types,p._specialType);
     const d=dist(userLat,userLng,latVal(p),lngVal(p));
     const url=photoUrl(p);
@@ -1954,7 +1956,7 @@ function fetchPlaces(type){
       // marca o tipo especial nos resultados
       res.forEach(r=>{ r._specialType=type; if(!allPlaces.find(x=>x.place_id===r.place_id)) allPlaces.push(r); });
       const resSorted=res.sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0)));
-      renderFeatured(resSorted.filter(p=>p._featured||photoUrl(p)));
+      renderFeatured(resSorted.filter(p=>photoUrl(p)));
       renderNear([...res.filter(p=>photoUrl(p)),...res.filter(p=>!photoUrl(p))]);
       addMarkers(mapHome,res,homeMarkers);
       if(fullInited) addMarkers(mapFull,res,fullMarkers);
@@ -1974,7 +1976,7 @@ function fetchPlaces(type){
       if(!allPlaces.find(p=>p.place_id==='DEMO_CHOCOLAND_001')) allPlaces.unshift(DEMO_FEATURED);
       // Destaque: _featured primeiro, depois por rating — SÓ com foto
       const sorted=[...allPlaces].sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0)));
-      const comFoto  = sorted.filter(p => p._featured || photoUrl(p));
+      const comFoto  = sorted.filter(p => photoUrl(p));
       renderFeatured(comFoto);
       // Mais próximos: com foto primeiro, sem foto no final
       const nearAll  = [...allPlaces].sort((a,b)=>dist(userLat,userLng,latVal(a),lngVal(a))-dist(userLat,userLng,latVal(b),lngVal(b)));
@@ -2271,7 +2273,7 @@ const DEMO_FEATURED={
   vicinity:'Av. Dr. Adhemar de Barros, 3900 — Campos do Jordão',
   opening_hours:{isOpen:()=>true},
   geometry:{location:{lat:()=>-22.7312,lng:()=>-45.6001}},
-  photos:null,
+  photos: null,
   reviews:[
     {author_name:'Ana Paula',rating:5,text:'Melhor fábrica de chocolate da Serra! Visita imperdível, os funcionários explicam todo o processo.'},
     {author_name:'Carlos M.',rating:5,text:'Cupom do app funcionou perfeitamente, economizamos bastante. Voltaremos com certeza!'},
@@ -3115,18 +3117,18 @@ window.initMap=function(){
     const specialCats=['chocolate','adventure','culture','transport'];
     if(t==='all'){
       const allS=[...allPlaces].sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0)));
-      renderFeatured(allS.filter(p=>p._featured||photoUrl(p)));
+      renderFeatured(allS.filter(p=>photoUrl(p)));
       const allN=[...allPlaces].sort((a,b)=>dist(userLat,userLng,latVal(a),lngVal(a))-dist(userLat,userLng,latVal(b),lngVal(b)));
       renderNear([...allN.filter(p=>photoUrl(p)),...allN.filter(p=>!photoUrl(p))]);
       addMarkers(mapHome,allPlaces,homeMarkers);
     } else if(specialCats.includes(t)){
       // categoria especial: filtra por _specialType ou busca se vazio
       const f=allPlaces.filter(p=>p._specialType===t);
-      if(f.length){const fS=[...f].sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0)));renderFeatured(fS.filter(p=>p._featured||photoUrl(p)));renderNear([...f.filter(p=>photoUrl(p)),...f.filter(p=>!photoUrl(p))]);addMarkers(mapHome,f,homeMarkers);}
+      if(f.length){const fS=[...f].sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0)));renderFeatured(fS.filter(p=>photoUrl(p)));renderNear([...f.filter(p=>photoUrl(p)),...f.filter(p=>!photoUrl(p))]);addMarkers(mapHome,f,homeMarkers);}
       else fetchPlaces(t);
     } else {
       const f=allPlaces.filter(p=>p.types&&p.types.includes(t));
-      if(f.length){const fS=[...f].sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0)));renderFeatured(fS.filter(p=>p._featured||photoUrl(p)));renderNear([...f.filter(p=>photoUrl(p)),...f.filter(p=>!photoUrl(p))]);addMarkers(mapHome,f,homeMarkers);}
+      if(f.length){const fS=[...f].sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0)));renderFeatured(fS.filter(p=>photoUrl(p)));renderNear([...f.filter(p=>photoUrl(p)),...f.filter(p=>!photoUrl(p))]);addMarkers(mapHome,f,homeMarkers);}
       else fetchPlaces(t);
     }
   });
