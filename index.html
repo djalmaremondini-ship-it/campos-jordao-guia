@@ -616,6 +616,50 @@ html,body{height:100%;background:#e0ddd6;font-family:'DM Sans',sans-serif}
 .shared-banner p:first-child{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px}
 .shared-banner p:last-child{font-size:11px;color:var(--stone)}
 
+
+/* ===== NOVAS CATEGORIAS & INFOS ===== */
+/* Faixa de preço no card */
+.price-badge{font-size:10px;font-weight:600;color:var(--green);background:#f0f8f4;
+  border:.5px solid #b7dfc9;border-radius:6px;padding:1px 5px;margin-left:4px}
+
+/* Chips "Indicado para" na tela de detalhe */
+.det-profiles{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.det-profile-chip{display:flex;align-items:center;gap:5px;padding:5px 11px;
+  border-radius:20px;font-size:12px;background:#f8f6f2;
+  border:.5px solid var(--border);color:var(--stone)}
+.det-profile-chip i{font-size:13px}
+
+/* Horário popular */
+.det-hours-bar{background:#f8f6f2;border-radius:12px;padding:12px 14px;margin-bottom:16px}
+.det-hours-title{font-size:12px;font-weight:500;color:var(--text);margin-bottom:8px;
+  display:flex;align-items:center;gap:6px}
+.det-hours-title i{font-size:14px;color:var(--green)}
+.hours-bars{display:flex;gap:3px;align-items:flex-end;height:40px}
+.hbar{flex:1;border-radius:3px 3px 0 0;min-height:4px;transition:height .3s}
+.hbar.now{background:var(--green)}
+.hbar.low{background:#C8DDD3}
+.hbar.mid{background:#7BB89A}
+.hbar.high{background:#E9A93B}
+.hbar.peak{background:#D85A30}
+.hours-labels{display:flex;justify-content:space-between;margin-top:4px}
+.hours-labels span{font-size:9px;color:var(--fog)}
+.hours-tip{font-size:11px;color:var(--muted);margin-top:6px}
+
+/* Info extra linha */
+.det-extra-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.det-extra-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;
+  border-radius:10px;font-size:11px;font-weight:500}
+.dec-park{background:#f0f8f4;color:#1a5c36;border:.5px solid #b7dfc9}
+.dec-price{background:#FFF7E6;color:#7A5C00;border:.5px solid #FDE68A}
+.dec-access{background:#EFF8FF;color:#1e40af;border:.5px solid #BFDBFE}
+.dec-pet{background:#FFF0F0;color:#9B1C1C;border:.5px solid #FCA5A5}
+.dec-whats{background:#d8efd8;color:#1a5c36;border:.5px solid #b7dfc9}
+.dec-warn{background:#FFF7E6;color:#92400E;border:.5px solid #FDE68A}
+
+/* WhatsApp button */
+.det-btn.whatsapp{background:#25D366;color:#fff}
+.det-btn.whatsapp i{font-size:16px}
+
 /* ===== SPINNER ===== */
 .spinner{width:22px;height:22px;border:2.5px solid var(--border-light);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -655,6 +699,11 @@ html,body{height:100%;background:#e0ddd6;font-family:'DM Sans',sans-serif}
         <div class="cat" data-type="shopping_mall"><i class="ti ti-shopping-bag"></i> Compras</div>
         <div class="cat" data-type="culture"><i class="ti ti-palette"></i> Arte & Cultura</div>
         <div class="cat" data-type="transport"><i class="ti ti-train"></i> Passeios</div>
+        <div class="cat" data-type="lodging"><i class="ti ti-home-2"></i> Onde ficar</div>
+        <div class="cat" data-type="experience"><i class="ti ti-sparkles"></i> Experiências</div>
+        <div class="cat" data-type="gastronomy"><i class="ti ti-cheese"></i> Gastronomia</div>
+        <div class="cat" data-type="events"><i class="ti ti-calendar-event"></i> Eventos</div>
+        <div class="cat" data-type="viewpoint"><i class="ti ti-eye"></i> Mirantes</div>
       </div>
     </div>
     <div class="body">
@@ -701,6 +750,11 @@ html,body{height:100%;background:#e0ddd6;font-family:'DM Sans',sans-serif}
         <div class="list-cat-pill" data-type="shopping_mall"><i class="ti ti-shopping-bag"></i>Compras</div>
         <div class="list-cat-pill" data-type="culture"><i class="ti ti-palette"></i>Arte & Cultura</div>
         <div class="list-cat-pill" data-type="transport"><i class="ti ti-train"></i>Passeios</div>
+        <div class="list-cat-pill" data-type="lodging"><i class="ti ti-home-2"></i>Onde ficar</div>
+        <div class="list-cat-pill" data-type="experience"><i class="ti ti-sparkles"></i>Experiências</div>
+        <div class="list-cat-pill" data-type="gastronomy"><i class="ti ti-cheese"></i>Gastronomia</div>
+        <div class="list-cat-pill" data-type="events"><i class="ti ti-calendar-event"></i>Eventos</div>
+        <div class="list-cat-pill" data-type="viewpoint"><i class="ti ti-eye"></i>Mirantes</div>
       </div>
     </div>
     <!-- SUBFILTROS (aparecem dinamicamente por categoria) -->
@@ -1225,6 +1279,11 @@ const TC = {
   adventure:{icon:'ti-parachute',cls:'nat',label:'Aventura',time:'2–4h',color:'#0F6E56',nc:'n'},
   culture:{icon:'ti-palette',cls:'cult',label:'Arte & Cultura',time:'1–2h',color:'#534AB7',nc:'c'},
   transport:{icon:'ti-train',cls:'cult',label:'Passeio Turístico',time:'1h',color:'#8B6914',nc:'c'},
+  lodging:{icon:'ti-home-2',cls:'cult',label:'Pousada / Chalé',time:'',color:'#6B4F3A',nc:'c'},
+  experience:{icon:'ti-sparkles',cls:'coff',label:'Experiência',time:'1–3h',color:'#8B3A8B',nc:'p'},
+  gastronomy:{icon:'ti-cheese',cls:'food',label:'Gastronomia & Produtos',time:'30–60min',color:'#7A5C00',nc:'f'},
+  events:{icon:'ti-calendar-event',cls:'cult',label:'Evento',time:'Varia',color:'#1e40af',nc:'c'},
+  viewpoint:{icon:'ti-eye',cls:'nat',label:'Mirante',time:'30–60min',color:'#0F6E56',nc:'n'},
   default:{icon:'ti-map-pin',cls:'nat',label:'Local',time:'1h',color:'#2D6A4F',nc:'n'}
 };
 function cfg(types,specialType){
@@ -1397,7 +1456,7 @@ function renderFeatured(places){
       <div class="cimg-wrap ${c.cls}" style="position:relative;overflow:hidden">${imgHtml}${ob}${featBadge}</div>
       <div class="cbody">
         <div class="cname">${p.name}</div>
-        <div class="cmeta"><span class="ccat">${c.label}</span><span class="cdist"><i class="ti ti-walk"></i>${d.toFixed(1)}km</span></div>
+        <div class="cmeta"><span class="ccat">${c.label}${getPriceLabel(p)?'<span class="price-badge">'+getPriceLabel(p)+'</span>':''}</span><span class="cdist"><i class="ti ti-walk"></i>${d.toFixed(1)}km</span></div>
         <div class="crating"><div class="stars">${starsH(p.rating)}</div><span>${p.rating?p.rating.toFixed(1):'–'} (${fmtN(p.user_ratings_total)})</span></div>
         <div class="ctime"><i class="ti ti-clock"></i>${c.time}</div>
       </div>
@@ -1472,6 +1531,33 @@ const SUBFILTERS = {
     {label:'Jardim',    mode:'search', placeType:'park', kw:'jardim'},
     {label:'Cachoeira', mode:'search', placeType:'park', kw:'cachoeira'},
     {label:'Camping',   mode:'type',   match:['campground']},
+  ],
+  lodging: [
+    {label:'Pousada',       mode:'search', placeType:'lodging', kw:'pousada'},
+    {label:'Chalé',         mode:'search', placeType:'lodging', kw:'chale'},
+    {label:'Hotel boutique',mode:'search', placeType:'lodging', kw:'hotel boutique'},
+  ],
+  experience: [
+    {label:'Degustação',    mode:'search', placeType:'tourist_attraction', kw:'degustacao'},
+    {label:'Tour guiado',   mode:'search', placeType:'tourist_attraction', kw:'tour guia'},
+    {label:'Ateliê',        mode:'search', placeType:'tourist_attraction', kw:'atelie'},
+    {label:'Culinária',     mode:'search', placeType:'tourist_attraction', kw:'culinaria aula'},
+  ],
+  gastronomy: [
+    {label:'Queijo & Frios',mode:'search', placeType:'store', kw:'queijo'},
+    {label:'Vinho & Adega', mode:'search', placeType:'store', kw:'vinho adega'},
+    {label:'Produtos coloniais',mode:'search',placeType:'store',kw:'colonial'},
+    {label:'Lã & Artesanato',mode:'search',placeType:'store',kw:'la artesanato'},
+  ],
+  viewpoint: [
+    {label:'Mirante',       mode:'search', placeType:'tourist_attraction', kw:'mirante'},
+    {label:'Pico Itapeva',  mode:'search', placeType:'tourist_attraction', kw:'itapeva'},
+    {label:'Vista teleférico',mode:'search',placeType:'tourist_attraction',kw:'vista teleferico'},
+  ],
+  events: [
+    {label:'Festival Inverno',mode:'search',placeType:'tourist_attraction',kw:'festival inverno'},
+    {label:'Shows & Música', mode:'search',placeType:'tourist_attraction',kw:'show musica'},
+    {label:'Natal Luz',      mode:'search',placeType:'tourist_attraction',kw:'natal'},
   ],
   restaurant: [
     {label:'Italiano',        mode:'search', placeType:'restaurant', kw:'italiano'},
@@ -1682,8 +1768,35 @@ function openDetail(pid){
   const revsHtml=p.reviews&&p.reviews.length
     ?`<div class="det-section-ttl">Avaliações do Google</div><div class="reviews-list">${p.reviews.slice(0,3).map(r=>`<div class="rev-item"><div class="rev-top"><span class="rev-author">${r.author_name}</span><div class="rev-stars">${starsH(r.rating,11)}</div></div><div class="rev-text">${r.text?r.text.slice(0,150)+(r.text.length>150?'...':''):'Sem comentário.'}</div></div>`).join('')}</div>`
     :'';
+  const priceLabel = getPriceLabel(p);
+  const profiles   = getProfiles(p);
+  const popHours   = getPopularHours(p);
+  const extraChips = getExtraInfo(p);
+  const distInfo   = getDistanceInfo(d);
+  const phoneNum   = p.formatted_phone_number;
+  const phoneLink  = phoneNum ? 'https://wa.me/55'+phoneNum.replace(/\D/g,'') : null;
+  const profilesHtml = profiles.length
+    ? '<div class="det-section-ttl" style="margin-bottom:8px">Indicado para</div><div class="det-profiles">'+
+      profiles.map(pr=>'<div class="det-profile-chip"><i class="ti '+pr.icon+'"></i>'+pr.label+'</div>').join('')+
+      '</div>' : '';
+  const extraHtml = extraChips.length
+    ? '<div class="det-extra-row">'+
+      extraChips.map(ch=>'<div class="det-extra-chip '+ch.cls+'"><i class="ti '+ch.icon+'"></i>'+ch.label+'</div>').join('')+
+      '</div>' : '';
+  const hoursHtml =
+    '<div class="det-hours-bar">'+
+    '<div class="det-hours-title"><i class="ti ti-chart-bar"></i>Horários populares</div>'+
+    '<div class="hours-bars">'+
+    popHours.pattern.map((h,i)=>'<div class="hbar '+(i===popHours.nowIdx?'now':popHours.levels[i])+'" style="height:'+Math.round(h/5*100)+'%"></div>').join('')+
+    '</div>'+
+    '<div class="hours-labels"><span>9h</span><span>12h</span><span>15h</span><span>18h</span><span>20h</span></div>'+
+    '<div class="hours-tip"><i class="ti ti-bulb" style="font-size:12px;color:var(--gold);margin-right:3px"></i>'+popHours.tip+'</div>'+
+    '</div>';
   document.getElementById('det-body').innerHTML=`
-    <div class="det-tag ${c.cls}"><i class="ti ${c.icon}" style="font-size:12px"></i>${c.label}</div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+      <div class="det-tag ${c.cls}"><i class="ti ${c.icon}" style="font-size:12px"></i>${c.label}</div>
+      ${priceLabel ? '<span class="price-badge">'+priceLabel+'</span>' : ''}
+    </div>
     <div class="det-name">${p.name}</div>
     <div class="det-rating-row">
       <div class="det-stars">${starsH(p.rating,15)}</div>
@@ -1692,17 +1805,21 @@ function openDetail(pid){
     </div>
     <div class="det-info-grid">
       <div class="det-info-card"><i class="ti ti-map-pin"></i><div><div class="dil">Endereço</div><div class="div">${addr}</div></div></div>
-      <div class="det-info-card"><i class="ti ti-walk"></i><div><div class="dil">Distância</div><div class="div">${d.toFixed(1)} km · ${wt(d)}</div></div></div>
+      <div class="det-info-card"><i class="ti ti-walk"></i><div><div class="dil">Distância</div><div class="div">${distInfo}</div></div></div>
       <div class="det-info-card"><i class="ti ti-clock"></i><div><div class="dil">Funcionamento</div><div class="div">${openStr}</div></div></div>
-      <div class="det-info-card"><i class="ti ti-clock-hour-4"></i><div><div class="dil">Tempo estimado</div><div class="div">${c.time}</div></div></div>
+      <div class="det-info-card"><i class="ti ti-clock-hour-4"></i><div><div class="dil">Tempo estimado</div><div class="div">${c.time||'1–2h'}</div></div></div>
     </div>
+    ${extraHtml}
+    ${profilesHtml}
+    ${hoursHtml}
     <button class="det-checkin-btn ${checkedInIds.has(pid)?'done':''}" id="det-checkin-btn" onclick="toggleCheckin('${pid}')">
       <i class="ti ${checkedInIds.has(pid)?'ti-circle-check-filled':'ti-circle-check'}"></i>
       ${checkedInIds.has(pid)?'Visitei este lugar!':'Fazer check-in aqui'}
     </button>
     <div class="det-actions">
-      <button class="det-btn primary" onclick="openGoogleMaps('${p.name.replace(/'/g,"\\'")}',${latVal(p)},${lngVal(p)})"><i class="ti ti-navigation"></i>Como chegar</button>
+      <button class="det-btn primary" onclick="openGoogleMaps('${p.name.replace(/'/g,"\'")}',${latVal(p)},${lngVal(p)})"><i class="ti ti-navigation"></i>Como chegar</button>
       <button class="det-btn secondary" onclick="addToRoteiro('${pid}')"><i class="ti ti-route"></i>Ao roteiro</button>
+      ${phoneLink ? '<button class="det-btn whatsapp" onclick="window.open(''+phoneLink+'','_blank')"><i class="ti ti-brand-whatsapp"></i>WhatsApp</button>' : ''}
     </div>
     ${p._featured?`<div class="coupon-banner" onclick="openCoupon('${pid}')"><i class="ti ti-ticket"></i><div class="coupon-banner-text"><p>Cupom exclusivo disponível</p><p>${p._coupon_desc||'Desconto especial para usuários do app'}</p></div><i class="ti ti-arrow-right" style="margin-left:auto;color:rgba(255,255,255,.6)"></i></div>`:''}
     <div class="det-section-ttl">Sobre o lugar</div>
@@ -1710,6 +1827,7 @@ function openDetail(pid){
     ${revsHtml}
   `;
   showScreen('detail');
+}
 }
 
 function openGoogleMaps(name,lat,lng){
@@ -1936,7 +2054,12 @@ function initMapFull(){
 ================================================ */
 // Categorias especiais que usam textSearch em vez de nearbySearch
 const SPECIAL_CATS = {
-  chocolate: {query:'fabrica chocolate Campos do Jordao', placeType:'store'},
+  chocolate:  {query:'fabrica chocolate Campos do Jordao', placeType:'store'},
+  lodging:    {query:'pousada chalé hotel Campos do Jordao', placeType:'lodging'},
+  experience: {query:'degustacao atelie experiencia Campos do Jordao', placeType:'tourist_attraction'},
+  gastronomy: {query:'queijo vinho frios coloniais Campos do Jordao', placeType:'store'},
+  events:     {query:'festival evento show Campos do Jordao', placeType:'tourist_attraction'},
+  viewpoint:  {query:'mirante vista panoramica Campos do Jordao', placeType:'tourist_attraction'},
   adventure:  {query:'aventura tirolesa arvorismo Campos do Jordao', placeType:'tourist_attraction'},
   culture:    {query:'museu arte cultura Campos do Jordao', placeType:'museum'},
   transport:  {query:'bonde trem teleferico passeio Campos do Jordao', placeType:'tourist_attraction'},
@@ -3024,6 +3147,109 @@ function initReviewModal() {
     document.body.appendChild(toast);
     setTimeout(()=>toast.remove(), 3000);
   });
+}
+
+
+/* ================================================
+   ENRIQUECIMENTO DE DADOS POR LUGAR
+================================================ */
+
+// Faixa de preço baseada no price_level do Google (0-4)
+function getPriceLabel(p){
+  const lvl = p.price_level;
+  if(lvl === undefined || lvl === null) return null;
+  const labels = ['Gratuito','R$','R$$','R$$$','R$$$$'];
+  return labels[lvl] || null;
+}
+
+// Perfis indicados baseados na categoria e reviews
+function getProfiles(p){
+  const types = p.types || [];
+  const special = p._specialType;
+  const profiles = [];
+  if(types.includes('park')||special==='adventure'||special==='viewpoint')
+    profiles.push({icon:'ti-walk',label:'Aventureiros'});
+  if(types.includes('restaurant')||types.includes('cafe'))
+    profiles.push({icon:'ti-tools-kitchen-2',label:'Gastrônomos'});
+  if(special==='chocolate'||types.includes('cafe'))
+    profiles.push({icon:'ti-heart',label:'Casais'});
+  if(types.includes('park')||types.includes('tourist_attraction'))
+    profiles.push({icon:'ti-users',label:'Famílias'});
+  if(special==='adventure'||types.includes('park'))
+    profiles.push({icon:'ti-user',label:'Solo'});
+  if(types.includes('lodging'))
+    profiles.push({icon:'ti-heart',label:'Casais'},{icon:'ti-users',label:'Famílias'});
+  if(p.rating >= 4.8)
+    profiles.push({icon:'ti-star',label:'Top avaliado'});
+  // Pet friendly — heurística por nome
+  const nm = (p.name||'').toLowerCase();
+  if(nm.includes('pet')||nm.includes('animal')||types.includes('park'))
+    profiles.push({icon:'ti-paw',label:'Pet friendly'});
+  return profiles.slice(0,5);
+}
+
+// Horários populares simulados baseados no tipo
+function getPopularHours(p){
+  const types = p.types || [];
+  const h = new Date().getHours();
+  // Padrão por tipo de lugar
+  let pattern; // 7 barras: 9h 10h 11h 12h 13h 14h 15h 16h 17h 18h 19h 20h
+  if(types.includes('restaurant')||types.includes('bar')){
+    pattern=[1,1,1,4,5,3,2,2,3,4,5,4]; // pico almoço e jantar
+  } else if(types.includes('cafe')){
+    pattern=[2,3,4,4,3,2,2,2,3,3,3,2]; // manhã e tarde
+  } else if(types.includes('park')){
+    pattern=[1,2,3,4,4,3,3,3,4,3,2,1]; // dia todo, pico meio-dia
+  } else {
+    pattern=[1,2,3,4,4,3,3,3,4,3,2,1];
+  }
+  const levels = ['low','low','mid','mid','high','mid','mid','mid','high','mid','low','low'];
+  const hours  = ['9h','10h','11h','12h','13h','14h','15h','16h','17h','18h','19h','20h'];
+  const nowIdx = Math.max(0, Math.min(11, h - 9));
+  // Dica de melhor horário
+  const minVal = Math.min(...pattern);
+  const minIdx = pattern.indexOf(minVal);
+  const tips = [
+    `Menos cheio: ${hours[minIdx]} — ótimo para evitar filas`,
+    'Mais tranquilo nas manhãs de semana',
+    'Fins de semana costumam ter espera na entrada',
+    'Chegue cedo para garantir lugar',
+  ];
+  const tip = tips[Math.abs(p.place_id.charCodeAt(0)%tips.length)] || tips[0];
+  return {pattern, levels, hours, nowIdx, tip};
+}
+
+// Informações extras (estacionamento, acessibilidade, WhatsApp)
+function getExtraInfo(p){
+  const types = p.types || [];
+  const nm    = (p.name||'').toLowerCase();
+  const chips = [];
+  // Estacionamento — heurística por tipo
+  if(types.includes('tourist_attraction')||types.includes('park'))
+    chips.push({cls:'dec-park',icon:'ti-car',label:'Estacionamento próximo'});
+  // Acessibilidade — lugares grandes geralmente têm
+  if(p.user_ratings_total > 200)
+    chips.push({cls:'dec-access',icon:'ti-accessible',label:'Acessível'});
+  // Pet friendly
+  if(types.includes('park'))
+    chips.push({cls:'dec-pet',icon:'ti-paw',label:'Aceita pets'});
+  // Preço de entrada
+  if(types.includes('park')&&nm.includes('parque'))
+    chips.push({cls:'dec-price',icon:'ti-ticket',label:'Entrada gratuita'});
+  // WhatsApp — para reservas
+  if(types.includes('restaurant')||types.includes('lodging'))
+    chips.push({cls:'dec-whats',icon:'ti-brand-whatsapp',label:'Reserva via WhatsApp'});
+  return chips.slice(0,4);
+}
+
+// Distância a pé vs carro
+function getDistanceInfo(d){
+  const walkMin  = Math.round(d / 0.08);  // ~5km/h
+  const carMin   = Math.round(d / 0.5);   // ~30km/h cidade
+  const walkStr  = walkMin < 60 ? walkMin+'min a pé' : Math.round(walkMin/60)+'h a pé';
+  const carStr   = carMin  < 60 ? carMin+'min de carro' : Math.round(carMin/60)+'h de carro';
+  if(d < 0.5) return walkStr; // perto demais para carro
+  return walkStr + ' · ' + carStr;
 }
 
 /* ================================================
