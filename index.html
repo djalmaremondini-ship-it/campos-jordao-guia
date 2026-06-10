@@ -1819,7 +1819,7 @@ function openDetail(pid){
     <div class="det-actions">
       <button class="det-btn primary" onclick="openGoogleMaps('${p.name.replace(/'/g,"\'")}',${latVal(p)},${lngVal(p)})"><i class="ti ti-navigation"></i>Como chegar</button>
       <button class="det-btn secondary" onclick="addToRoteiro('${pid}')"><i class="ti ti-route"></i>Ao roteiro</button>
-      ${phoneLink ? '<button class="det-btn whatsapp" onclick="window.open(''+phoneLink+'','_blank')"><i class="ti ti-brand-whatsapp"></i>WhatsApp</button>' : ''}
+      ${phoneLink ? '<button class="det-btn whatsapp" onclick="openWhatsApp(this)" data-url="'+phoneLink+'"><i class="ti ti-brand-whatsapp"></i>WhatsApp</button>' : ''}
     </div>
     ${p._featured?`<div class="coupon-banner" onclick="openCoupon('${pid}')"><i class="ti ti-ticket"></i><div class="coupon-banner-text"><p>Cupom exclusivo disponível</p><p>${p._coupon_desc||'Desconto especial para usuários do app'}</p></div><i class="ti ti-arrow-right" style="margin-left:auto;color:rgba(255,255,255,.6)"></i></div>`:''}
     <div class="det-section-ttl">Sobre o lugar</div>
@@ -1832,6 +1832,10 @@ function openDetail(pid){
 
 function openGoogleMaps(name,lat,lng){
   window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`,'_blank');
+}
+function openWhatsApp(btn){
+  const url=btn.dataset.url;
+  if(url) window.open(url,'_blank');
 }
 
 function toggleSave(pid){
