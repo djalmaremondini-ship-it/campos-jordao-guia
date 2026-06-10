@@ -879,6 +879,29 @@ const LS = {
   // restaura roteiro após places carregarem
   restoreRoteiro(){
     try{
+      // Checa se veio via link compartilhado (?roteiro=id1,id2,...)
+      const params=new URLSearchParams(window.location.search);
+      const sharedIds=params.get('roteiro');
+      if(sharedIds){
+        const ids=decodeURIComponent(sharedIds).split(',').filter(Boolean);
+        roteiroPlaces=ids.map(id=>allPlaces.find(p=>p.place_id===id)).filter(Boolean);
+        if(roteiroPlaces.length){
+          renderRoteiro();
+          showScreen('roteiro');
+          // Limpa a URL sem recarregar
+          window.history.replaceState({},'',window.location.pathname);
+          // Banner de boas vindas
+          setTimeout(()=>{
+            const toast=document.createElement('div');
+            toast.style.cssText='position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#2D6A4F;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2)';
+            toast.textContent='✓ Roteiro carregado com '+roteiroPlaces.length+' lugar'+(roteiroPlaces.length>1?'es':'')+'!';
+            document.body.appendChild(toast);
+            setTimeout(()=>toast.remove(),3000);
+          },600);
+          return;
+        }
+      }
+      // Senão, restaura do localStorage
       const ids=JSON.parse(localStorage.getItem('cj_roteiro')||'[]');
       if(ids.length){
         roteiroPlaces=ids.map(id=>allPlaces.find(p=>p.place_id===id)).filter(Boolean);
@@ -1681,12 +1704,31 @@ function initPainel(){
     const user=document.getElementById('painel-user').value.trim();
     const pass=document.getElementById('painel-pass').value;
     // Demo: qualquer login funciona (futuro: Firebase Auth)
-    if(user&&pass.length>=4){
+    const DEMO_USERS={
+      'demo@cjguia.com.br':'demo123',
+      'parceiro@badenbaden.com.br':'senha123',
+      'chocoland':'choco2024',
+    };
+    const validPass=DEMO_USERS[user.toLowerCase()];
+    if(validPass&&pass===validPass){
+      document.getElementById('painel-login-area').style.display='none';
+      document.getElementById('painel-dash').style.display='block';
+      const nome=user.includes('@')?user.split('@')[0]:user;
+      document.getElementById('painel-welcome').textContent='Bem-vindo, '+nome.charAt(0).toUpperCase()+nome.slice(1)+'!';
+      // Simula métricas diferentes por usuário
+      if(user==='chocoland'){
+        document.getElementById('ps-views').textContent='1.247';
+        document.getElementById('ps-checkins').textContent='183';
+        document.getElementById('ps-coupons').textContent='67';
+        document.getElementById('ps-saves').textContent='412';
+      }
+    } else if(user&&pass.length>=4){
+      // Qualquer login válido entra em modo demo
       document.getElementById('painel-login-area').style.display='none';
       document.getElementById('painel-dash').style.display='block';
       document.getElementById('painel-welcome').textContent='Bem-vindo, '+user.split('@')[0]+'!';
     } else {
-      alert('Preencha e-mail e senha (mín. 4 caracteres)');
+      alert('Preencha e-mail e senha (mín. 4 caracteres)\n\nAcesso demo:\nE-mail: demo@cjguia.com.br\nSenha: demo123');
     }
   });
   document.getElementById('painel-logout-btn').addEventListener('click',()=>{
@@ -1733,6 +1775,27 @@ window.initMap=function(){
       document.getElementById('geo-status').textContent='Usando localização central de Campos do Jordão';
     });
   }
+
+  // Injeta lugar demo com destaque + cupom (remover em produção)
+  const DEMO_FEATURED={
+    place_id:'DEMO_CHOCOLAND_001',
+    name:'Chocoland — Fábrica de Chocolate ⭐',
+    types:['store','food'],
+    _specialType:'chocolate',
+    _featured:true,
+    _coupon_desc:'15% OFF em toda a loja para usuários do app',
+    rating:4.8,
+    user_ratings_total:2041,
+    vicinity:'Av. Dr. Adhemar de Barros, 3900 — Campos do Jordão',
+    opening_hours:{isOpen:()=>true},
+    geometry:{location:{lat:()=>-22.7312,lng:()=>-45.6001}},
+    photos:null,
+    reviews:[
+      {author_name:'Ana Paula',rating:5,text:'Melhor fábrica de chocolate da Serra! Visita imperdível, os funcionários explicam todo o processo.'},
+      {author_name:'Carlos M.',rating:5,text:'Cupom do app funcionou perfeitamente, economizamos bastante. Voltaremos com certeza!'},
+    ]
+  };
+  allPlaces.unshift(DEMO_FEATURED);
 
   fetchPlaces('all');
 
