@@ -428,6 +428,49 @@ html,body{height:100%;background:#e0ddd6;font-family:'DM Sans',sans-serif}
 .day-max{font-size:13px;font-weight:500;color:var(--text)}
 .w-credit{text-align:center;padding:12px 0 16px;font-size:10px;color:#bbb}
 
+
+/* ===== CHECKIN / BADGE DESTAQUE ===== */
+.det-checkin-btn{width:100%;padding:13px;border-radius:12px;border:none;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;background:#f0f8f4;color:var(--green);border:.5px solid #b7dfc9}
+.det-checkin-btn.done{background:#d8efd8;color:#1a5c36}
+.det-checkin-btn i{font-size:18px}
+.featured-badge{position:absolute;top:7px;left:7px;background:linear-gradient(135deg,#B7791F,#e8a838);color:#fff;font-size:9px;font-weight:600;padding:3px 8px;border-radius:10px;z-index:3;display:flex;align-items:center;gap:3px;letter-spacing:.3px}
+.featured-badge i{font-size:10px}
+.coupon-banner{background:linear-gradient(135deg,#B7791F,#d4902a);border-radius:14px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px;cursor:pointer}
+.coupon-banner i{font-size:24px;color:#fff;flex-shrink:0}
+.coupon-banner-text p:first-child{font-size:13px;font-weight:500;color:#fff}
+.coupon-banner-text p:last-child{font-size:11px;color:rgba(255,255,255,.7)}
+/* VISITED LIST */
+.visited-list{display:flex;flex-direction:column;gap:8px}
+.visited-item{background:var(--card);border-radius:12px;border:.5px solid var(--border);padding:10px 12px;display:flex;align-items:center;gap:10px}
+.visited-item .vi-img{width:40px;height:40px;border-radius:9px;overflow:hidden;flex-shrink:0;background:#e8f4e8;display:flex;align-items:center;justify-content:center}
+.visited-item .vi-img img{width:100%;height:100%;object-fit:cover}
+.visited-item .vi-info{flex:1;min-width:0}
+.visited-item .vi-name{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.visited-item .vi-date{font-size:11px;color:var(--muted);margin-top:1px}
+.visited-item .vi-badge{font-size:10px;font-weight:500;padding:3px 8px;border-radius:8px;background:#d8efd8;color:#1a5c36;flex-shrink:0}
+/* SHARE ROTEIRO */
+.share-rot-btn{background:#f0f8f4;color:var(--green);border:.5px solid #b7dfc9;border-radius:12px;padding:12px;text-align:center;cursor:pointer;font-weight:500;font-size:13px;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:6px}
+.share-rot-btn i{font-size:16px}
+/* COUPON MODAL */
+.coupon-qr-wrap{background:#f8f6f2;border-radius:14px;padding:20px;text-align:center;margin-bottom:16px}
+.coupon-qr-wrap canvas{border-radius:8px}
+.coupon-code{font-size:22px;font-weight:700;letter-spacing:4px;color:var(--text);margin:10px 0 4px;font-family:'Playfair Display',serif}
+.coupon-val{font-size:13px;color:var(--muted)}
+.coupon-exp{font-size:11px;color:var(--sub);margin-top:4px}
+/* PAINEL DONO */
+.painel-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.painel-stat{background:#f8f6f2;border-radius:12px;padding:14px;text-align:center}
+.painel-stat .psval{font-size:24px;font-weight:600;color:var(--green)}
+.painel-stat .pslbl{font-size:11px;color:var(--muted);margin-top:2px}
+.painel-plan{border-radius:14px;padding:16px;margin-bottom:14px;border:.5px solid var(--border)}
+.painel-plan.active-plan{background:#f0f8f4;border-color:#b7dfc9}
+.painel-plan h3{font-size:15px;font-weight:500;color:var(--text);margin-bottom:4px}
+.painel-plan p{font-size:12px;color:var(--muted);line-height:1.5}
+.painel-plan .plan-price{font-size:18px;font-weight:600;color:var(--green);margin-top:8px}
+.painel-plan .plan-btn{margin-top:10px;width:100%;padding:10px;border-radius:10px;border:none;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
+.painel-plan .plan-btn.current{background:#d8efd8;color:#1a5c36}
+.painel-plan .plan-btn.upgrade{background:var(--green);color:#fff}
+
 /* ===== SPINNER ===== */
 .spinner{width:22px;height:22px;border:2.5px solid var(--border-light);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -582,7 +625,7 @@ html,body{height:100%;background:#e0ddd6;font-family:'DM Sans',sans-serif}
       <div class="prof-name-d" id="prof-name-d">Visitante</div>
       <div class="prof-sub-d" id="prof-sub-d">Bem-vindo a Campos do Jordão</div>
       <div class="prof-stats">
-        <div class="pstat"><div class="psn" id="ps-visited">0</div><div class="psl">Visitados</div></div>
+        <div class="pstat" style="cursor:pointer" onclick="document.getElementById('prof-visited-grid').scrollIntoView({behavior:'smooth'})"><div class="psn" id="ps-visited">0</div><div class="psl">Visitados</div></div>
         <div class="pstat"><div class="psn" id="ps-saved">0</div><div class="psl">Salvos</div></div>
         <div class="pstat"><div class="psn" id="ps-reviews">0</div><div class="psl">Avaliações</div></div>
       </div>
@@ -599,9 +642,94 @@ html,body{height:100%;background:#e0ddd6;font-family:'DM Sans',sans-serif}
         <div class="prof-menu-item" id="pref-lang"><i class="ti ti-language lead"></i><span class="pm-label">Idioma</span><span class="pm-val">Português</span><i class="ti ti-chevron-right trail"></i></div>
       </div>
       <div class="prof-section">
+        <div class="prof-sec-ttl">Lugares visitados</div>
+        <div id="prof-visited-grid" class="visited-list"><div class="empty-state"><i class="ti ti-map-pin"></i>Nenhum check-in ainda.</div></div>
+      </div>
+      <div class="prof-section">
+        <div class="prof-sec-ttl">Para estabelecimentos</div>
+        <div class="prof-menu-item" id="open-painel-btn"><i class="ti ti-building-store lead"></i><span class="pm-label">Painel do Parceiro</span><span class="pm-val" style="font-size:10px;background:#d8efd8;color:#1a5c36;padding:2px 7px;border-radius:8px;font-weight:500">NOVO</span><i class="ti ti-chevron-right trail"></i></div>
+      </div>
+      <div class="prof-section">
         <div class="prof-sec-ttl">Sobre</div>
         <div class="prof-menu-item"><i class="ti ti-info-circle lead"></i><span class="pm-label">Sobre o app</span><i class="ti ti-chevron-right trail"></i></div>
         <div class="prof-menu-item"><i class="ti ti-help lead"></i><span class="pm-label">Ajuda & Suporte</span><i class="ti ti-chevron-right trail"></i></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== COUPON SCREEN ===== -->
+  <div class="screen" id="screen-coupon" style="padding-bottom:70px">
+    <div class="list-hdr">
+      <div class="back-btn" id="coupon-back"><i class="ti ti-arrow-left"></i></div>
+      <div><h2>Cupom de Desconto</h2><p id="coupon-place-name">–</p></div>
+    </div>
+    <div style="padding:16px" id="coupon-body">
+      <div class="coupon-qr-wrap">
+        <canvas id="qr-canvas" width="180" height="180"></canvas>
+        <div class="coupon-code" id="coupon-code">–</div>
+        <div class="coupon-val" id="coupon-val">–</div>
+        <div class="coupon-exp" id="coupon-exp">–</div>
+      </div>
+      <div style="background:#fff;border-radius:14px;border:.5px solid var(--border);padding:14px;font-size:13px;color:var(--muted);line-height:1.6">
+        <strong style="color:var(--text);display:block;margin-bottom:6px">Como usar</strong>
+        Mostre este QR Code ou o código na hora do pagamento. O desconto é aplicado automaticamente. Válido para uma utilização por visita.
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PAINEL DO ESTABELECIMENTO ===== -->
+  <div class="screen" id="screen-painel" style="padding-bottom:70px">
+    <div class="map-full-hdr" style="padding-bottom:18px;display:flex;align-items:center;gap:12px">
+      <div class="back-btn" id="painel-back" style="flex-shrink:0"><i class="ti ti-arrow-left"></i></div>
+      <h2>Painel do Estabelecimento</h2>
+    </div>
+    <div style="padding:14px" id="painel-body">
+      <div id="painel-login-area">
+        <div style="text-align:center;padding:20px 0 24px">
+          <i class="ti ti-building-store" style="font-size:44px;color:var(--green);display:block;margin-bottom:10px"></i>
+          <p style="font-size:15px;font-weight:500;color:var(--text);margin-bottom:4px">Área do Parceiro</p>
+          <p style="font-size:13px;color:var(--muted)">Entre com as credenciais do seu estabelecimento</p>
+        </div>
+        <div class="form-field"><label class="form-label">E-mail ou CNPJ</label><input class="form-input" id="painel-user" type="text" placeholder="seu@estabelecimento.com"/></div>
+        <div class="form-field"><label class="form-label">Senha</label><input class="form-input" id="painel-pass" type="password" placeholder="••••••••"/></div>
+        <button class="modal-btn save" style="width:100%;padding:13px;border-radius:12px;font-size:14px;margin-top:4px" id="painel-login-btn">Entrar</button>
+        <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:14px">Não é parceiro ainda? <span style="color:var(--green);cursor:pointer;font-weight:500" id="painel-cadastro-link">Saiba mais</span></p>
+      </div>
+      <div id="painel-dash" style="display:none">
+        <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--text);margin-bottom:16px" id="painel-welcome">Bem-vindo!</div>
+        <div class="painel-stat-grid">
+          <div class="painel-stat"><div class="psval" id="ps-views">247</div><div class="pslbl">Visualizações esta semana</div></div>
+          <div class="painel-stat"><div class="psval" id="ps-checkins">38</div><div class="pslbl">Check-ins este mês</div></div>
+          <div class="painel-stat"><div class="psval" id="ps-coupons">12</div><div class="pslbl">Cupons resgatados</div></div>
+          <div class="painel-stat"><div class="psval" id="ps-saves">94</div><div class="pslbl">Salvos pelos turistas</div></div>
+        </div>
+        <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:10px">Meu plano atual</div>
+        <div class="painel-plan active-plan">
+          <h3>🟢 Plano Gratuito</h3>
+          <p>Listagem básica, aparece nos resultados de busca sem destaque.</p>
+          <div class="plan-price">R$ 0/mês</div>
+          <button class="plan-btn current" disabled>Plano atual</button>
+        </div>
+        <div style="font-size:13px;font-weight:500;color:var(--text);margin:14px 0 10px">Upgrade disponível</div>
+        <div class="painel-plan">
+          <h3>⭐ Plano Visibilidade — R$199/mês</h3>
+          <p>Aparece no topo da categoria, badge "Destaque" nos cards, notificação push quando turista está a 500m.</p>
+          <button class="plan-btn upgrade" onclick="alert('Em breve! Entre em contato: parceiros@cjguia.com.br')">Quero este plano</button>
+        </div>
+        <div class="painel-plan">
+          <h3>🎫 Plano Cupom — R$299/mês</h3>
+          <p>Tudo do Visibilidade + crie cupons exclusivos para usuários do app com QR Code validável.</p>
+          <button class="plan-btn upgrade" onclick="alert('Em breve! Entre em contato: parceiros@cjguia.com.br')">Quero este plano</button>
+        </div>
+        <div class="painel-plan">
+          <h3>📅 Plano Reserva — R$499/mês + 4%</h3>
+          <p>Tudo do Cupom + reservas direto no app. Turista reserva mesa ou passeio sem sair do guia.</p>
+          <button class="plan-btn upgrade" onclick="alert('Em breve! Entre em contato: parceiros@cjguia.com.br')">Quero este plano</button>
+        </div>
+        <div style="margin-top:16px">
+          <button class="modal-btn cancel" style="width:100%;padding:12px;border-radius:12px" id="painel-logout-btn">Sair da conta</button>
+        </div>
       </div>
     </div>
   </div>
@@ -713,6 +841,8 @@ let mapHome, mapFull, fullInited=false;
 let userLat=CJ.lat, userLng=CJ.lng;
 let allPlaces=[], homeMarkers=[], fullMarkers=[];
 let savedIds=new Set();
+let checkedInIds=new Set(); // {place_id: date}
+let checkedInDates={};
 let prevScreen='home';
 let searchRadius=5000;
 let listPlaces=[], listSort='rating';
@@ -720,6 +850,46 @@ let listCatFilter='all', listSubFilter=null, listSubfilterPlaces=null;
 let profile={name:'Visitante',city:'',bio:''};
 let weatherData=null;
 let roteiroPlaces=[];
+
+/* ================================================
+   PERSISTÊNCIA — localStorage
+================================================ */
+const LS = {
+  save(){
+    try{
+      localStorage.setItem('cj_profile', JSON.stringify(profile));
+      localStorage.setItem('cj_saved',   JSON.stringify([...savedIds]));
+      localStorage.setItem('cj_checkins',JSON.stringify(checkedInDates));
+      localStorage.setItem('cj_roteiro', JSON.stringify(roteiroPlaces.map(p=>p.place_id)));
+      localStorage.setItem('cj_radius',  searchRadius);
+    }catch(e){}
+  },
+  load(){
+    try{
+      const p=localStorage.getItem('cj_profile');
+      if(p) profile=JSON.parse(p);
+      const s=localStorage.getItem('cj_saved');
+      if(s) savedIds=new Set(JSON.parse(s));
+      const c=localStorage.getItem('cj_checkins');
+      if(c){ checkedInDates=JSON.parse(c); checkedInIds=new Set(Object.keys(checkedInDates)); }
+      const r=localStorage.getItem('cj_radius');
+      if(r) searchRadius=parseInt(r);
+    }catch(e){}
+  },
+  // restaura roteiro após places carregarem
+  restoreRoteiro(){
+    try{
+      const ids=JSON.parse(localStorage.getItem('cj_roteiro')||'[]');
+      if(ids.length){
+        roteiroPlaces=ids.map(id=>allPlaces.find(p=>p.place_id===id)).filter(Boolean);
+        if(roteiroPlaces.length) renderRoteiro();
+      }
+    }catch(e){}
+  }
+};
+
+// Carrega dados ao iniciar
+LS.load();
 
 /* ================================================
    SCREEN NAVIGATION
@@ -748,8 +918,9 @@ function renderFeatured(places){
     const url=photoUrl(p);
     const ob=p.opening_hours?(p.opening_hours.isOpen()?'<span class="cbadge open">Aberto</span>':'<span class="cbadge closed">Fechado</span>'):'';
     const img=url?`<img src="${url}" alt="${p.name}" onerror="this.style.display='none'">`:'';
+    const featBadge=p._featured?`<div class="featured-badge"><i class="ti ti-star-filled"></i>DESTAQUE</div>`:'';
     return `<div class="pcard" data-pid="${p.place_id}">
-      <div class="cimg-wrap ${c.cls}">${img}<i class="ti ${c.icon} fall"></i>${ob}</div>
+      <div class="cimg-wrap ${c.cls}">${img}<i class="ti ${c.icon} fall"></i>${ob}${featBadge}</div>
       <div class="cbody">
         <div class="cname">${p.name}</div>
         <div class="cmeta"><span class="ccat">${c.label}</span><span class="cdist"><i class="ti ti-walk"></i>${d.toFixed(1)}km</span></div>
@@ -1026,10 +1197,15 @@ function openDetail(pid){
       <div class="det-info-card"><i class="ti ti-clock"></i><div><div class="dil">Funcionamento</div><div class="div">${openStr}</div></div></div>
       <div class="det-info-card"><i class="ti ti-clock-hour-4"></i><div><div class="dil">Tempo estimado</div><div class="div">${c.time}</div></div></div>
     </div>
+    <button class="det-checkin-btn ${checkedInIds.has(pid)?'done':''}" id="det-checkin-btn" onclick="toggleCheckin('${pid}')">
+      <i class="ti ${checkedInIds.has(pid)?'ti-circle-check-filled':'ti-circle-check'}"></i>
+      ${checkedInIds.has(pid)?'Visitei este lugar!':'Fazer check-in aqui'}
+    </button>
     <div class="det-actions">
       <button class="det-btn primary" onclick="openGoogleMaps('${p.name.replace(/'/g,"\\'")}',${p.geometry.location.lat()},${p.geometry.location.lng()})"><i class="ti ti-navigation"></i>Como chegar</button>
       <button class="det-btn secondary" onclick="addToRoteiro('${pid}')"><i class="ti ti-route"></i>Ao roteiro</button>
     </div>
+    ${p._featured?`<div class="coupon-banner" onclick="openCoupon('${pid}')"><i class="ti ti-ticket"></i><div class="coupon-banner-text"><p>Cupom exclusivo disponível</p><p>${p._coupon_desc||'Desconto especial para usuários do app'}</p></div><i class="ti ti-arrow-right" style="margin-left:auto;color:rgba(255,255,255,.6)"></i></div>`:''}
     <div class="det-section-ttl">Sobre o lugar</div>
     <div class="det-desc">Localizado em Campos do Jordão, ${p.name} é um dos destinos mais procurados da região. ${p.rating&&p.rating>=4.5?'Altamente recomendado pelos visitantes com nota excelente no Google.':p.rating&&p.rating>=4.0?'Muito bem avaliado pelos turistas que visitaram.':'Um destino interessante para incluir no roteiro.'}</div>
     ${revsHtml}
@@ -1047,6 +1223,27 @@ function toggleSave(pid){
   const btn=document.getElementById('det-save');
   if(btn) btn.className='det-hero-save'+(savedIds.has(pid)?' saved':'');
   document.getElementById('ps-saved').textContent=savedIds.size;
+  LS.save();
+}
+
+function toggleCheckin(pid){
+  if(checkedInIds.has(pid)){
+    checkedInIds.delete(pid);
+    delete checkedInDates[pid];
+  } else {
+    checkedInIds.add(pid);
+    checkedInDates[pid]={name:allPlaces.find(p=>p.place_id===pid)?.name||'',date:new Date().toLocaleDateString('pt-BR')};
+  }
+  document.getElementById('ps-visited').textContent=checkedInIds.size;
+  // atualiza botão de checkin se estiver na tela de detalhe
+  const btn=document.getElementById('det-checkin-btn');
+  if(btn){
+    btn.className='det-checkin-btn'+(checkedInIds.has(pid)?' done':'');
+    btn.innerHTML=checkedInIds.has(pid)
+      ?'<i class="ti ti-circle-check-filled"></i>Visitei este lugar!'
+      :'<i class="ti ti-circle-check"></i>Fazer check-in aqui';
+  }
+  LS.save();
 }
 
 function addToRoteiro(pid){
@@ -1106,14 +1303,18 @@ function renderRoteiro(){
     <div style="background:var(--green);color:#fff;border-radius:12px;padding:13px;text-align:center;cursor:pointer;font-weight:500;font-size:14px;margin-top:16px" id="start-rot-btn">
       <i class="ti ti-navigation" style="vertical-align:-2px;margin-right:6px"></i>Iniciar navegação
     </div>
+    <div class="share-rot-btn" id="share-rot-btn">
+      <i class="ti ti-share"></i>Compartilhar roteiro
+    </div>
   `;
-  document.getElementById('clear-rot').addEventListener('click',()=>{roteiroPlaces=[];renderRoteiro();});
+  document.getElementById('clear-rot').addEventListener('click',()=>{roteiroPlaces=[];LS.save();renderRoteiro();});
   document.getElementById('start-rot-btn').addEventListener('click',()=>{
     if(sorted.length>0){
       const p=sorted[0];
       openGoogleMaps(p.name,p.geometry.location.lat(),p.geometry.location.lng());
     }
   });
+  document.getElementById('share-rot-btn').addEventListener('click',shareRoteiro);
   steps.querySelectorAll('.rot-card').forEach(card=>card.addEventListener('click',()=>openDetail(card.dataset.pid)));
 }
 
@@ -1124,15 +1325,41 @@ function refreshProfile(){
   document.getElementById('prof-name-d').textContent=profile.name||'Visitante';
   document.getElementById('prof-sub-d').textContent=profile.city?`${profile.city} · Bem-vindo!`:'Bem-vindo a Campos do Jordão';
   document.getElementById('ps-saved').textContent=savedIds.size;
+  document.getElementById('ps-visited').textContent=checkedInIds.size;
+
+  // Salvos
   const sg=document.getElementById('prof-saved-grid');
-  if(!savedIds.size){sg.innerHTML='<div class="empty-state" style="grid-column:1/-1"><i class="ti ti-heart"></i>Nenhum lugar salvo ainda.</div>';return;}
-  const saved=allPlaces.filter(p=>savedIds.has(p.place_id));
-  sg.innerHTML=saved.map(p=>{
-    const c=cfg(p.types,p._specialType);const url=photoUrl(p,200);
-    const img=url?`<img src="${url}" alt="${p.name}" onerror="this.style.display='none'">`:`<i class="ti ${c.icon}"></i>`;
-    return `<div class="saved-card" data-pid="${p.place_id}"><div class="saved-img ${c.cls}">${img}</div><div class="saved-body"><div class="saved-name">${p.name}</div><div class="saved-sub">${c.label}</div></div></div>`;
-  }).join('');
-  sg.querySelectorAll('.saved-card').forEach(card=>card.addEventListener('click',()=>openDetail(card.dataset.pid)));
+  if(!savedIds.size){
+    sg.innerHTML='<div class="empty-state" style="grid-column:1/-1"><i class="ti ti-heart"></i>Nenhum lugar salvo ainda.</div>';
+  } else {
+    const saved=allPlaces.filter(p=>savedIds.has(p.place_id));
+    sg.innerHTML=saved.map(p=>{
+      const c=cfg(p.types,p._specialType);const url=photoUrl(p,200);
+      const img=url?`<img src="${url}" alt="${p.name}" onerror="this.style.display='none'">`:`<i class="ti ${c.icon}"></i>`;
+      return `<div class="saved-card" data-pid="${p.place_id}"><div class="saved-img ${c.cls}">${img}</div><div class="saved-body"><div class="saved-name">${p.name}</div><div class="saved-sub">${c.label}</div></div></div>`;
+    }).join('');
+    sg.querySelectorAll('.saved-card').forEach(card=>card.addEventListener('click',()=>openDetail(card.dataset.pid)));
+  }
+
+  // Visitados
+  const vg=document.getElementById('prof-visited-grid');
+  if(!checkedInIds.size){
+    vg.innerHTML='<div class="empty-state"><i class="ti ti-map-pin"></i>Nenhum check-in ainda.</div>';
+  } else {
+    const visited=Object.entries(checkedInDates);
+    vg.innerHTML=visited.map(([pid,info])=>{
+      const p=allPlaces.find(x=>x.place_id===pid);
+      const url=p?photoUrl(p,100):null;
+      const img=url?`<img src="${url}" onerror="this.style.display='none'">`:'';
+      const c=p?cfg(p.types,p._specialType):TC.default;
+      return `<div class="visited-item" data-pid="${pid}" style="cursor:pointer">
+        <div class="vi-img ${c.cls}">${img}<i class="ti ${c.icon}" style="font-size:18px;opacity:.4;${url?'display:none':''}"></i></div>
+        <div class="vi-info"><div class="vi-name">${info.name||'Lugar'}</div><div class="vi-date">${info.date}</div></div>
+        <div class="vi-badge">✓ Visitei</div>
+      </div>`;
+    }).join('');
+    vg.querySelectorAll('.visited-item').forEach(item=>item.addEventListener('click',()=>openDetail(item.dataset.pid)));
+  }
 }
 
 /* ================================================
@@ -1233,6 +1460,7 @@ function fetchPlaces(type){
       renderNear(allPlaces);
       addMarkers(mapHome,allPlaces,homeMarkers);
       if(fullInited) addMarkers(mapFull,allPlaces,fullMarkers);
+      LS.restoreRoteiro();
     }
   }
 
@@ -1386,6 +1614,92 @@ async function openWeatherPopup(){
   }
 }
 
+
+/* ================================================
+   CUPOM + QR CODE
+================================================ */
+function openCoupon(pid){
+  const p=allPlaces.find(x=>x.place_id===pid);
+  if(!p)return;
+  document.getElementById('coupon-place-name').textContent=p.name;
+  const code='CJ'+Math.random().toString(36).substr(2,6).toUpperCase();
+  document.getElementById('coupon-code').textContent=code;
+  document.getElementById('coupon-val').textContent=p._coupon_desc||'10% de desconto na conta';
+  const exp=new Date();exp.setDate(exp.getDate()+7);
+  document.getElementById('coupon-exp').textContent='Válido até '+exp.toLocaleDateString('pt-BR');
+  // QR simples desenhado no canvas
+  drawQR(code+'|'+pid);
+  prevScreen=document.querySelector('.screen.active')?.id?.replace('screen-','')||'detail';
+  showScreen('coupon');
+}
+
+function drawQR(text){
+  const canvas=document.getElementById('qr-canvas');
+  const ctx=canvas.getContext('2d');
+  const size=180,cells=21,cell=Math.floor(size/cells);
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,size,size);
+  ctx.fillStyle='#1a1a1a';
+  // seed hash do texto para padrão determinístico
+  let hash=0;for(let i=0;i<text.length;i++) hash=(hash*31+text.charCodeAt(i))&0xfffffff;
+  for(let r=0;r<cells;r++){
+    for(let c=0;c<cells;c++){
+      // cantos fixos (finder patterns)
+      const inFinder=(r<7&&c<7)||(r<7&&c>=cells-7)||(r>=cells-7&&c<7);
+      let fill=false;
+      if(inFinder){
+        const lr=r<7?r:r-(cells-7),lc=c<7?c:c-(cells-7);
+        fill=(lr===0||lr===6||lc===0||lc===6||(lr>=2&&lr<=4&&lc>=2&&lc<=4));
+      } else {
+        fill=((hash^(r*cells+c)*2654435761)&1)===1;
+      }
+      if(fill){ctx.fillRect(c*cell+1,r*cell+1,cell-1,cell-1);}
+    }
+  }
+}
+
+/* ================================================
+   SHARE ROTEIRO
+================================================ */
+function shareRoteiro(){
+  const ids=roteiroPlaces.map(p=>p.place_id).join(',');
+  const url=window.location.origin+window.location.pathname+'?roteiro='+encodeURIComponent(ids);
+  if(navigator.share){
+    navigator.share({title:'Meu Roteiro em Campos do Jordão',text:'Veja o roteiro que montei!',url});
+  } else {
+    navigator.clipboard.writeText(url).then(()=>{
+      alert('Link copiado!\n'+url);
+    }).catch(()=>alert('Link: '+url));
+  }
+}
+
+/* ================================================
+   PAINEL DO ESTABELECIMENTO
+================================================ */
+function initPainel(){
+  document.getElementById('painel-back').onclick=()=>showScreen('profile');
+  document.getElementById('painel-login-btn').addEventListener('click',()=>{
+    const user=document.getElementById('painel-user').value.trim();
+    const pass=document.getElementById('painel-pass').value;
+    // Demo: qualquer login funciona (futuro: Firebase Auth)
+    if(user&&pass.length>=4){
+      document.getElementById('painel-login-area').style.display='none';
+      document.getElementById('painel-dash').style.display='block';
+      document.getElementById('painel-welcome').textContent='Bem-vindo, '+user.split('@')[0]+'!';
+    } else {
+      alert('Preencha e-mail e senha (mín. 4 caracteres)');
+    }
+  });
+  document.getElementById('painel-logout-btn').addEventListener('click',()=>{
+    document.getElementById('painel-login-area').style.display='block';
+    document.getElementById('painel-dash').style.display='none';
+    document.getElementById('painel-user').value='';
+    document.getElementById('painel-pass').value='';
+  });
+  document.getElementById('painel-cadastro-link').addEventListener('click',()=>{
+    alert('Entre em contato:\nparceiros@cjguia.com.br\n\nPlanos a partir de R$199/mês');
+  });
+}
+
 /* ================================================
    INIT GOOGLE MAPS CALLBACK
 ================================================ */
@@ -1396,6 +1710,15 @@ window.initMap=function(){
   document.getElementById('map-home-loading').style.display='none';
 
   // geolocation
+  // Aplica preferências salvas
+  document.getElementById('pref-radius-val').textContent=`${searchRadius/1000} km`;
+  if(profile.name&&profile.name!=='Visitante'){
+    document.getElementById('prof-name-d').textContent=profile.name;
+    document.getElementById('prof-sub-d').textContent=profile.city?`${profile.city} · Bem-vindo!`:'Bem-vindo a Campos do Jordão';
+  }
+  document.getElementById('ps-saved').textContent=savedIds.size;
+  document.getElementById('ps-visited').textContent=checkedInIds.size;
+
   if(navigator.geolocation){
     navigator.geolocation.getCurrentPosition(pos=>{
       userLat=pos.coords.latitude;
@@ -1475,11 +1798,14 @@ window.initMap=function(){
   // roteiro
   document.getElementById('rot-banner').addEventListener('click',()=>showScreen('roteiro'));
   document.getElementById('criar-rot-btn').addEventListener('click',()=>{
-    // add top rated as suggestions
     const top=[...allPlaces].sort((a,b)=>(b.rating||0)-(a.rating||0)).slice(0,4);
     top.forEach(p=>{if(!roteiroPlaces.find(x=>x.place_id===p.place_id)) roteiroPlaces.push(p);});
     renderRoteiro();
+    LS.save();
   });
+  document.getElementById('coupon-back').addEventListener('click',()=>showScreen(prevScreen));
+  document.getElementById('open-painel-btn').addEventListener('click',()=>showScreen('painel'));
+  initPainel();
 
   // weather
   document.getElementById('weather-chip-btn').addEventListener('click',openWeatherPopup);
@@ -1501,6 +1827,7 @@ window.initMap=function(){
     profile.bio=document.getElementById('edit-bio').value;
     document.getElementById('modal-profile').style.display='none';
     refreshProfile();
+    LS.save();
   });
 
   // radius
@@ -1517,6 +1844,7 @@ window.initMap=function(){
     });
     opt.classList.add('active-opt');
     document.getElementById('modal-radius').style.display='none';
+    LS.save();
     fetchPlaces('all');
   });
 
