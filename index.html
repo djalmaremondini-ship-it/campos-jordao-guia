@@ -698,7 +698,7 @@ let savedIds=new Set();
 let prevScreen='home';
 let searchRadius=5000;
 let listPlaces=[], listSort='rating';
-let listCatFilter='all', listSubFilter=null;
+let listCatFilter='all', listSubFilter=null, listSubfilterPlaces=null;
 let profile={name:'Visitante',city:'',bio:''};
 let weatherData=null;
 let roteiroPlaces=[];
@@ -768,59 +768,78 @@ function renderNear(places){
    LIST ALL — filtros de categoria + subfiltros
 ================================================ */
 
-// Subfiltros por categoria — detectados nos types do Google Places
+// Subfiltros por categoria
+// mode:'type'  → filtra pelo array types do Google Places (funciona bem)
+// mode:'search' → faz nova busca no Places API com keyword (para culinária, onde o tipo é sempre 'restaurant')
 const SUBFILTERS = {
   tourist_attraction: [
-    {label:'Passeio livre',   match:['park','tourist_attraction']},
-    {label:'Museu',           match:['museum']},
-    {label:'Mirante',         match:['point_of_interest']},
-    {label:'Igreja / Capela', match:['church','place_of_worship']},
-    {label:'Monumento',       match:['premise','establishment']},
+    {label:'Museu',           mode:'type',   match:['museum']},
+    {label:'Igreja / Capela', mode:'type',   match:['church','place_of_worship']},
+    {label:'Parque',          mode:'type',   match:['park']},
+    {label:'Ponto histórico', mode:'type',   match:['tourist_attraction']},
   ],
   park: [
-    {label:'Trilha',          match:['park','natural_feature']},
-    {label:'Jardim',          match:['park']},
-    {label:'Cachoeira',       match:['natural_feature']},
-    {label:'Camping',         match:['campground']},
+    {label:'Trilha',          mode:'search', placeType:'park',        kw:'trilha Campos do Jordão'},
+    {label:'Jardim',          mode:'search', placeType:'park',        kw:'jardim Campos do Jordão'},
+    {label:'Cachoeira',       mode:'search', placeType:'park',        kw:'cachoeira Campos do Jordão'},
+    {label:'Camping',         mode:'type',   match:['campground']},
   ],
   restaurant: [
-    {label:'Italiano',        match:['restaurant'], kw:'italian'},
-    {label:'Suíço / Europeu', match:['restaurant'], kw:'swiss'},
-    {label:'Brasileiro',      match:['restaurant'], kw:'brazilian'},
-    {label:'Churrasco',       match:['restaurant'], kw:'churrasco'},
-    {label:'Pizza',           match:['restaurant'], kw:'pizza'},
-    {label:'Frutos do mar',   match:['restaurant'], kw:'seafood'},
-    {label:'Vegano',          match:['restaurant'], kw:'vegan'},
+    {label:'Italiano',        mode:'search', placeType:'restaurant',  kw:'restaurante italiano Campos do Jordão'},
+    {label:'Suíço / Europeu', mode:'search', placeType:'restaurant',  kw:'restaurante suíço europeu Campos do Jordão'},
+    {label:'Churrasco',       mode:'search', placeType:'restaurant',  kw:'churrascaria Campos do Jordão'},
+    {label:'Pizza',           mode:'search', placeType:'restaurant',  kw:'pizzaria Campos do Jordão'},
+    {label:'Frutos do mar',   mode:'search', placeType:'restaurant',  kw:'frutos do mar Campos do Jordão'},
+    {label:'Japonês',         mode:'search', placeType:'restaurant',  kw:'restaurante japonês Campos do Jordão'},
+    {label:'Vegano',          mode:'search', placeType:'restaurant',  kw:'restaurante vegano vegetariano Campos do Jordão'},
+    {label:'Café & Bistrô',   mode:'search', placeType:'restaurant',  kw:'bistrô café Campos do Jordão'},
   ],
   cafe: [
-    {label:'Chocolate',       match:['cafe'], kw:'chocolate'},
-    {label:'Café colonial',   match:['cafe'], kw:'colonial'},
-    {label:'Padaria',         match:['bakery']},
-    {label:'Sorveteria',      match:['ice_cream']},
+    {label:'Chocolate',       mode:'search', placeType:'cafe',        kw:'chocolate café Campos do Jordão'},
+    {label:'Café colonial',   mode:'search', placeType:'cafe',        kw:'café colonial Campos do Jordão'},
+    {label:'Padaria',         mode:'type',   match:['bakery']},
+    {label:'Sorveteria',      mode:'search', placeType:'cafe',        kw:'sorveteria Campos do Jordão'},
   ],
   bar: [
-    {label:'Cervejaria',      match:['bar'], kw:'cerveja'},
-    {label:'Pub',             match:['bar'], kw:'pub'},
-    {label:'Vinho',           match:['bar'], kw:'vinho'},
+    {label:'Cervejaria',      mode:'search', placeType:'bar',         kw:'cervejaria Campos do Jordão'},
+    {label:'Pub',             mode:'search', placeType:'bar',         kw:'pub bar Campos do Jordão'},
+    {label:'Vinho',           mode:'search', placeType:'bar',         kw:'vinho adega Campos do Jordão'},
   ],
   shopping_mall: [
-    {label:'Artesanato',      match:['store'], kw:'artesanato'},
-    {label:'Chocolates',      match:['store'], kw:'chocolate'},
-    {label:'Roupas',          match:['clothing_store']},
-    {label:'Souvenirs',       match:['store'], kw:'souvenir'},
+    {label:'Artesanato',      mode:'search', placeType:'store',       kw:'artesanato Campos do Jordão'},
+    {label:'Chocolates',      mode:'search', placeType:'store',       kw:'loja chocolate Campos do Jordão'},
+    {label:'Roupas',          mode:'type',   match:['clothing_store']},
+    {label:'Souvenirs',       mode:'search', placeType:'store',       kw:'souvenir lembrança Campos do Jordão'},
   ],
 };
 
+// Cache de buscas por subfiltro pra não repetir chamadas
+const subfiltroCache = {};
+
 function placeMatchesSubfilter(p, sf) {
-  if (!sf) return true;
+  if (!sf || sf.mode === 'search') return true; // search usa fetchSubfilter
   const types = p.types || [];
-  const name  = (p.name || '').toLowerCase();
-  const vicinity = (p.vicinity || '').toLowerCase();
-  const typeMatch = sf.match.some(t => types.includes(t));
-  if (sf.kw) {
-    return typeMatch && (name.includes(sf.kw) || vicinity.includes(sf.kw));
-  }
-  return typeMatch;
+  return sf.match.some(t => types.includes(t));
+}
+
+// Busca Places API por keyword quando mode==='search'
+function fetchSubfilter(sf, callback) {
+  const cacheKey = sf.kw;
+  if (subfiltroCache[cacheKey]) { callback(subfiltroCache[cacheKey]); return; }
+  const service = new google.maps.places.PlacesService(mapHome);
+  const center  = new google.maps.LatLng(userLat, userLng);
+  service.nearbySearch({
+    location: center,
+    radius: searchRadius,
+    type: sf.placeType,
+    keyword: sf.kw
+  }, (results, status) => {
+    const res = (status === google.maps.places.PlacesServiceStatus.OK && results) ? results : [];
+    subfiltroCache[cacheKey] = res;
+    // merge nos allPlaces pra não perder dados
+    res.forEach(r => { if (!allPlaces.find(x => x.place_id === r.place_id)) allPlaces.push(r); });
+    callback(res);
+  });
 }
 
 function buildSubfilters(catType) {
@@ -838,8 +857,25 @@ function buildSubfilters(catType) {
     pill.addEventListener('click', () => {
       row.querySelectorAll('.subf-pill').forEach(p => p.classList.remove('active'));
       pill.classList.add('active');
-      listSubFilter = pill.dataset.sub === 'all' ? null : subs[parseInt(pill.dataset.sub)];
-      renderList();
+      if (pill.dataset.sub === 'all') {
+        listSubFilter = null;
+        listSubfilterPlaces = null;
+        renderList();
+        return;
+      }
+      const sf = subs[parseInt(pill.dataset.sub)];
+      listSubFilter = sf;
+      if (sf.mode === 'search') {
+        // mostra loading e faz busca real
+        document.getElementById('list-grid').innerHTML = '<div class="loading-box"><div class="spinner"></div></div>';
+        fetchSubfilter(sf, (results) => {
+          listSubfilterPlaces = results;
+          renderList();
+        });
+      } else {
+        listSubfilterPlaces = null;
+        renderList();
+      }
     });
   });
 }
@@ -848,6 +884,7 @@ function openListAll(title, places, initialCat) {
   listPlaces = places;
   listCatFilter = initialCat || 'all';
   listSubFilter = null;
+  listSubfilterPlaces = null;
   document.getElementById('list-title').textContent = title;
   document.getElementById('list-search-input').value = '';
   listSort = 'rating';
@@ -860,16 +897,18 @@ function openListAll(title, places, initialCat) {
 }
 
 function renderList() {
-  let places = [...listPlaces];
-  // categoria
-  if (listCatFilter !== 'all') {
-    places = places.filter(p => p.types && p.types.includes(listCatFilter));
-  }
-  // subfiltro
-  if (listSubFilter) {
-    places = places.filter(p => placeMatchesSubfilter(p, listSubFilter));
-    // se subfiltro por kw não encontrar nada, mostra todos da categoria
-    if (!places.length) places = listPlaces.filter(p => p.types && p.types.includes(listCatFilter));
+  let places;
+  // se subfiltro mode=search, usa resultados da busca Places diretamente
+  if (listSubFilter && listSubFilter.mode === 'search' && listSubfilterPlaces !== null) {
+    places = [...listSubfilterPlaces];
+  } else {
+    places = [...listPlaces];
+    if (listCatFilter !== 'all') {
+      places = places.filter(p => p.types && p.types.includes(listCatFilter));
+    }
+    if (listSubFilter && listSubFilter.mode === 'type') {
+      places = places.filter(p => placeMatchesSubfilter(p, listSubFilter));
+    }
   }
   // busca por texto
   const q = document.getElementById('list-search-input').value.toLowerCase();
@@ -1313,6 +1352,7 @@ window.initMap=function(){
     pill.classList.add('active');
     listCatFilter=pill.dataset.type;
     listSubFilter=null;
+    listSubfilterPlaces=null;
     buildSubfilters(listCatFilter);
     renderList();
   });
