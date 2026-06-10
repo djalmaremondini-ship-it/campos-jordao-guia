@@ -1461,7 +1461,7 @@ function fetchPlaces(type){
       const res=(status===google.maps.places.PlacesServiceStatus.OK&&results)?results:[];
       // marca o tipo especial nos resultados
       res.forEach(r=>{ r._specialType=type; if(!allPlaces.find(x=>x.place_id===r.place_id)) allPlaces.push(r); });
-      renderFeatured(res.sort((a,b)=>(b.rating||0)-(a.rating||0)));
+      renderFeatured(res.sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0))));
       renderNear(res);
       addMarkers(mapHome,res,homeMarkers);
       if(fullInited) addMarkers(mapFull,res,fullMarkers);
@@ -1478,7 +1478,10 @@ function fetchPlaces(type){
     pending--;
     if(pending===0){
       allPlaces=collected.filter((p,i,a)=>a.findIndex(x=>x.place_id===p.place_id)===i);
-      const sorted=[...allPlaces].sort((a,b)=>(b.rating||0)-(a.rating||0));
+      // Re-injeta demo destaque sempre que allPlaces é reconstruído
+      if(!allPlaces.find(p=>p.place_id==='DEMO_CHOCOLAND_001')) allPlaces.unshift(DEMO_FEATURED);
+      // Destaques primeiro, depois por rating
+      const sorted=[...allPlaces].sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0)));
       renderFeatured(sorted);
       renderNear(allPlaces);
       addMarkers(mapHome,allPlaces,homeMarkers);
@@ -1579,17 +1582,30 @@ function renderWeatherPopup(data){
     </div>`;
   }).join('');
   const dailyHtml=daily.time.map((date,i)=>{
-    const rawCode = daily.weather_code[i];
-    const dw = rawCode != null ? getWMO(rawCode) : {desc:'Variável',icon:'ti-cloud'};
+    // Para hoje (i=0), usa weather_code atual que é mais preciso que o diário
+    const rawCode = i===0 ? cur.weather_code : daily.weather_code[i];
+    const dw = rawCode != null ? getWMO(rawCode) : {desc:'Variável',icon:'ti-cloud',night:'ti-cloud'};
+    // Para ícone de hoje usa hora atual (dia/noite)
+    const dayIcon = i===0 ? (isNight(h)?dw.night:dw.icon) : dw.icon;
     const dmax = daily.temperature_2m_max[i] != null ? Math.round(daily.temperature_2m_max[i]) : '--';
     const dmin = daily.temperature_2m_min[i] != null ? Math.round(daily.temperature_2m_min[i]) : '--';
-    const rain = daily.precipitation_probability_max[i] != null ? daily.precipitation_probability_max[i] : 0;
+    // Para hoje, usa probabilidade horária máxima se o diário vier null
+    let rain = daily.precipitation_probability_max[i];
+    if(rain == null && i===0){
+      // pega máximo das próximas horas de hoje
+      const todayProbs = hourly.precipitation_probability
+        ? hourly.precipitation_probability.slice(hStart, hStart+24).filter(v=>v!=null)
+        : [];
+      rain = todayProbs.length ? Math.max(...todayProbs) : 0;
+    }
+    rain = rain != null ? rain : 0;
+    const rainColor = rain>=70?'#2980b9':rain>=30?'#5b9bd5':'#a0bfd5';
     const rainHtml = rain > 0
-      ? `<div class="day-rain" style="color:${rain>=70?'#2980b9':rain>=30?'#5b9bd5':'#a0bfd5'}"><i class="ti ti-droplet"></i>${rain}%</div>`
-      : `<div class="day-rain" style="color:#ccc"><i class="ti ti-droplet" style="opacity:.3"></i>—</div>`;
+      ? `<div class="day-rain" style="color:${rainColor}"><i class="ti ti-droplet"></i>${rain}%</div>`
+      : `<div class="day-rain" style="color:#ccc"><i class="ti ti-droplet" style="opacity:.25"></i>0%</div>`;
     return `<div class="day-row">
       <div class="day-name">${dayName(date,i)}</div>
-      <div class="day-icon"><i class="ti ${dw.icon}"></i></div>
+      <div class="day-icon"><i class="ti ${dayIcon}"></i></div>
       <div class="day-desc">${dw.desc}</div>
       ${rainHtml}
       <div class="day-minmax"><span class="day-min">${dmin}°</span><span class="day-max">${dmax}°</span></div>
@@ -1626,14 +1642,20 @@ function renderWeatherPopup(data){
 
 async function openWeatherPopup(){
   document.getElementById('weather-popup').style.display='flex';
-  if(weatherData){renderWeatherPopup(weatherData);return;}
-  document.getElementById('weather-content').innerHTML='<div class="loading-box" style="padding:40px"><div class="spinner"></div><p style="margin-top:12px;font-size:13px;color:var(--muted)">Buscando clima...</p></div>';
-  try{
-    weatherData=await fetchWeather();
-    updateChip(weatherData);
+  // Sempre busca dados frescos se tiver mais de 30min desde o último fetch
+  const now=Date.now();
+  if(!weatherData||!weatherData._fetchedAt||(now-weatherData._fetchedAt)>30*60*1000){
+    document.getElementById('weather-content').innerHTML='<div class="loading-box" style="padding:40px"><div class="spinner"></div><p style="margin-top:12px;font-size:13px;color:var(--muted)">Buscando clima...</p></div>';
+    try{
+      weatherData=await fetchWeather();
+      weatherData._fetchedAt=now;
+      updateChip(weatherData);
+      renderWeatherPopup(weatherData);
+    }catch(e){
+      document.getElementById('weather-content').innerHTML='<div class="empty-state"><i class="ti ti-cloud-off"></i>Não foi possível carregar o clima.</div>';
+    }
+  } else {
     renderWeatherPopup(weatherData);
-  }catch(e){
-    document.getElementById('weather-content').innerHTML='<div class="empty-state"><i class="ti ti-cloud-off"></i>Não foi possível carregar o clima.</div>';
   }
 }
 
@@ -1743,6 +1765,28 @@ function initPainel(){
 }
 
 /* ================================================
+   DEMO — lugar com destaque + cupom (remover em produção)
+================================================ */
+const DEMO_FEATURED={
+  place_id:'DEMO_CHOCOLAND_001',
+  name:'Chocoland — Fábrica de Chocolate',
+  types:['store','food'],
+  _specialType:'chocolate',
+  _featured:true,
+  _coupon_desc:'15% OFF em toda a loja para usuários do app',
+  rating:4.8,
+  user_ratings_total:2041,
+  vicinity:'Av. Dr. Adhemar de Barros, 3900 — Campos do Jordão',
+  opening_hours:{isOpen:()=>true},
+  geometry:{location:{lat:()=>-22.7312,lng:()=>-45.6001}},
+  photos:null,
+  reviews:[
+    {author_name:'Ana Paula',rating:5,text:'Melhor fábrica de chocolate da Serra! Visita imperdível, os funcionários explicam todo o processo.'},
+    {author_name:'Carlos M.',rating:5,text:'Cupom do app funcionou perfeitamente, economizamos bastante. Voltaremos com certeza!'},
+  ]
+};
+
+/* ================================================
    INIT GOOGLE MAPS CALLBACK
 ================================================ */
 window.initMap=function(){
@@ -1776,26 +1820,6 @@ window.initMap=function(){
     });
   }
 
-  // Injeta lugar demo com destaque + cupom (remover em produção)
-  const DEMO_FEATURED={
-    place_id:'DEMO_CHOCOLAND_001',
-    name:'Chocoland — Fábrica de Chocolate ⭐',
-    types:['store','food'],
-    _specialType:'chocolate',
-    _featured:true,
-    _coupon_desc:'15% OFF em toda a loja para usuários do app',
-    rating:4.8,
-    user_ratings_total:2041,
-    vicinity:'Av. Dr. Adhemar de Barros, 3900 — Campos do Jordão',
-    opening_hours:{isOpen:()=>true},
-    geometry:{location:{lat:()=>-22.7312,lng:()=>-45.6001}},
-    photos:null,
-    reviews:[
-      {author_name:'Ana Paula',rating:5,text:'Melhor fábrica de chocolate da Serra! Visita imperdível, os funcionários explicam todo o processo.'},
-      {author_name:'Carlos M.',rating:5,text:'Cupom do app funcionou perfeitamente, economizamos bastante. Voltaremos com certeza!'},
-    ]
-  };
-  allPlaces.unshift(DEMO_FEATURED);
 
   fetchPlaces('all');
 
@@ -1807,17 +1831,17 @@ window.initMap=function(){
     const t=cat.dataset.type;
     const specialCats=['chocolate','adventure','culture','transport'];
     if(t==='all'){
-      renderFeatured([...allPlaces].sort((a,b)=>(b.rating||0)-(a.rating||0)));
+      renderFeatured([...allPlaces].sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0))));
       renderNear(allPlaces);
       addMarkers(mapHome,allPlaces,homeMarkers);
     } else if(specialCats.includes(t)){
       // categoria especial: filtra por _specialType ou busca se vazio
       const f=allPlaces.filter(p=>p._specialType===t);
-      if(f.length){renderFeatured([...f].sort((a,b)=>(b.rating||0)-(a.rating||0)));renderNear(f);addMarkers(mapHome,f,homeMarkers);}
+      if(f.length){renderFeatured([...f].sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0))));renderNear(f);addMarkers(mapHome,f,homeMarkers);}
       else fetchPlaces(t);
     } else {
       const f=allPlaces.filter(p=>p.types&&p.types.includes(t));
-      if(f.length){renderFeatured([...f].sort((a,b)=>(b.rating||0)-(a.rating||0)));renderNear(f);addMarkers(mapHome,f,homeMarkers);}
+      if(f.length){renderFeatured([...f].sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0))));renderNear(f);addMarkers(mapHome,f,homeMarkers);}
       else fetchPlaces(t);
     }
   });
@@ -1825,7 +1849,7 @@ window.initMap=function(){
   // see all buttons — passa categoria ativa do home
   document.getElementById('see-all-featured').addEventListener('click',()=>{
     const activeCat=document.querySelector('#cats .cat.active')?.dataset.type||'all';
-    openListAll('Todos os lugares',[...allPlaces].sort((a,b)=>(b.rating||0)-(a.rating||0)), activeCat);
+    openListAll('Todos os lugares',[...allPlaces].sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0))), activeCat);
   });
   document.getElementById('see-all-near').addEventListener('click',()=>{
     const activeCat=document.querySelector('#cats .cat.active')?.dataset.type||'all';
@@ -1861,7 +1885,7 @@ window.initMap=function(){
   // roteiro
   document.getElementById('rot-banner').addEventListener('click',()=>showScreen('roteiro'));
   document.getElementById('criar-rot-btn').addEventListener('click',()=>{
-    const top=[...allPlaces].sort((a,b)=>(b.rating||0)-(a.rating||0)).slice(0,4);
+    const top=[...allPlaces].sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0))).slice(0,4);
     top.forEach(p=>{if(!roteiroPlaces.find(x=>x.place_id===p.place_id)) roteiroPlaces.push(p);});
     renderRoteiro();
     LS.save();
