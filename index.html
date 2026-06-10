@@ -486,7 +486,11 @@ html,body{height:100%;background:#e0ddd6;font-family:'DM Sans',sans-serif}
       <div class="header-top">
         <div>
           <div class="loc-line"><i class="ti ti-map-pin"></i><span id="loc-text">Campos do Jordão, SP</span></div>
-          <div class="htitle">Explore a <span>Serra</span></div>
+          <!-- LOGO ROTERA -->
+          <div id="rotera-logo-wrap" style="margin-top:2px">
+            <canvas id="logo-measure" style="display:none"></canvas>
+            <svg id="rotera-logo-svg" xmlns="http://www.w3.org/2000/svg" style="display:block"></svg>
+          </div>
         </div>
         <div class="wchip" id="weather-chip-btn">
           <i class="ti ti-cloud-snow" id="chip-icon"></i>
@@ -817,6 +821,11 @@ function cfg(types,specialType){
 /* ================================================
    UTILS
 ================================================ */
+// Normaliza geometry.location tanto de Places API (função) quanto de objeto simples
+function latVal(p){ const l=p.geometry.location; return typeof l.lat==='function'?l.lat():l.lat; }
+function lngVal(p){ const l=p.geometry.location; return typeof l.lng==='function'?l.lng():l.lng; }
+function latLng(p){ return new google.maps.LatLng(latVal(p),lngVal(p)); }
+
 function dist(a,b,c,d){
   const R=6371,dl=(c-a)*Math.PI/180,dn=(d-b)*Math.PI/180;
   const x=Math.sin(dl/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dn/2)**2;
@@ -831,7 +840,31 @@ function starsH(r,sz=10){
     else s+=`<i class="ti ti-star" style="font-size:${sz}px;color:#E9A93B"></i>`;
   }return s;
 }
-function photoUrl(p,w=400){return p.photos&&p.photos.length?p.photos[0].getUrl({maxWidth:w,maxHeight:w}):null;}
+function photoUrl(p,w=400){
+  try{ return p.photos&&p.photos.length?p.photos[0].getUrl({maxWidth:w,maxHeight:w}):null; }
+  catch(e){ return null; }
+}
+
+// Gradientes de fallback por categoria — usados quando não há foto
+const CAT_GRADIENTS={
+  nat:   'linear-gradient(135deg,#1C4A35 0%,#3D7A5E 100%)',
+  food:  'linear-gradient(135deg,#7B3F00 0%,#B7791F 100%)',
+  cult:  'linear-gradient(135deg,#312E81 0%,#534AB7 100%)',
+  coff:  'linear-gradient(135deg,#4B2E1A 0%,#8B5E3C 100%)',
+  n:     'linear-gradient(135deg,#1C4A35 0%,#3D7A5E 100%)',
+  f:     'linear-gradient(135deg,#7B3F00 0%,#B7791F 100%)',
+  c:     'linear-gradient(135deg,#312E81 0%,#534AB7 100%)',
+  p:     'linear-gradient(135deg,#4B2E1A 0%,#8B5E3C 100%)',
+};
+
+// Retorna HTML de imagem OU fallback com gradiente + ícone centralizado
+function imgOrFallback(url,cls,icon,styles){
+  styles=styles||"width:100%;height:100%;object-fit:cover;display:block";
+  var grad=CAT_GRADIENTS[cls]||CAT_GRADIENTS.nat;
+  var fallback="<div style=\"width:100%;height:100%;background:"+grad+";display:flex;align-items:center;justify-content:center\"><i class=\"ti "+icon+"\" style=\"font-size:28px;color:rgba(255,255,255,.4)\"></i></div>";
+  if(!url) return fallback;
+  return "<img src=\""+url+"\" style=\""+styles+"\" onerror=\"this.outerHTML=decodeURIComponent(this.dataset.f)\" data-f=\""+encodeURIComponent(fallback)+"\">";
+}
 function fmtN(n){return n?n.toLocaleString('pt-BR'):'?';}
 
 /* ================================================
@@ -937,13 +970,13 @@ function renderFeatured(places){
   if(!places.length){el.innerHTML='<p style="padding:10px;font-size:13px;color:var(--muted)">Nenhum lugar encontrado.</p>';return;}
   el.innerHTML=places.slice(0,12).map(p=>{
     const c=cfg(p.types,p._specialType);
-    const d=dist(userLat,userLng,p.geometry.location.lat(),p.geometry.location.lng());
+    const d=dist(userLat,userLng,latVal(p),lngVal(p));
     const url=photoUrl(p);
     const ob=p.opening_hours?(p.opening_hours.isOpen()?'<span class="cbadge open">Aberto</span>':'<span class="cbadge closed">Fechado</span>'):'';
-    const img=url?`<img src="${url}" alt="${p.name}" onerror="this.style.display='none'">`:'';
     const featBadge=p._featured?`<div class="featured-badge"><i class="ti ti-star-filled"></i>DESTAQUE</div>`:'';
+    const imgHtml=imgOrFallback(url,c.cls,c.icon);
     return `<div class="pcard" data-pid="${p.place_id}">
-      <div class="cimg-wrap ${c.cls}">${img}<i class="ti ${c.icon} fall"></i>${ob}${featBadge}</div>
+      <div class="cimg-wrap ${c.cls}" style="position:relative;overflow:hidden">${imgHtml}${ob}${featBadge}</div>
       <div class="cbody">
         <div class="cname">${p.name}</div>
         <div class="cmeta"><span class="ccat">${c.label}</span><span class="cdist"><i class="ti ti-walk"></i>${d.toFixed(1)}km</span></div>
@@ -959,16 +992,16 @@ function renderNear(places){
   const el=document.getElementById('near-list');
   if(!places.length){el.innerHTML='<p style="padding:10px;font-size:13px;color:var(--muted)">Nenhum lugar próximo.</p>';return;}
   const sorted=[...places].sort((a,b)=>
-    dist(userLat,userLng,a.geometry.location.lat(),a.geometry.location.lng())-
-    dist(userLat,userLng,b.geometry.location.lat(),b.geometry.location.lng())
+    dist(userLat,userLng,latVal(a),lngVal(a))-
+    dist(userLat,userLng,latVal(b),lngVal(b))
   );
   el.innerHTML=sorted.slice(0,8).map(p=>{
     const c=cfg(p.types,p._specialType);
-    const d=dist(userLat,userLng,p.geometry.location.lat(),p.geometry.location.lng());
+    const d=dist(userLat,userLng,latVal(p),lngVal(p));
     const url=photoUrl(p,150);
-    const img=url?`<img src="${url}" alt="${p.name}" onerror="this.style.display='none'">`:`<i class="ti ${c.icon}"></i>`;
+    const img=imgOrFallback(url,c.nc,c.icon,'width:100%;height:100%;object-fit:cover');
     return `<div class="nitem" data-pid="${p.place_id}">
-      <div class="nthumb ${c.nc}">${img}</div>
+      <div class="nthumb ${c.nc}" style="overflow:hidden">${img}</div>
       <div class="ninfo"><div class="nname">${p.name}</div><div class="nsub"><i class="ti ti-map-pin"></i>${d.toFixed(1)} km · ${c.label}</div></div>
       <div class="nright"><div class="dbadge">${wt(d)}</div><div class="nrat"><i class="ti ti-star-filled"></i>${p.rating?p.rating.toFixed(1):'–'}<span>(${fmtN(p.user_ratings_total)})</span></div></div>
     </div>`;
@@ -1158,7 +1191,7 @@ function renderList() {
   if (q) places = places.filter(p => p.name.toLowerCase().includes(q) || (p.vicinity||'').toLowerCase().includes(q));
   // ordenação
   if (listSort === 'rating')   places.sort((a,b) => (b.rating||0) - (a.rating||0));
-  else if (listSort === 'dist') places.sort((a,b) => dist(userLat,userLng,a.geometry.location.lat(),a.geometry.location.lng()) - dist(userLat,userLng,b.geometry.location.lat(),b.geometry.location.lng()));
+  else if (listSort === 'dist') places.sort((a,b) => dist(userLat,userLng,latVal(a),lngVal(a)) - dist(userLat,userLng,latVal(b),lngVal(b)));
   else if (listSort === 'reviews') places.sort((a,b) => (b.user_ratings_total||0) - (a.user_ratings_total||0));
   else if (listSort === 'az')  places.sort((a,b) => a.name.localeCompare(b.name,'pt-BR'));
   document.getElementById('list-subtitle').textContent = `${places.length} lugar${places.length !== 1 ? 'es' : ''} encontrado${places.length !== 1 ? 's' : ''}`;
@@ -1166,9 +1199,9 @@ function renderList() {
   if (!places.length) { el.innerHTML = '<div class="empty-state"><i class="ti ti-search"></i>Nenhum resultado encontrado.</div>'; return; }
   el.innerHTML = places.map(p => {
     const c = cfg(p.types,p._specialType);
-    const d = dist(userLat, userLng, p.geometry.location.lat(), p.geometry.location.lng());
+    const d = dist(userLat,userLng,latVal(p),lngVal(p));
     const url = photoUrl(p, 200);
-    const img = url ? `<img src="${url}" alt="${p.name}" onerror="this.style.display='none'">` : `<i class="ti ${c.icon}"></i>`;
+    const img = imgOrFallback(url, c.cls, c.icon,'width:100%;height:100%;object-fit:cover;position:absolute;inset:0');
     const ob = p.opening_hours ? (p.opening_hours.isOpen() ? '<span class="lcard-open open">Aberto</span>' : '<span class="lcard-open closed">Fechado</span>') : '';
     return `<div class="lcard" data-pid="${p.place_id}">
       <div class="lcard-img ${c.cls}">${img}</div>
@@ -1194,14 +1227,34 @@ function openDetail(pid){
   const hero=document.getElementById('det-hero');
   // clear
   Array.from(hero.children).forEach(ch=>{if(!ch.classList.contains('det-hero-back')&&!ch.classList.contains('det-hero-save'))ch.remove();});
-  if(url){const img=new Image();img.src=url;img.alt=p.name;img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover';img.onerror=()=>img.remove();hero.appendChild(img);}
-  else{const ic=document.createElement('i');ic.className=`ti ${c.icon}`;ic.style.cssText='font-size:60px;opacity:.25';hero.appendChild(ic);}
+  if(url){
+    const img=new Image();
+    img.src=url;img.alt=p.name;
+    img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover';
+    img.onerror=()=>{
+      img.remove();
+      const grad=CAT_GRADIENTS[c.cls]||CAT_GRADIENTS.nat;
+      hero.style.background=grad;
+      const ic=document.createElement('i');
+      ic.className=`ti ${c.icon}`;
+      ic.style.cssText='font-size:64px;color:rgba(255,255,255,.3);position:relative;z-index:1';
+      hero.appendChild(ic);
+    };
+    hero.appendChild(img);
+  } else {
+    const grad=CAT_GRADIENTS[c.cls]||CAT_GRADIENTS.nat;
+    hero.style.background=grad;
+    const ic=document.createElement('i');
+    ic.className=`ti ${c.icon}`;
+    ic.style.cssText='font-size:64px;color:rgba(255,255,255,.3)';
+    hero.appendChild(ic);
+  }
   const savedBtn=document.getElementById('det-save');
   savedBtn.className='det-hero-save'+(savedIds.has(pid)?' saved':'');
   document.getElementById('det-back').onclick=()=>showScreen(prevScreen);
   savedBtn.onclick=()=>toggleSave(pid);
   const addr=p.vicinity||'Campos do Jordão, SP';
-  const d=dist(userLat,userLng,p.geometry.location.lat(),p.geometry.location.lng());
+  const d=dist(userLat,userLng,latVal(p),lngVal(p));
   const openStr=p.opening_hours?(p.opening_hours.isOpen()?'<span style="color:#2D6A4F;font-weight:500">Aberto agora</span>':'<span style="color:#c0392b;font-weight:500">Fechado</span>'):'N/D';
   const revsHtml=p.reviews&&p.reviews.length
     ?`<div class="det-section-ttl">Avaliações do Google</div><div class="reviews-list">${p.reviews.slice(0,3).map(r=>`<div class="rev-item"><div class="rev-top"><span class="rev-author">${r.author_name}</span><div class="rev-stars">${starsH(r.rating,11)}</div></div><div class="rev-text">${r.text?r.text.slice(0,150)+(r.text.length>150?'...':''):'Sem comentário.'}</div></div>`).join('')}</div>`
@@ -1225,7 +1278,7 @@ function openDetail(pid){
       ${checkedInIds.has(pid)?'Visitei este lugar!':'Fazer check-in aqui'}
     </button>
     <div class="det-actions">
-      <button class="det-btn primary" onclick="openGoogleMaps('${p.name.replace(/'/g,"\\'")}',${p.geometry.location.lat()},${p.geometry.location.lng()})"><i class="ti ti-navigation"></i>Como chegar</button>
+      <button class="det-btn primary" onclick="openGoogleMaps('${p.name.replace(/'/g,"\\'")}',${latVal(p)},${lngVal(p)})"><i class="ti ti-navigation"></i>Como chegar</button>
       <button class="det-btn secondary" onclick="addToRoteiro('${pid}')"><i class="ti ti-route"></i>Ao roteiro</button>
     </div>
     ${p._featured?`<div class="coupon-banner" onclick="openCoupon('${pid}')"><i class="ti ti-ticket"></i><div class="coupon-banner-text"><p>Cupom exclusivo disponível</p><p>${p._coupon_desc||'Desconto especial para usuários do app'}</p></div><i class="ti ti-arrow-right" style="margin-left:auto;color:rgba(255,255,255,.6)"></i></div>`:''}
@@ -1290,8 +1343,8 @@ function renderRoteiro(){
   }
   content.style.display='none';
   const sorted=[...roteiroPlaces].sort((a,b)=>
-    dist(userLat,userLng,a.geometry.location.lat(),a.geometry.location.lng())-
-    dist(userLat,userLng,b.geometry.location.lat(),b.geometry.location.lng())
+    dist(userLat,userLng,latVal(a),lngVal(a))-
+    dist(userLat,userLng,latVal(b),lngVal(b))
   );
   steps.innerHTML=`
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
@@ -1303,7 +1356,7 @@ function renderRoteiro(){
         const c=cfg(p.types,p._specialType);
         const url=photoUrl(p,300);
         const img=url?`<img src="${url}" alt="${p.name}" onerror="this.style.display='none'">`:`<i class="ti ${c.icon}"></i>`;
-        const d=dist(userLat,userLng,p.geometry.location.lat(),p.geometry.location.lng());
+        const d=dist(userLat,userLng,latVal(p),lngVal(p));
         return `<div class="rot-step">
           <div class="rot-step-left">
             <div class="rot-num">${i+1}</div>
@@ -1334,7 +1387,7 @@ function renderRoteiro(){
   document.getElementById('start-rot-btn').addEventListener('click',()=>{
     if(sorted.length>0){
       const p=sorted[0];
-      openGoogleMaps(p.name,p.geometry.location.lat(),p.geometry.location.lng());
+      openGoogleMaps(p.name,latVal(p),lngVal(p));
     }
   });
   document.getElementById('share-rot-btn').addEventListener('click',shareRoteiro);
@@ -1403,7 +1456,7 @@ function addMarkers(map,places,arr){
   places.forEach(p=>{
     const c=cfg(p.types,p._specialType);
     const marker=new google.maps.Marker({
-      position:p.geometry.location,map,title:p.name,
+      position:latLng(p),map,title:p.name,
       icon:{path:google.maps.SymbolPath.CIRCLE,scale:8,fillColor:c.color,fillOpacity:1,strokeColor:'#fff',strokeWeight:2}
     });
     const url=photoUrl(p,220);
@@ -1821,6 +1874,51 @@ window.initMap=function(){
   }
 
 
+  // ── LOGO ROTERA no header ──
+  (function renderLogo(){
+    const cv=document.getElementById('logo-measure');
+    if(!cv) return;
+    const ctx=cv.getContext('2d');
+    const FS=26; // tamanho da fonte no header
+    const fontStr=`${FS}px 'DM Serif Display', Georgia, serif`;
+    // Aguarda fonte carregar
+    document.fonts.ready.then(()=>{
+      ctx.font=fontStr;
+      const tw=ctx.measureText('Rotera').width;
+      const PAD=2;
+      const baseline=FS*0.82;
+      const routeY=baseline+FS*0.28;
+      const pinH=FS*0.62;
+      const pinW=pinH*0.65;
+      const pr=pinW*0.5;
+      const pinCX=PAD+tw;
+      const py=routeY-pinH*0.42;
+      const pinBotY=routeY+pinH*0.38;
+      const amp=FS*0.09;
+      const svgW=pinCX+pr+6;
+      const svgH=pinBotY+4;
+      // Bezier path
+      const mx1=PAD+tw*0.25, my1=routeY-amp;
+      const mx2=PAD+tw*0.5,  my2=routeY+amp;
+      const mx3=PAD+tw*0.75, my3=routeY-amp;
+      const rp=`M${PAD},${routeY} C${mx1},${my1} ${mx1+10},${my1} ${mx2},${my2} C${mx2+10},${my2} ${mx3},${my3} ${pinCX},${routeY}`;
+      // Pin teardrop
+      const tp=`M${pinCX},${pinBotY} C${pinCX-pr*0.4},${pinBotY-pr*0.7} ${pinCX-pr},${py+pr*0.5} ${pinCX-pr},${py} A${pr},${pr} 0 1,1 ${pinCX+pr},${py} C${pinCX+pr},${py+pr*0.5} ${pinCX+pr*0.4},${pinBotY-pr*0.7} ${pinCX},${pinBotY} Z`;
+      const svg=document.getElementById('rotera-logo-svg');
+      svg.setAttribute('width',svgW);
+      svg.setAttribute('height',svgH);
+      svg.setAttribute('viewBox',`0 0 ${svgW} ${svgH}`);
+      svg.innerHTML=`
+        <text x="${PAD}" y="${baseline}" font-family="'DM Serif Display',Georgia,serif" font-size="${FS}" fill="#fff" style="letter-spacing:-0.5px">Rotera</text>
+        <path d="${rp}" stroke="rgba(255,255,255,0.18)" stroke-width="${FS*0.07}" stroke-linecap="round" fill="none"/>
+        <path d="${rp}" stroke="rgba(255,255,255,0.55)" stroke-width="${FS*0.038}" stroke-linecap="round" fill="none"/>
+        <circle cx="${PAD}" cy="${routeY}" r="${FS*0.05}" fill="rgba(255,255,255,0.3)"/>
+        <path d="${tp}" fill="#E8A84C"/>
+        <circle cx="${pinCX}" cy="${py}" r="${FS*0.19}" fill="rgba(255,255,255,0.88)"/>
+      `;
+    });
+  })();
+
   fetchPlaces('all');
 
   // category filter
@@ -1853,7 +1951,7 @@ window.initMap=function(){
   });
   document.getElementById('see-all-near').addEventListener('click',()=>{
     const activeCat=document.querySelector('#cats .cat.active')?.dataset.type||'all';
-    openListAll('Mais próximos',[...allPlaces].sort((a,b)=>dist(userLat,userLng,a.geometry.location.lat(),a.geometry.location.lng())-dist(userLat,userLng,b.geometry.location.lat(),b.geometry.location.lng())), activeCat);
+    openListAll('Mais próximos',[...allPlaces].sort((a,b)=>dist(userLat,userLng,latVal(a),lngVal(a))-dist(userLat,userLng,latVal(b),lngVal(b))), activeCat);
   });
 
   // category pills na tela de lista
