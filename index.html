@@ -2585,7 +2585,6 @@ const STAR_LABELS = ['','Péssimo','Ruim','Regular','Bom','Excelente!'];
 
 /* ── ROTEIROS DEMO DA COMUNIDADE ── */
 function getCommunityRoteiros() {
-  // Pega salvos + demos pré-carregados
   let saved = [];
   try { saved = JSON.parse(localStorage.getItem(LS_ROTEIROS_KEY)||'[]'); } catch(e){}
 
@@ -2600,11 +2599,9 @@ function getCommunityRoteiros() {
       date:'08/06/2025',
       places:['Chocoland','Vila Capivari','Baden Baden','Teleférico de CJ'],
       placeTypes:['coff','cult','food','cult'],
+      placeKeywords:['chocoland','capivari','baden','teleferico'],
       tags:['Casais','Tarde','Centro'],
-      rating:4.8,
-      reviews:23,
-      uses:87,
-      nota_media:4.8,
+      rating:4.8, reviews:23, uses:87, nota_media:4.8,
       positivos_top:['Organização','Lugares incríveis'],
       negativos_top:['Lugares cheios'],
       destaques:'Baden Baden no fim do dia é perfeito. Reserve mesa com antecedência!',
@@ -2619,11 +2616,9 @@ function getCommunityRoteiros() {
       date:'02/06/2025',
       places:['Parque Estadual','Horto Florestal','Pedra do Baú','Restaurante Pórtico'],
       placeTypes:['nat','nat','nat','food'],
+      placeKeywords:['parque','horto','pedra','portico'],
       tags:['Aventura','Trilha','Natureza'],
-      rating:4.9,
-      reviews:41,
-      uses:156,
-      nota_media:4.9,
+      rating:4.9, reviews:41, uses:156, nota_media:4.9,
       positivos_top:['Lugares incríveis','Tempo bem usado'],
       negativos_top:['Muito corrido'],
       destaques:'Saia cedo, antes das 8h. A trilha da Pedra do Baú vale cada segundo!',
@@ -2636,13 +2631,11 @@ function getCommunityRoteiros() {
       avatar:'MF',
       duration:'3h',
       date:'25/05/2025',
-      places:['Chocoland','Café Colonial Bela','Chocoland Museu do Cacau'],
+      places:['Chocoland','Café Bela Serra','Museu do Cacau'],
       placeTypes:['coff','coff','coff'],
+      placeKeywords:['chocoland','cafe','museu'],
       tags:['Família','Manhã','Chocolate'],
-      rating:4.6,
-      reviews:18,
-      uses:62,
-      nota_media:4.6,
+      rating:4.6, reviews:18, uses:62, nota_media:4.6,
       positivos_top:['Ótimo para família','Variedade'],
       negativos_top:[],
       destaques:'As crianças amaram! Visita à fábrica às 10h tem degustação inclusa.',
@@ -2657,19 +2650,44 @@ function getCommunityRoteiros() {
       date:'18/05/2025',
       places:['Teleférico','Vila Capivari','Parque Estadual','Baden Baden','Pórtico'],
       placeTypes:['cult','cult','nat','food','food'],
+      placeKeywords:['teleferico','capivari','parque','baden','portico'],
       tags:['Full day','Completo','Top'],
-      rating:5.0,
-      reviews:67,
-      uses:210,
-      nota_media:5.0,
+      rating:5.0, reviews:67, uses:210, nota_media:5.0,
       positivos_top:['Tempo bem usado','Fácil de seguir','Lugares incríveis'],
       negativos_top:[],
       destaques:'Se tiver só 1 dia, esse é o roteiro. Teleférico abre às 9h, vá primeiro.',
     }
   ];
 
-  // Mescla demos + salvos pelo usuário, mais recentes primeiro
   return [...saved.reverse(), ...demos];
+}
+
+// Busca foto para um slot do card da comunidade
+function getCommunitySlotPhoto(name, keyword, cls) {
+  // 1. Tenta pelo keyword específico
+  if(keyword) {
+    const m = allPlaces.find(p => p.name.toLowerCase().includes(keyword));
+    if(m) { const u = photoUrl(m,200); if(u) return u; }
+  }
+  // 2. Tenta pelas palavras do nome (mais longa primeiro)
+  const stop = ['de','do','da','dos','das','e','em','no','na','o','a'];
+  const words = name.toLowerCase().split(' ')
+    .filter(w => w.length > 2 && !stop.includes(w))
+    .sort((a,b) => b.length - a.length);
+  for(const w of words) {
+    const m = allPlaces.find(p => p.name.toLowerCase().includes(w));
+    if(m) { const u = photoUrl(m,200); if(u) return u; }
+  }
+  // 3. Fallback por categoria — pega qualquer place com foto da mesma categoria
+  const typeMap = {nat:'park',food:'restaurant',coff:'cafe',cult:'tourist_attraction'};
+  const fallbackType = typeMap[cls] || 'tourist_attraction';
+  const catPlaces = allPlaces.filter(p => p.types && p.types.includes(fallbackType) && p.photos && p.photos.length);
+  if(catPlaces.length) {
+    const best = catPlaces.sort((a,b)=>(b.rating||0)-(a.rating||0))[0];
+    const u = photoUrl(best, 200);
+    if(u) return u;
+  }
+  return null;
 }
 
 /* ── RENDERIZAR LISTA ── */
@@ -2687,16 +2705,11 @@ function renderCommunityList(filter) {
 
   el.innerHTML = roteiros.map(r => {
     const iconMap = {nat:'ti-trees',food:'ti-tools-kitchen-2',coff:'ti-coffee',cult:'ti-building-arch'};
-    const gradMap = {nat:'#d8efd8',food:'#faeeda',coff:'#f5edd8',cult:'#e8e4f8'};
     const photos = (r.places||[]).slice(0,3).map((name,idx) => {
       const cls  = (r.placeTypes||[])[idx] || 'nat';
+      const kw   = (r.placeKeywords||[])[idx] || null;
       const icon = iconMap[cls]||'ti-map-pin';
-      const bg   = gradMap[cls]||'#e8f4e8';
-      // Tenta casar com place real — busca pela palavra mais longa do nome
-      const words = name.toLowerCase().split(' ').filter(w => w.length > 3);
-      const kw    = words.sort((a,b) => b.length - a.length)[0] || name.toLowerCase().split(' ')[0];
-      const mp    = allPlaces.find(p => p.name.toLowerCase().includes(kw));
-      const url   = mp ? photoUrl(mp, 200) : null;
+      const url  = getCommunitySlotPhoto(name, kw, cls);
       if(url) return `<div class="cc-photo ${cls}"><img src="${url}" alt="${name}" onerror="this.style.display='none'"></div>`;
       return `<div class="cc-photo ${cls}"><i class="ti ${icon}"></i></div>`;
     }).join('');
