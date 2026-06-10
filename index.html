@@ -2052,9 +2052,6 @@ function initPainel(){
     document.getElementById('painel-user').value='';
     document.getElementById('painel-pass').value='';
   });
-  document.getElementById('painel-cadastro-link').addEventListener('click',()=>{
-    alert('Entre em contato:\nparceiros@cjguia.com.br\n\nPlanos a partir de R$199/mês');
-  });
 }
 
 /* ================================================
@@ -2282,7 +2279,7 @@ function loadPlanDates() {
    CADASTRO DE PARCEIRO + GOOGLE SHEETS
 ================================================ */
 // SUBSTITUA pela URL do seu Google Apps Script Web App
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycby07WB2aCkf4zKXqB5lEC_IekURrBVyjQ5C63vhIuSow_MHLuPk8mE1n1r3rTfgLfqV/exec';
+const SHEETS_URL = 'https://script.google.com/macros/s/SEU_SCRIPT_ID/exec';
 
 function selectPlan(el) {
   document.querySelectorAll('.plan-opt').forEach(o => o.classList.remove('selected'));
