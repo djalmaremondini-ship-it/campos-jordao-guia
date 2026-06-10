@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Campos do Jordão — Guia Turístico</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ===== RESET & BASE ===== */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#2D6A4F;
+  --gl:#74C69D;
+  --gold:#B7791F;
+  --bg:#f0ede8;
+  --card:#ffffff;
+  --border:#e8e4de;
+  --border-light:#e0ddd6;
+  --text:#1a1a1a;
+  --muted:#888888;
+  --sub:#aaaaaa;
+}
+html,body{height:100%;background:#e0ddd6;font-family:'DM Sans',sans-serif}
+.app{
+  max-width:390px;margin:0 auto;
+  background:var(--bg);min-height:100vh;
+  position:relative;overflow:hidden;
+  box-shadow:0 0 40px rgba(0,0,0,.15);
+}
+
+/* ===== SCREENS ===== */
+.screen{display:none;flex-direction:column;min-height:100vh;padding-bottom:70px;overflow-y:auto}
+.screen.active{display:flex}
+
+/* ===== BOTTOM NAV ===== */
+.bnav{
+  background:var(--card);border-top:.5px solid var(--border);
+  display:flex;justify-content:space-around;
+  padding:10px 0 16px;
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:390px;z-index:300;
+}
+.bni{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 14px;-webkit-tap-highlight-color:transparent}
+.bni i{font-size:22px;color:#bbb;transition:color .15s}
+.bni span{font-size:10px;color:#bbb;transition:color .15s}
+.bni.active i,.bni.active span{color:var(--green)}
+.bni.active span{font-weight:500}
+
+/* ===== HEADER ===== */
+.header{background:var(--green);padding:18px 18px 0;flex-shrink:0}
+.header-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.loc-line{display:flex;align-items:center;gap:5px;font-size:11px;color:rgba(255,255,255,.65);margin-bottom:3px}
+.loc-line i{font-size:12px;color:var(--gl)}
+.htitle{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#fff;line-height:1.2}
+.htitle span{color:var(--gl)}
+
+/* WEATHER CHIP */
+.wchip{
+  background:rgba(255,255,255,.12);border:.5px solid rgba(255,255,255,.2);
+  border-radius:20px;padding:7px 13px;
+  display:flex;align-items:center;gap:6px;
+  font-size:13px;color:#fff;cursor:pointer;
+  flex-shrink:0;-webkit-tap-highlight-color:transparent;
+  transition:background .15s;
+}
+.wchip:active{background:rgba(255,255,255,.22)}
+.wchip i{font-size:17px;color:var(--gl)}
+
+/* SEARCH */
+.searchbar{
+  background:rgba(255,255,255,.15);border:.5px solid rgba(255,255,255,.25);
+  border-radius:12px;padding:10px 14px;
+  display:flex;align-items:center;gap:10px;margin-bottom:16px;
+}
+.searchbar input{
+  background:transparent;border:none;outline:none;
+  font-size:14px;color:#fff;width:100%;font-family:'DM Sans',sans-serif;
+}
+.searchbar input::placeholder{color:rgba(255,255,255,.5)}
+.searchbar i{font-size:16px;color:rgba(255,255,255,.6);flex-shrink:0}
+
+/* CATEGORIES */
+.cats{display:flex;gap:8px;overflow-x:auto;padding-bottom:16px;scrollbar-width:none}
+.cats::-webkit-scrollbar{display:none}
+.cat{
+  display:flex;align-items:center;gap:6px;
+  padding:7px 13px;border-radius:20px;
+  font-size:12px;font-weight:500;white-space:nowrap;
+  cursor:pointer;border:.5px solid transparent;
+  flex-shrink:0;transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.cat.active{background:#fff;color:var(--green)}
+.cat.active i{color:var(--green)}
+.cat:not(.active){background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border-color:rgba(255,255,255,.15)}
+.cat i{font-size:14px}
+
+/* ===== BODY ===== */
+.body{padding:14px;flex:1}
+.geo-bar{
+  background:var(--card);border-radius:10px;border:.5px solid var(--border-light);
+  padding:8px 12px;display:flex;align-items:center;gap:8px;
+  margin-bottom:14px;font-size:12px;color:#666;
+}
+.geo-dot{width:8px;height:8px;border-radius:50%;background:var(--gl);flex-shrink:0;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* MAP HOME */
+#map-home-container{border-radius:14px;overflow:hidden;border:.5px solid #ddd;margin-bottom:16px;height:165px;background:#e8f4e8;position:relative}
+#map-home{width:100%;height:100%}
+.mlo{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#e8f4e8}
+
+/* SECTION HEADER */
+.sec-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.sec-ttl{font-family:'Playfair Display',serif;font-size:17px;font-weight:500;color:var(--text)}
+.see-all{font-size:12px;color:var(--green);font-weight:500;cursor:pointer;display:flex;align-items:center;gap:3px;-webkit-tap-highlight-color:transparent}
+
+/* FEATURED CARDS */
+.cards-row{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;margin-bottom:18px;scrollbar-width:none}
+.cards-row::-webkit-scrollbar{display:none}
+.pcard{
+  background:var(--card);border-radius:14px;border:.5px solid var(--border);
+  overflow:hidden;flex-shrink:0;width:168px;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.cimg-wrap{
+  width:100%;height:100px;position:relative;overflow:hidden;
+  background:#e8f4e8;display:flex;align-items:center;justify-content:center;
+}
+.cimg-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cimg-wrap i.fall{font-size:34px;opacity:.4}
+.cimg-wrap.nat{background:#d8efd8}.cimg-wrap.nat i.fall{color:#2D6A4F}
+.cimg-wrap.food{background:#faeeda}.cimg-wrap.food i.fall{color:#B7791F}
+.cimg-wrap.cult{background:#e8e4f8}.cimg-wrap.cult i.fall{color:#534AB7}
+.cimg-wrap.coff{background:#f5edd8}.cimg-wrap.coff i.fall{color:#8B5E3C}
+.cbadge{position:absolute;top:7px;right:7px;font-size:10px;font-weight:500;padding:3px 8px;border-radius:10px;z-index:2}
+.cbadge.open{background:#d8efd8;color:#2D6A4F}
+.cbadge.closed{background:#fee2e2;color:#c0392b}
+.cbody{padding:10px 11px 12px}
+.cname{font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cmeta{display:flex;justify-content:space-between;margin-bottom:5px}
+.ccat{font-size:10px;color:var(--muted)}
+.cdist{font-size:10px;color:var(--sub);display:flex;align-items:center;gap:3px}
+.crating{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted)}
+.stars i{font-size:10px;color:#E9A93B}
+.ctime{display:flex;align-items:center;gap:3px;font-size:10px;color:var(--sub);margin-top:4px}
+.ctime i{font-size:11px}
+
+/* ROTEIRO BANNER */
+.rotbanner{
+  background:var(--green);border-radius:16px;padding:15px;
+  margin-bottom:18px;display:flex;gap:12px;align-items:center;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.roticon{width:42px;height:42px;border-radius:11px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.roticon i{font-size:22px;color:var(--gl)}
+.rottext p:first-child{font-size:14px;font-weight:500;color:#fff;margin-bottom:2px}
+.rottext p:last-child{font-size:11px;color:rgba(255,255,255,.6)}
+
+/* NEAR LIST */
+.nearlist{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.nitem{
+  background:var(--card);border-radius:12px;border:.5px solid var(--border);
+  padding:10px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.nthumb{
+  width:46px;height:46px;border-radius:10px;overflow:hidden;
+  flex-shrink:0;background:#e8f4e8;display:flex;align-items:center;justify-content:center;
+}
+.nthumb img{width:100%;height:100%;object-fit:cover}
+.nthumb i{font-size:20px;opacity:.5}
+.nthumb.n{background:#d8efd8}.nthumb.n i{color:#2D6A4F}
+.nthumb.f{background:#faeeda}.nthumb.f i{color:#B7791F}
+.nthumb.c{background:#e8e4f8}.nthumb.c i{color:#534AB7}
+.nthumb.p{background:#f5edd8}.nthumb.p i{color:#8B5E3C}
+.ninfo{flex:1;min-width:0}
+.nname{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nsub{font-size:11px;color:var(--muted);margin-top:1px;display:flex;align-items:center;gap:5px}
+.nright{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.dbadge{font-size:10px;padding:3px 8px;border-radius:8px;background:var(--bg);color:var(--muted);border:.5px solid var(--border-light);white-space:nowrap}
+.nrat{font-size:11px;color:#E9A93B;display:flex;align-items:center;gap:3px}
+.nrat span{color:var(--sub)}
+
+/* ===== MAP FULL SCREEN ===== */
+.map-full-hdr{background:var(--green);padding:18px 18px 14px;flex-shrink:0}
+.map-full-hdr h2{font-family:'Playfair Display',serif;font-size:20px;color:#fff;margin-bottom:12px}
+.mfrow{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.mfrow::-webkit-scrollbar{display:none}
+.mfpill{
+  padding:6px 13px;border-radius:20px;font-size:11px;font-weight:500;
+  white-space:nowrap;cursor:pointer;border:.5px solid transparent;flex-shrink:0;
+}
+.mfpill.active{background:#fff;color:var(--green)}
+.mfpill:not(.active){background:rgba(255,255,255,.15);color:rgba(255,255,255,.8);border-color:rgba(255,255,255,.2)}
+#map-full{width:100%;flex:1;min-height:360px}
+.map-legend{background:var(--card);border-radius:12px;border:.5px solid var(--border-light);padding:10px 14px;margin:12px 14px;display:flex;flex-wrap:wrap;gap:8px}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#555}
+.leg-dot{width:9px;height:9px;border-radius:50%}
+
+/* ===== LIST SCREEN ===== */
+.list-hdr{background:var(--green);padding:16px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.back-btn{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.back-btn i{font-size:20px;color:#fff}
+.list-hdr h2{font-family:'Playfair Display',serif;font-size:18px;color:#fff}
+.list-hdr p{font-size:11px;color:rgba(255,255,255,.65);margin-top:1px}
+.list-search{background:rgba(255,255,255,.15);border:.5px solid rgba(255,255,255,.25);border-radius:10px;padding:9px 13px;display:flex;align-items:center;gap:8px;margin:0 14px 14px}
+.list-search input{background:transparent;border:none;outline:none;font-size:13px;color:#fff;width:100%;font-family:'DM Sans',sans-serif}
+.list-search input::placeholder{color:rgba(255,255,255,.5)}
+.sort-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:10px 14px;background:var(--card);border-bottom:.5px solid var(--border);flex-shrink:0}
+.sort-row::-webkit-scrollbar{display:none}
+.sort-pill{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap;cursor:pointer;border:.5px solid var(--border-light);background:var(--card);color:#666;flex-shrink:0}
+.sort-pill.active{background:var(--green);color:#fff;border-color:var(--green)}
+/* CATEGORY FILTER BAR na lista */
+.list-cat-bar{background:var(--green);padding:0 14px 12px;flex-shrink:0}
+.list-cat-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.list-cat-row::-webkit-scrollbar{display:none}
+.list-cat-pill{display:flex;align-items:center;gap:5px;padding:6px 13px;border-radius:20px;font-size:12px;font-weight:500;white-space:nowrap;cursor:pointer;border:.5px solid transparent;flex-shrink:0;transition:all .15s}
+.list-cat-pill.active{background:#fff;color:var(--green)}
+.list-cat-pill.active i{color:var(--green)}
+.list-cat-pill:not(.active){background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.18)}
+.list-cat-pill i{font-size:13px}
+/* SUBFILTROS */
+.subfilter-bar{background:#f8f6f2;border-bottom:.5px solid var(--border);padding:8px 14px;flex-shrink:0;display:none}
+.subfilter-bar.visible{display:block}
+.subfilter-label{font-size:10px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px}
+.subfilter-row{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.subfilter-row::-webkit-scrollbar{display:none}
+.subf-pill{padding:4px 11px;border-radius:14px;font-size:11px;font-weight:500;white-space:nowrap;cursor:pointer;border:.5px solid var(--border-light);background:var(--card);color:#555;flex-shrink:0;transition:all .12s}
+.subf-pill.active{background:var(--green);color:#fff;border-color:var(--green)}
+.list-grid{display:flex;flex-direction:column;gap:10px;padding:14px}
+.lcard{background:var(--card);border-radius:14px;border:.5px solid var(--border);overflow:hidden;cursor:pointer;display:flex}
+.lcard-img{width:90px;height:90px;flex-shrink:0;overflow:hidden;background:#e8f4e8;display:flex;align-items:center;justify-content:center;position:relative}
+.lcard-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.lcard-img i{font-size:28px;opacity:.4}
+.lcard-img.nat{background:#d8efd8}.lcard-img.nat i{color:#2D6A4F}
+.lcard-img.food{background:#faeeda}.lcard-img.food i{color:#B7791F}
+.lcard-img.cult{background:#e8e4f8}.lcard-img.cult i{color:#534AB7}
+.lcard-img.coff{background:#f5edd8}.lcard-img.coff i{color:#8B5E3C}
+.lcard-body{padding:11px 13px;flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between}
+.lcard-name{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lcard-cat{font-size:11px;color:var(--muted);margin:2px 0 5px}
+.lcard-rat{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted)}
+.lcard-bot{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.lcard-dist{font-size:10px;color:var(--sub);display:flex;align-items:center;gap:3px}
+.lcard-open{font-size:10px;font-weight:500;padding:2px 7px;border-radius:8px}
+.lcard-open.open{background:#d8efd8;color:#2D6A4F}
+.lcard-open.closed{background:#fee2e2;color:#c0392b}
+
+/* ===== DETAIL SCREEN ===== */
+.det-hero{width:100%;height:230px;position:relative;background:#e8f4e8;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+.det-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.det-hero-back,.det-hero-save{
+  position:absolute;top:16px;width:36px;height:36px;
+  border-radius:10px;background:rgba(0,0,0,.35);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;z-index:5;-webkit-tap-highlight-color:transparent;
+}
+.det-hero-back{left:16px}
+.det-hero-save{right:16px}
+.det-hero-back i,.det-hero-save i{font-size:20px;color:#fff}
+.det-hero-save.saved{background:rgba(220,38,38,.75)}
+.det-body{padding:16px;flex:1}
+.det-tag{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:4px 10px;border-radius:10px;margin-bottom:10px}
+.det-tag.nat{background:#d8efd8;color:#2D6A4F}
+.det-tag.food{background:#faeeda;color:#B7791F}
+.det-tag.cult{background:#e8e4f8;color:#534AB7}
+.det-tag.coff{background:#f5edd8;color:#8B5E3C}
+.det-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.2}
+.det-rating-row{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.det-stars i{font-size:14px;color:#E9A93B}
+.det-rat-num{font-size:14px;font-weight:500;color:var(--text)}
+.det-rat-ct{font-size:12px;color:var(--muted)}
+.det-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.det-info-card{background:#f8f6f2;border-radius:12px;padding:11px 12px;display:flex;align-items:flex-start;gap:9px}
+.det-info-card i{font-size:18px;color:var(--green);flex-shrink:0;margin-top:1px}
+.det-info-card .dil{font-size:10px;color:var(--muted);margin-bottom:2px}
+.det-info-card .div{font-size:12px;font-weight:500;color:var(--text);line-height:1.4}
+.det-actions{display:flex;gap:8px;margin-bottom:20px}
+.det-btn{
+  flex:1;padding:12px 8px;border-radius:12px;border:none;
+  font-size:13px;font-weight:500;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  font-family:'DM Sans',sans-serif;-webkit-tap-highlight-color:transparent;
+}
+.det-btn.primary{background:var(--green);color:#fff}
+.det-btn.secondary{background:var(--card);color:var(--green);border:.5px solid var(--border-light)}
+.det-btn i{font-size:16px}
+.det-section-ttl{font-size:14px;font-weight:500;color:var(--text);margin-bottom:10px}
+.det-desc{font-size:13px;color:#555;line-height:1.65;margin-bottom:16px}
+.reviews-list{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.rev-item{background:#f8f6f2;border-radius:12px;padding:12px 13px}
+.rev-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.rev-author{font-size:12px;font-weight:500;color:var(--text)}
+.rev-stars i{font-size:11px;color:#E9A93B}
+.rev-text{font-size:12px;color:#555;line-height:1.55}
+
+/* ===== ROTEIRO SCREEN ===== */
+.rot-body{padding:16px}
+.rot-empty{text-align:center;padding:30px 20px;color:var(--muted)}
+.rot-empty i{font-size:48px;display:block;margin-bottom:12px;color:#ccc}
+.rot-btn-main{background:var(--green);color:#fff;border-radius:12px;padding:13px;text-align:center;cursor:pointer;font-weight:500;font-size:14px;margin-top:16px}
+.rot-steps{display:flex;flex-direction:column}
+.rot-step{display:flex;gap:12px;padding-bottom:14px}
+.rot-step-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:36px}
+.rot-num{width:36px;height:36px;border-radius:50%;background:var(--green);color:#fff;font-size:13px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rot-line{flex:1;width:2px;background:var(--border-light);margin:4px 0}
+.rot-card{background:var(--card);border-radius:14px;border:.5px solid var(--border);overflow:hidden;flex:1;cursor:pointer}
+.rot-card-img{height:80px;position:relative;overflow:hidden;background:#e8f4e8;display:flex;align-items:center;justify-content:center}
+.rot-card-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.rot-card-img i{font-size:28px;opacity:.35}
+.rot-card-img.nat{background:#d8efd8}.rot-card-img.nat i{color:#2D6A4F}
+.rot-card-img.food{background:#faeeda}.rot-card-img.food i{color:#B7791F}
+.rot-card-img.cult{background:#e8e4f8}.rot-card-img.cult i{color:#534AB7}
+.rot-card-img.coff{background:#f5edd8}.rot-card-img.coff i{color:#8B5E3C}
+.rot-card-body{padding:10px 12px}
+.rot-card-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rot-card-meta{display:flex;gap:10px}
+.rot-card-meta span{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:3px}
+
+/* ===== PROFILE ===== */
+.prof-hdr{background:var(--green);padding:28px 20px 22px;text-align:center;flex-shrink:0;position:relative}
+.prof-edit-btn{position:absolute;top:18px;right:18px;width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.prof-edit-btn i{font-size:18px;color:#fff}
+.prof-avatar{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.2);border:2.5px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;overflow:hidden;cursor:pointer}
+.prof-avatar i{font-size:32px;color:#fff}
+.prof-avatar img{width:100%;height:100%;object-fit:cover}
+.prof-name-d{font-family:'Playfair Display',serif;font-size:20px;color:#fff;margin-bottom:2px}
+.prof-sub-d{font-size:12px;color:rgba(255,255,255,.65)}
+.prof-stats{display:flex;justify-content:center;margin-top:16px}
+.pstat{flex:1;text-align:center;border-right:.5px solid rgba(255,255,255,.2);padding:8px 0}
+.pstat:last-child{border-right:none}
+.pstat .psn{font-size:18px;font-weight:500;color:#fff}
+.pstat .psl{font-size:10px;color:rgba(255,255,255,.6);margin-top:2px}
+.prof-body{padding:14px;flex:1}
+.prof-sec-ttl{font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;margin-top:4px}
+.prof-section{margin-bottom:20px}
+.saved-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.saved-card{background:var(--card);border-radius:12px;border:.5px solid var(--border);overflow:hidden;cursor:pointer}
+.saved-img{height:65px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center}
+.saved-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.saved-img i{font-size:24px;opacity:.4}
+.saved-img.nat{background:#d8efd8}.saved-img.nat i{color:#2D6A4F}
+.saved-img.food{background:#faeeda}.saved-img.food i{color:#B7791F}
+.saved-img.coff{background:#f5edd8}.saved-img.coff i{color:#8B5E3C}
+.saved-img.cult{background:#e8e4f8}.saved-img.cult i{color:#534AB7}
+.saved-body{padding:8px 9px}
+.saved-name{font-size:11px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.saved-sub{font-size:10px;color:var(--muted);margin-top:1px}
+.prof-menu-item{background:var(--card);border-radius:12px;border:.5px solid var(--border);padding:13px 14px;display:flex;align-items:center;gap:12px;margin-bottom:8px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.prof-menu-item i.lead{font-size:20px;color:var(--green);width:24px;text-align:center}
+.pm-label{flex:1;font-size:14px;color:var(--text)}
+.pm-val{font-size:12px;color:var(--muted);margin-right:4px}
+.prof-menu-item i.trail{font-size:16px;color:#ccc}
+.empty-state{text-align:center;padding:24px 16px;color:var(--muted);font-size:13px}
+.empty-state i{font-size:36px;display:block;margin-bottom:8px;color:#ccc}
+
+/* ===== MODALS ===== */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);
+  z-index:500;display:flex;align-items:flex-end;justify-content:center;
+}
+.modal-sheet{background:var(--card);border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:390px;animation:slideUp .2s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:36px;height:4px;border-radius:2px;background:var(--border-light);margin:0 auto 18px}
+.modal-title{font-family:'Playfair Display',serif;font-size:18px;color:var(--text);margin-bottom:16px}
+.form-field{margin-bottom:14px}
+.form-label{font-size:12px;color:var(--muted);margin-bottom:5px;display:block}
+.form-input{width:100%;border:.5px solid var(--border-light);border-radius:10px;padding:10px 13px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--text);background:#fafafa;outline:none}
+.form-input:focus{border-color:var(--green)}
+.modal-actions{display:flex;gap:8px;margin-top:6px}
+.modal-btn{flex:1;padding:12px;border-radius:12px;border:none;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
+.modal-btn.save{background:var(--green);color:#fff}
+.modal-btn.cancel{background:var(--bg);color:#666}
+.radius-opt{padding:12px 14px;border-radius:12px;border:.5px solid var(--border-light);cursor:pointer;font-size:14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.radius-opt.active-opt{border-color:var(--green);background:#f0f8f4}
+
+/* ===== WEATHER POPUP ===== */
+.weather-popup-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);
+  z-index:600;display:flex;align-items:flex-end;justify-content:center;
+}
+.weather-sheet{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:390px;animation:slideUp .22s ease;max-height:90vh;overflow-y:auto}
+.w-handle{width:36px;height:4px;border-radius:2px;background:var(--border-light);margin:14px auto 0}
+.w-hero{
+  background:linear-gradient(155deg,#1b5236 0%,#2D6A4F 55%,#3d8a65 100%);
+  padding:20px;margin:14px 14px 0;border-radius:16px;position:relative;overflow:hidden;
+}
+.w-hero::before{content:'';position:absolute;top:-40px;right:-20px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.05)}
+.w-hero-loc{font-size:11px;color:rgba(255,255,255,.6);margin-bottom:6px;display:flex;align-items:center;gap:4px}
+.w-hero-main{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px}
+.w-big-temp{font-size:56px;font-weight:300;color:#fff;line-height:1;letter-spacing:-2px}
+.w-big-temp sup{font-size:22px;vertical-align:top;margin-top:10px;font-weight:400}
+.w-hero-right{text-align:right}
+.w-hero-icon{font-size:44px;color:rgba(255,255,255,.9);display:block;margin-bottom:4px}
+.w-hero-desc{font-size:13px;color:rgba(255,255,255,.7)}
+.w-feels{font-size:12px;color:rgba(255,255,255,.55);margin-top:2px}
+.w-hero-extra{display:flex;border-top:.5px solid rgba(255,255,255,.15);padding-top:14px;gap:0}
+.w-extra-item{flex:1;text-align:center;border-right:.5px solid rgba(255,255,255,.12)}
+.w-extra-item:last-child{border-right:none}
+.w-extra-item .wil{font-size:9px;color:rgba(255,255,255,.5);margin-bottom:3px;text-transform:uppercase;letter-spacing:.4px}
+.w-extra-item .wiv{font-size:13px;font-weight:500;color:#fff;display:flex;align-items:center;justify-content:center;gap:4px}
+.w-extra-item .wiv i{font-size:13px;color:var(--gl)}
+.w-section-label{font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:14px 20px 8px}
+.hourly-row{display:flex;gap:8px;overflow-x:auto;padding:0 20px 4px;scrollbar-width:none}
+.hourly-row::-webkit-scrollbar{display:none}
+.hour-card{background:#f8f6f2;border-radius:12px;border:.5px solid var(--border);padding:10px 12px;text-align:center;flex-shrink:0;min-width:58px}
+.hour-card.now{background:var(--green);border-color:var(--green)}
+.hc-time{font-size:10px;color:var(--muted);margin-bottom:5px}
+.hc-time.now{color:rgba(255,255,255,.7)}
+.hc-icon{font-size:18px;color:var(--green);margin-bottom:4px;display:block}
+.hc-icon.now{color:rgba(255,255,255,.9)}
+.hc-temp{font-size:13px;font-weight:500;color:var(--text)}
+.hc-temp.now{color:#fff}
+.daily-list{margin:0 14px}
+.day-row{display:flex;align-items:center;gap:10px;padding:11px 13px;background:#f8f6f2;border-bottom:.5px solid #ece9e3}
+.day-row:first-child{border-radius:12px 12px 0 0}
+.day-row:last-child{border-radius:0 0 12px 12px;border-bottom:none}
+.day-name{font-size:13px;font-weight:500;color:var(--text);width:52px;flex-shrink:0}
+.day-icon{font-size:20px;color:var(--green);width:26px;text-align:center;flex-shrink:0}
+.day-desc{font-size:11px;color:var(--muted);flex:1}
+.day-rain{font-size:11px;color:#5b9bd5;display:flex;align-items:center;gap:2px;width:38px;flex-shrink:0}
+.day-minmax{display:flex;gap:6px;flex-shrink:0}
+.day-min{font-size:12px;color:var(--sub)}
+.day-max{font-size:13px;font-weight:500;color:var(--text)}
+.w-credit{text-align:center;padding:12px 0 16px;font-size:10px;color:#bbb}
+
+/* ===== SPINNER ===== */
+.spinner{width:22px;height:22px;border:2.5px solid var(--border-light);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-box{padding:24px;text-align:center}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- ===== HOME ===== -->
+  <div class="screen active" id="screen-home">
+    <div class="header">
+      <div class="header-top">
+        <div>
+          <div class="loc-line"><i class="ti ti-map-pin"></i><span id="loc-text">Campos do Jordão, SP</span></div>
+          <div class="htitle">Explore a <span>Serra</span></div>
+        </div>
+        <div class="wchip" id="weather-chip-btn">
+          <i class="ti ti-cloud-snow" id="chip-icon"></i>
+          <span id="chip-temp">--°C</span>
+        </div>
+      </div>
+      <div class="searchbar"><i class="ti ti-search"></i><input type="text" placeholder="Buscar restaurantes, parques..." id="search-input"/></div>
+      <div class="cats" id="cats">
+        <div class="cat active" data-type="all"><i class="ti ti-layout-grid"></i> Todos</div>
+        <div class="cat" data-type="tourist_attraction"><i class="ti ti-building-arch"></i> Pontos turísticos</div>
+        <div class="cat" data-type="park"><i class="ti ti-trees"></i> Natureza</div>
+        <div class="cat" data-type="restaurant"><i class="ti ti-tools-kitchen-2"></i> Restaurantes</div>
+        <div class="cat" data-type="cafe"><i class="ti ti-coffee"></i> Cafés</div>
+        <div class="cat" data-type="bar"><i class="ti ti-beer"></i> Bares</div>
+        <div class="cat" data-type="shopping_mall"><i class="ti ti-shopping-bag"></i> Compras</div>
+      </div>
+    </div>
+    <div class="body">
+      <div class="geo-bar"><div class="geo-dot"></div><span id="geo-status">Obtendo geolocalização...</span></div>
+      <div id="map-home-container"><div id="map-home"></div><div class="mlo" id="map-home-loading"><div class="spinner"></div></div></div>
+      <div class="sec-hdr">
+        <div class="sec-ttl">Em destaque</div>
+        <div class="see-all" id="see-all-featured">Ver todos <i class="ti ti-arrow-right" style="font-size:12px"></i></div>
+      </div>
+      <div class="cards-row" id="featured-cards"><div class="loading-box"><div class="spinner"></div></div></div>
+      <div class="rotbanner" id="rot-banner">
+        <div class="roticon"><i class="ti ti-route"></i></div>
+        <div class="rottext"><p>Montar meu roteiro agora</p><p>IA cria rota otimizada com tempo em cada ponto</p></div>
+        <i class="ti ti-arrow-right" style="margin-left:auto;color:rgba(255,255,255,.5)"></i>
+      </div>
+      <div class="sec-hdr">
+        <div class="sec-ttl">Mais próximos</div>
+        <div class="see-all" id="see-all-near">Ver todos <i class="ti ti-arrow-right" style="font-size:12px"></i></div>
+      </div>
+      <div class="nearlist" id="near-list"><div class="loading-box"><div class="spinner"></div></div></div>
+    </div>
+  </div>
+
+  <!-- ===== LIST ALL ===== -->
+  <div class="screen" id="screen-list">
+    <div class="list-hdr">
+      <div class="back-btn" id="list-back"><i class="ti ti-arrow-left"></i></div>
+      <div><h2 id="list-title">Todos os lugares</h2><p id="list-subtitle">Carregando...</p></div>
+    </div>
+    <div style="background:var(--green);padding:0 14px 0">
+      <div class="list-search"><i class="ti ti-search"></i><input type="text" id="list-search-input" placeholder="Buscar na lista..."/></div>
+    </div>
+    <!-- FILTROS DE CATEGORIA -->
+    <div class="list-cat-bar">
+      <div class="list-cat-row" id="list-cat-row">
+        <div class="list-cat-pill active" data-type="all"><i class="ti ti-layout-grid"></i>Todos</div>
+        <div class="list-cat-pill" data-type="tourist_attraction"><i class="ti ti-building-arch"></i>Pontos turísticos</div>
+        <div class="list-cat-pill" data-type="park"><i class="ti ti-trees"></i>Natureza</div>
+        <div class="list-cat-pill" data-type="restaurant"><i class="ti ti-tools-kitchen-2"></i>Restaurantes</div>
+        <div class="list-cat-pill" data-type="cafe"><i class="ti ti-coffee"></i>Cafés</div>
+        <div class="list-cat-pill" data-type="bar"><i class="ti ti-beer"></i>Bares</div>
+        <div class="list-cat-pill" data-type="shopping_mall"><i class="ti ti-shopping-bag"></i>Compras</div>
+      </div>
+    </div>
+    <!-- SUBFILTROS (aparecem dinamicamente por categoria) -->
+    <div class="subfilter-bar" id="subfilter-bar">
+      <div class="subfilter-label" id="subfilter-label">Especialidade</div>
+      <div class="subfilter-row" id="subfilter-row"></div>
+    </div>
+    <!-- ORDENAÇÃO -->
+    <div class="sort-row" id="sort-row">
+      <div class="sort-pill active" data-sort="rating">Melhor avaliados</div>
+      <div class="sort-pill" data-sort="dist">Mais próximos</div>
+      <div class="sort-pill" data-sort="reviews">Mais avaliados</div>
+      <div class="sort-pill" data-sort="az">A–Z</div>
+    </div>
+    <div class="list-grid" id="list-grid"></div>
+  </div>
+
+  <!-- ===== MAP ===== -->
+  <div class="screen" id="screen-map" style="padding-bottom:70px">
+    <div class="map-full-hdr">
+      <h2>Mapa de Campos do Jordão</h2>
+      <div class="mfrow" id="map-filters">
+        <div class="mfpill active" data-type="all">Todos</div>
+        <div class="mfpill" data-type="tourist_attraction">Pontos turísticos</div>
+        <div class="mfpill" data-type="park">Natureza</div>
+        <div class="mfpill" data-type="restaurant">Restaurantes</div>
+        <div class="mfpill" data-type="cafe">Cafés</div>
+        <div class="mfpill" data-type="bar">Bares</div>
+      </div>
+    </div>
+    <div id="map-full" style="flex:1;min-height:360px"></div>
+    <div class="map-legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#534AB7"></div>Ponto turístico</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#2D6A4F"></div>Natureza</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#B7791F"></div>Restaurante</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#8B5E3C"></div>Café</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#D85A30"></div>Bar</div>
+    </div>
+  </div>
+
+  <!-- ===== ROTEIRO ===== -->
+  <div class="screen" id="screen-roteiro">
+    <div class="map-full-hdr" style="padding-bottom:18px"><h2>Meu Roteiro</h2></div>
+    <div class="rot-body">
+      <div id="rot-content">
+        <div class="rot-empty">
+          <i class="ti ti-route"></i>
+          <p style="font-weight:500;color:#555;font-size:15px;margin-bottom:6px">Monte seu roteiro</p>
+          <p style="font-size:13px;line-height:1.6">A IA analisa pontos próximos, avaliações e tempo estimado para criar o roteiro ideal.</p>
+        </div>
+        <div class="rot-btn-main" id="criar-rot-btn">Criar roteiro com IA ↗</div>
+      </div>
+      <div id="roteiro-steps" style="margin-top:16px"></div>
+    </div>
+  </div>
+
+  <!-- ===== DETAIL ===== -->
+  <div class="screen" id="screen-detail">
+    <div class="det-hero" id="det-hero">
+      <div class="det-hero-back" id="det-back"><i class="ti ti-arrow-left"></i></div>
+      <div class="det-hero-save" id="det-save"><i class="ti ti-heart"></i></div>
+    </div>
+    <div class="det-body" id="det-body"></div>
+  </div>
+
+  <!-- ===== PROFILE ===== -->
+  <div class="screen" id="screen-profile">
+    <div class="prof-hdr">
+      <div class="prof-edit-btn" id="prof-edit-btn"><i class="ti ti-edit"></i></div>
+      <div class="prof-avatar" id="prof-avatar"><i class="ti ti-user" id="prof-av-icon"></i></div>
+      <div class="prof-name-d" id="prof-name-d">Visitante</div>
+      <div class="prof-sub-d" id="prof-sub-d">Bem-vindo a Campos do Jordão</div>
+      <div class="prof-stats">
+        <div class="pstat"><div class="psn" id="ps-visited">0</div><div class="psl">Visitados</div></div>
+        <div class="pstat"><div class="psn" id="ps-saved">0</div><div class="psl">Salvos</div></div>
+        <div class="pstat"><div class="psn" id="ps-reviews">0</div><div class="psl">Avaliações</div></div>
+      </div>
+    </div>
+    <div class="prof-body">
+      <div class="prof-section">
+        <div class="prof-sec-ttl">Lugares salvos</div>
+        <div class="saved-grid" id="prof-saved-grid"><div class="empty-state" style="grid-column:1/-1"><i class="ti ti-heart"></i>Nenhum lugar salvo ainda.</div></div>
+      </div>
+      <div class="prof-section">
+        <div class="prof-sec-ttl">Preferências</div>
+        <div class="prof-menu-item" id="pref-notif"><i class="ti ti-bell lead"></i><span class="pm-label">Notificações</span><span class="pm-val" id="pref-notif-val">Ativas</span><i class="ti ti-chevron-right trail"></i></div>
+        <div class="prof-menu-item" id="pref-radius"><i class="ti ti-map-pin lead"></i><span class="pm-label">Raio de busca</span><span class="pm-val" id="pref-radius-val">5 km</span><i class="ti ti-chevron-right trail"></i></div>
+        <div class="prof-menu-item" id="pref-lang"><i class="ti ti-language lead"></i><span class="pm-label">Idioma</span><span class="pm-val">Português</span><i class="ti ti-chevron-right trail"></i></div>
+      </div>
+      <div class="prof-section">
+        <div class="prof-sec-ttl">Sobre</div>
+        <div class="prof-menu-item"><i class="ti ti-info-circle lead"></i><span class="pm-label">Sobre o app</span><i class="ti ti-chevron-right trail"></i></div>
+        <div class="prof-menu-item"><i class="ti ti-help lead"></i><span class="pm-label">Ajuda & Suporte</span><i class="ti ti-chevron-right trail"></i></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== BOTTOM NAV ===== -->
+  <div class="bnav">
+    <div class="bni active" data-screen="home"><i class="ti ti-home"></i><span>Início</span></div>
+    <div class="bni" data-screen="map"><i class="ti ti-map-2"></i><span>Mapa</span></div>
+    <div class="bni" data-screen="roteiro"><i class="ti ti-route"></i><span>Roteiro</span></div>
+    <div class="bni" data-screen="profile"><i class="ti ti-user"></i><span>Perfil</span></div>
+  </div>
+
+  <!-- ===== MODAL: EDIT PROFILE ===== -->
+  <div class="modal-overlay" id="modal-profile" style="display:none">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Editar perfil</div>
+      <div class="form-field"><label class="form-label">Nome</label><input class="form-input" id="edit-name" type="text" placeholder="Seu nome"/></div>
+      <div class="form-field"><label class="form-label">Cidade de origem</label><input class="form-input" id="edit-city" type="text" placeholder="Ex: São Paulo, SP"/></div>
+      <div class="form-field"><label class="form-label">Sobre você</label><input class="form-input" id="edit-bio" type="text" placeholder="Ex: Apaixonado por trilhas"/></div>
+      <div class="modal-actions">
+        <button class="modal-btn cancel" id="modal-prof-cancel">Cancelar</button>
+        <button class="modal-btn save" id="modal-prof-save">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: RADIUS ===== -->
+  <div class="modal-overlay" id="modal-radius" style="display:none">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Raio de busca</div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Escolha o raio para encontrar lugares próximos</p>
+      <div id="radius-opts">
+        <div class="radius-opt" data-km="2">2 km <span style="font-size:12px;color:var(--muted)">Área central</span></div>
+        <div class="radius-opt active-opt" data-km="5">5 km <span style="font-size:12px;color:var(--green);font-weight:500">✓ Atual</span></div>
+        <div class="radius-opt" data-km="10">10 km <span style="font-size:12px;color:var(--muted)">Região ampla</span></div>
+        <div class="radius-opt" data-km="20">20 km <span style="font-size:12px;color:var(--muted)">Serra toda</span></div>
+      </div>
+      <div class="modal-actions" style="margin-top:8px"><button class="modal-btn cancel" id="radius-close">Fechar</button></div>
+    </div>
+  </div>
+
+  <!-- ===== WEATHER POPUP ===== -->
+  <div class="weather-popup-overlay" id="weather-popup" style="display:none">
+    <div class="weather-sheet" id="weather-sheet">
+      <div class="w-handle"></div>
+      <div id="weather-content"><div class="loading-box" style="padding:40px"><div class="spinner"></div></div></div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<script>
+/* ================================================
+   CONFIGURAÇÃO
+================================================ */
+const GOOGLE_API_KEY = 'AIzaSyDfQIYqC6B8Q1AR-osYKDAkI9dkYJZd0rk'; // substituir pela chave nova
+const CJ = {lat:-22.7389, lng:-45.5908};
+
+/* ================================================
+   TYPE CONFIG
+================================================ */
+const TC = {
+  tourist_attraction:{icon:'ti-building-arch',cls:'cult',label:'Ponto turístico',time:'1–2h',color:'#534AB7',nc:'c'},
+  park:{icon:'ti-trees',cls:'nat',label:'Parque / Natureza',time:'2–4h',color:'#2D6A4F',nc:'n'},
+  restaurant:{icon:'ti-tools-kitchen-2',cls:'food',label:'Restaurante',time:'1–2h',color:'#B7791F',nc:'f'},
+  cafe:{icon:'ti-coffee',cls:'coff',label:'Café',time:'30–60min',color:'#8B5E3C',nc:'p'},
+  bar:{icon:'ti-beer',cls:'food',label:'Bar',time:'1–2h',color:'#D85A30',nc:'f'},
+  shopping_mall:{icon:'ti-shopping-bag',cls:'cult',label:'Compras',time:'1–3h',color:'#534AB7',nc:'c'},
+  default:{icon:'ti-map-pin',cls:'nat',label:'Local',time:'1h',color:'#2D6A4F',nc:'n'}
+};
+function cfg(types){if(!types)return TC.default;for(const t of Object.keys(TC)){if(types.includes(t))return TC[t];}return TC.default;}
+
+/* ================================================
+   UTILS
+================================================ */
+function dist(a,b,c,d){
+  const R=6371,dl=(c-a)*Math.PI/180,dn=(d-b)*Math.PI/180;
+  const x=Math.sin(dl/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dn/2)**2;
+  return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
+}
+function wt(km){const m=Math.round(km/0.08);return m<60?`~${m}min`:`~${Math.round(m/60)}h`;}
+function starsH(r,sz=10){
+  if(!r)return '';let s='';
+  for(let i=1;i<=5;i++){
+    if(r>=i) s+=`<i class="ti ti-star-filled" style="font-size:${sz}px;color:#E9A93B"></i>`;
+    else if(r>=i-.5) s+=`<i class="ti ti-star-half-filled" style="font-size:${sz}px;color:#E9A93B"></i>`;
+    else s+=`<i class="ti ti-star" style="font-size:${sz}px;color:#E9A93B"></i>`;
+  }return s;
+}
+function photoUrl(p,w=400){return p.photos&&p.photos.length?p.photos[0].getUrl({maxWidth:w,maxHeight:w}):null;}
+function fmtN(n){return n?n.toLocaleString('pt-BR'):'?';}
+
+/* ================================================
+   STATE
+================================================ */
+let mapHome, mapFull, fullInited=false;
+let userLat=CJ.lat, userLng=CJ.lng;
+let allPlaces=[], homeMarkers=[], fullMarkers=[];
+let savedIds=new Set();
+let prevScreen='home';
+let searchRadius=5000;
+let listPlaces=[], listSort='rating';
+let listCatFilter='all', listSubFilter=null;
+let profile={name:'Visitante',city:'',bio:''};
+let weatherData=null;
+let roteiroPlaces=[];
+
+/* ================================================
+   SCREEN NAVIGATION
+================================================ */
+function showScreen(name){
+  const cur=document.querySelector('.screen.active');
+  if(cur&&cur.id!=='screen-'+name) prevScreen=cur.id.replace('screen-','');
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.bni').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  const bn=document.querySelector(`.bni[data-screen="${name}"]`);
+  if(bn) bn.classList.add('active');
+  if(name==='map') setTimeout(initMapFull,80);
+  if(name==='profile') refreshProfile();
+}
+
+/* ================================================
+   RENDER HOME
+================================================ */
+function renderFeatured(places){
+  const el=document.getElementById('featured-cards');
+  if(!places.length){el.innerHTML='<p style="padding:10px;font-size:13px;color:var(--muted)">Nenhum lugar encontrado.</p>';return;}
+  el.innerHTML=places.slice(0,12).map(p=>{
+    const c=cfg(p.types);
+    const d=dist(userLat,userLng,p.geometry.location.lat(),p.geometry.location.lng());
+    const url=photoUrl(p);
+    const ob=p.opening_hours?(p.opening_hours.isOpen()?'<span class="cbadge open">Aberto</span>':'<span class="cbadge closed">Fechado</span>'):'';
+    const img=url?`<img src="${url}" alt="${p.name}" onerror="this.style.display='none'">`:'';
+    return `<div class="pcard" data-pid="${p.place_id}">
+      <div class="cimg-wrap ${c.cls}">${img}<i class="ti ${c.icon} fall"></i>${ob}</div>
+      <div class="cbody">
+        <div class="cname">${p.name}</div>
+        <div class="cmeta"><span class="ccat">${c.label}</span><span class="cdist"><i class="ti ti-walk"></i>${d.toFixed(1)}km</span></div>
+        <div class="crating"><div class="stars">${starsH(p.rating)}</div><span>${p.rating?p.rating.toFixed(1):'–'} (${fmtN(p.user_ratings_total)})</span></div>
+        <div class="ctime"><i class="ti ti-clock"></i>${c.time}</div>
+      </div>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('.pcard').forEach(card=>card.addEventListener('click',()=>openDetail(card.dataset.pid)));
+}
+
+function renderNear(places){
+  const el=document.getElementById('near-list');
+  if(!places.length){el.innerHTML='<p style="padding:10px;font-size:13px;color:var(--muted)">Nenhum lugar próximo.</p>';return;}
+  const sorted=[...places].sort((a,b)=>
+    dist(userLat,userLng,a.geometry.location.lat(),a.geometry.location.lng())-
+    dist(userLat,userLng,b.geometry.location.lat(),b.geometry.location.lng())
+  );
+  el.innerHTML=sorted.slice(0,8).map(p=>{
+    const c=cfg(p.types);
+    const d=dist(userLat,userLng,p.geometry.location.lat(),p.geometry.location.lng());
+    const url=photoUrl(p,150);
+    const img=url?`<img src="${url}" alt="${p.name}" onerror="this.style.display='none'">`:`<i class="ti ${c.icon}"></i>`;
+    return `<div class="nitem" data-pid="${p.place_id}">
+      <div class="nthumb ${c.nc}">${img}</div>
+      <div class="ninfo"><div class="nname">${p.name}</div><div class="nsub"><i class="ti ti-map-pin"></i>${d.toFixed(1)} km · ${c.label}</div></div>
+      <div class="nright"><div class="dbadge">${wt(d)}</div><div class="nrat"><i class="ti ti-star-filled"></i>${p.rating?p.rating.toFixed(1):'–'}<span>(${fmtN(p.user_ratings_total)})</span></div></div>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('.nitem').forEach(item=>item.addEventListener('click',()=>openDetail(item.dataset.pid)));
+}
+
+/* ================================================
+   LIST ALL — filtros de categoria + subfiltros
+================================================ */
+
+// Subfiltros por categoria — detectados nos types do Google Places
+const SUBFILTERS = {
+  tourist_attraction: [
+    {label:'Passeio livre',   match:['park','tourist_attraction']},
+    {label:'Museu',           match:['museum']},
+    {label:'Mirante',         match:['point_of_interest']},
+    {label:'Igreja / Capela', match:['church','place_of_worship']},
+    {label:'Monumento',       match:['premise','establishment']},
+  ],
+  park: [
+    {label:'Trilha',          match:['park','natural_feature']},
+    {label:'Jardim',          match:['park']},
+    {label:'Cachoeira',       match:['natural_feature']},
+    {label:'Camping',         match:['campground']},
+  ],
+  restaurant: [
+    {label:'Italiano',        match:['restaurant'], kw:'italian'},
+    {label:'Suíço / Europeu', match:['restaurant'], kw:'swiss'},
+    {label:'Brasileiro',      match:['restaurant'], kw:'brazilian'},
+    {label:'Churrasco',       match:['restaurant'], kw:'churrasco'},
+    {label:'Pizza',           match:['restaurant'], kw:'pizza'},
+    {label:'Frutos do mar',   match:['restaurant'], kw:'seafood'},
+    {label:'Vegano',          match:['restaurant'], kw:'vegan'},
+  ],
+  cafe: [
+    {label:'Chocolate',       match:['cafe'], kw:'chocolate'},
+    {label:'Café colonial',   match:['cafe'], kw:'colonial'},
+    {label:'Padaria',         match:['bakery']},
+    {label:'Sorveteria',      match:['ice_cream']},
+  ],
+  bar: [
+    {label:'Cervejaria',      match:['bar'], kw:'cerveja'},
+    {label:'Pub',             match:['bar'], kw:'pub'},
+    {label:'Vinho',           match:['bar'], kw:'vinho'},
+  ],
+  shopping_mall: [
+    {label:'Artesanato',      match:['store'], kw:'artesanato'},
+    {label:'Chocolates',      match:['store'], kw:'chocolate'},
+    {label:'Roupas',          match:['clothing_store']},
+    {label:'Souvenirs',       match:['store'], kw:'souvenir'},
+  ],
+};
+
+let listCatFilter = 'all';
+let listSubFilter = null;
+
+function placeMatchesSubfilter(p, sf) {
+  if (!sf) return true;
+  const types = p.types || [];
+  const name  = (p.name || '').toLowerCase();
+  const vicinity = (p.vicinity || '').toLowerCase();
+  const typeMatch = sf.match.some(t => types.includes(t));
+  if (sf.kw) {
+    return typeMatch && (name.includes(sf.kw) || vicinity.includes(sf.kw));
+  }
+  return typeMatch;
+}
+
+function buildSubfilters(catType) {
+  const bar = document.getElementById('subfilter-bar');
+  const row = document.getElementById('subfilter-row');
+  const lbl = document.getElementById('subfilter-label');
+  const subs = SUBFILTERS[catType];
+  if (!subs || catType === 'all') { bar.classList.remove('visible'); listSubFilter=null; return; }
+  bar.classList.add('visible');
+  const labels = { tourist_attraction:'Tipo de ponto', park:'Tipo de natureza', restaurant:'Cozinha', cafe:'Tipo de café', bar:'Tipo de bar', shopping_mall:'Segmento' };
+  lbl.textContent = labels[catType] || 'Especialidade';
+  row.innerHTML = `<div class="subf-pill active" data-sub="all">Todos</div>` +
+    subs.map((s,i) => `<div class="subf-pill" data-sub="${i}">${s.label}</div>`).join('');
+  row.querySelectorAll('.subf-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      row.querySelectorAll('.subf-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      listSubFilter = pill.dataset.sub === 'all' ? null : subs[parseInt(pill.dataset.sub)];
+      renderList();
+    });
+  });
+}
+
+function openListAll(title, places, initialCat) {
+  listPlaces = places;
+  listCatFilter = initialCat || 'all';
+  listSubFilter = null;
+  document.getElementById('list-title').textContent = title;
+  document.getElementById('list-search-input').value = '';
+  listSort = 'rating';
+  document.querySelectorAll('.sort-pill').forEach(p => p.classList.toggle('active', p.dataset.sort === 'rating'));
+  // sync cat pills
+  document.querySelectorAll('.list-cat-pill').forEach(p => p.classList.toggle('active', p.dataset.type === listCatFilter));
+  buildSubfilters(listCatFilter);
+  renderList();
+  showScreen('list');
+}
+
+function renderList() {
+  let places = [...listPlaces];
+  // categoria
+  if (listCatFilter !== 'all') {
+    places = places.filter(p => p.types && p.types.includes(listCatFilter));
+  }
+  // subfiltro
+  if (listSubFilter) {
+    places = places.filter(p => placeMatchesSubfilter(p, listSubFilter));
+    // se subfiltro por kw não encontrar nada, mostra todos da categoria
+    if (!places.length) places = listPlaces.filter(p => p.types && p.types.includes(listCatFilter));
+  }
+  // busca por texto
+  const q = document.getElementById('list-search-input').value.toLowerCase();
+  if (q) places = places.filter(p => p.name.toLowerCase().includes(q) || (p.vicinity||'').toLowerCase().includes(q));
+  // ordenação
+  if (listSort === 'rating')   places.sort((a,b) => (b.rating||0) - (a.rating||0));
+  else if (listSort === 'dist') places.sort((a,b) => dist(userLat,userLng,a.geometry.location.lat(),a.geometry.location.lng()) - dist(userLat,userLng,b.geometry.location.lat(),b.geometry.location.lng()));
+  else if (listSort === 'reviews') places.sort((a,b) => (b.user_ratings_total||0) - (a.user_ratings_total||0));
+  else if (listSort === 'az')  places.sort((a,b) => a.name.localeCompare(b.name,'pt-BR'));
+  document.getElementById('list-subtitle').textContent = `${places.length} lugar${places.length !== 1 ? 'es' : ''} encontrado${places.length !== 1 ? 's' : ''}`;
+  const el = document.getElementById('list-grid');
+  if (!places.length) { el.innerHTML = '<div class="empty-state"><i class="ti ti-search"></i>Nenhum resultado encontrado.</div>'; return; }
+  el.innerHTML = places.map(p => {
+    const c = cfg(p.types);
+    const d = dist(userLat, userLng, p.geometry.location.lat(), p.geometry.location.lng());
+    const url = photoUrl(p, 200);
+    const img = url ? `<img src="${url}" alt="${p.name}" onerror="this.style.display='none'">` : `<i class="ti ${c.icon}"></i>`;
+    const ob = p.opening_hours ? (p.opening_hours.isOpen() ? '<span class="lcard-open open">Aberto</span>' : '<span class="lcard-open closed">Fechado</span>') : '';
+    return `<div class="lcard" data-pid="${p.place_id}">
+      <div class="lcard-img ${c.cls}">${img}</div>
+      <div class="lcard-body">
+        <div class="lcard-name">${p.name}</div>
+        <div class="lcard-cat">${c.label}</div>
+        <div class="lcard-rat">${starsH(p.rating,12)}<span style="margin-left:4px">${p.rating ? p.rating.toFixed(1) : '–'} (${fmtN(p.user_ratings_total)})</span></div>
+        <div class="lcard-bot"><span class="lcard-dist"><i class="ti ti-map-pin" style="font-size:10px"></i>${d.toFixed(1)} km · ${wt(d)}</span>${ob}</div>
+      </div>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('.lcard').forEach(card => card.addEventListener('click', () => openDetail(card.dataset.pid)));
+}
+
+/* ================================================
+   DETAIL
+================================================ */
+function openDetail(pid){
+  const p=allPlaces.find(x=>x.place_id===pid);
+  if(!p)return;
+  const c=cfg(p.types);
+  const url=photoUrl(p,700);
+  const hero=document.getElementById('det-hero');
+  // clear
+  Array.from(hero.children).forEach(ch=>{if(!ch.classList.contains('det-hero-back')&&!ch.classList.contains('det-hero-save'))ch.remove();});
+  if(url){const img=new Image();img.src=url;img.alt=p.name;img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover';img.onerror=()=>img.remove();hero.appendChild(img);}
+  else{const ic=document.createElement('i');ic.className=`ti ${c.icon}`;ic.style.cssText='font-size:60px;opacity:.25';hero.appendChild(ic);}
+  const savedBtn=document.getElementById('det-save');
+  savedBtn.className='det-hero-save'+(savedIds.has(pid)?' saved':'');
+  document.getElementById('det-back').onclick=()=>showScreen(prevScreen);
+  savedBtn.onclick=()=>toggleSave(pid);
+  const addr=p.vicinity||'Campos do Jordão, SP';
+  const d=dist(userLat,userLng,p.geometry.location.lat(),p.geometry.location.lng());
+  const openStr=p.opening_hours?(p.opening_hours.isOpen()?'<span style="color:#2D6A4F;font-weight:500">Aberto agora</span>':'<span style="color:#c0392b;font-weight:500">Fechado</span>'):'N/D';
+  const revsHtml=p.reviews&&p.reviews.length
+    ?`<div class="det-section-ttl">Avaliações do Google</div><div class="reviews-list">${p.reviews.slice(0,3).map(r=>`<div class="rev-item"><div class="rev-top"><span class="rev-author">${r.author_name}</span><div class="rev-stars">${starsH(r.rating,11)}</div></div><div class="rev-text">${r.text?r.text.slice(0,150)+(r.text.length>150?'...':''):'Sem comentário.'}</div></div>`).join('')}</div>`
+    :'';
+  document.getElementById('det-body').innerHTML=`
+    <div class="det-tag ${c.cls}"><i class="ti ${c.icon}" style="font-size:12px"></i>${c.label}</div>
+    <div class="det-name">${p.name}</div>
+    <div class="det-rating-row">
+      <div class="det-stars">${starsH(p.rating,15)}</div>
+      <span class="det-rat-num">${p.rating?p.rating.toFixed(1):'–'}</span>
+      <span class="det-rat-ct">(${fmtN(p.user_ratings_total)} avaliações)</span>
+    </div>
+    <div class="det-info-grid">
+      <div class="det-info-card"><i class="ti ti-map-pin"></i><div><div class="dil">Endereço</div><div class="div">${addr}</div></div></div>
+      <div class="det-info-card"><i class="ti ti-walk"></i><div><div class="dil">Distância</div><div class="div">${d.toFixed(1)} km · ${wt(d)}</div></div></div>
+      <div class="det-info-card"><i class="ti ti-clock"></i><div><div class="dil">Funcionamento</div><div class="div">${openStr}</div></div></div>
+      <div class="det-info-card"><i class="ti ti-clock-hour-4"></i><div><div class="dil">Tempo estimado</div><div class="div">${c.time}</div></div></div>
+    </div>
+    <div class="det-actions">
+      <button class="det-btn primary" onclick="openGoogleMaps('${p.name.replace(/'/g,"\\'")}',${p.geometry.location.lat()},${p.geometry.location.lng()})"><i class="ti ti-navigation"></i>Como chegar</button>
+      <button class="det-btn secondary" onclick="addToRoteiro('${pid}')"><i class="ti ti-route"></i>Ao roteiro</button>
+    </div>
+    <div class="det-section-ttl">Sobre o lugar</div>
+    <div class="det-desc">Localizado em Campos do Jordão, ${p.name} é um dos destinos mais procurados da região. ${p.rating&&p.rating>=4.5?'Altamente recomendado pelos visitantes com nota excelente no Google.':p.rating&&p.rating>=4.0?'Muito bem avaliado pelos turistas que visitaram.':'Um destino interessante para incluir no roteiro.'}</div>
+    ${revsHtml}
+  `;
+  showScreen('detail');
+}
+
+function openGoogleMaps(name,lat,lng){
+  window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`,'_blank');
+}
+
+function toggleSave(pid){
+  if(savedIds.has(pid)) savedIds.delete(pid);
+  else savedIds.add(pid);
+  const btn=document.getElementById('det-save');
+  if(btn) btn.className='det-hero-save'+(savedIds.has(pid)?' saved':'');
+  document.getElementById('ps-saved').textContent=savedIds.size;
+}
+
+function addToRoteiro(pid){
+  const p=allPlaces.find(x=>x.place_id===pid);
+  if(!p)return;
+  if(!roteiroPlaces.find(x=>x.place_id===pid)) roteiroPlaces.push(p);
+  renderRoteiro();
+  showScreen('roteiro');
+}
+
+/* ================================================
+   ROTEIRO
+================================================ */
+function renderRoteiro(){
+  const content=document.getElementById('rot-content');
+  const steps=document.getElementById('roteiro-steps');
+  if(!roteiroPlaces.length){
+    content.style.display='block';
+    steps.innerHTML='';
+    return;
+  }
+  content.style.display='none';
+  const sorted=[...roteiroPlaces].sort((a,b)=>
+    dist(userLat,userLng,a.geometry.location.lat(),a.geometry.location.lng())-
+    dist(userLat,userLng,b.geometry.location.lat(),b.geometry.location.lng())
+  );
+  steps.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--text)">${sorted.length} lugar${sorted.length>1?'es':''} no roteiro</div>
+      <div style="font-size:12px;color:var(--green);cursor:pointer" id="clear-rot">Limpar tudo</div>
+    </div>
+    <div class="rot-steps">
+      ${sorted.map((p,i)=>{
+        const c=cfg(p.types);
+        const url=photoUrl(p,300);
+        const img=url?`<img src="${url}" alt="${p.name}" onerror="this.style.display='none'">`:`<i class="ti ${c.icon}"></i>`;
+        const d=dist(userLat,userLng,p.geometry.location.lat(),p.geometry.location.lng());
+        return `<div class="rot-step">
+          <div class="rot-step-left">
+            <div class="rot-num">${i+1}</div>
+            ${i<sorted.length-1?'<div class="rot-line"></div>':''}
+          </div>
+          <div class="rot-card" data-pid="${p.place_id}">
+            <div class="rot-card-img ${c.cls}">${img}</div>
+            <div class="rot-card-body">
+              <div class="rot-card-name">${p.name}</div>
+              <div class="rot-card-meta">
+                <span><i class="ti ti-clock"></i>${c.time}</span>
+                <span><i class="ti ti-map-pin"></i>${d.toFixed(1)} km</span>
+                ${p.rating?`<span><i class="ti ti-star-filled" style="color:#E9A93B"></i>${p.rating.toFixed(1)}</span>`:''}
+              </div>
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="background:var(--green);color:#fff;border-radius:12px;padding:13px;text-align:center;cursor:pointer;font-weight:500;font-size:14px;margin-top:16px" id="start-rot-btn">
+      <i class="ti ti-navigation" style="vertical-align:-2px;margin-right:6px"></i>Iniciar navegação
+    </div>
+  `;
+  document.getElementById('clear-rot').addEventListener('click',()=>{roteiroPlaces=[];renderRoteiro();});
+  document.getElementById('start-rot-btn').addEventListener('click',()=>{
+    if(sorted.length>0){
+      const p=sorted[0];
+      openGoogleMaps(p.name,p.geometry.location.lat(),p.geometry.location.lng());
+    }
+  });
+  steps.querySelectorAll('.rot-card').forEach(card=>card.addEventListener('click',()=>openDetail(card.dataset.pid)));
+}
+
+/* ================================================
+   PROFILE
+================================================ */
+function refreshProfile(){
+  document.getElementById('prof-name-d').textContent=profile.name||'Visitante';
+  document.getElementById('prof-sub-d').textContent=profile.city?`${profile.city} · Bem-vindo!`:'Bem-vindo a Campos do Jordão';
+  document.getElementById('ps-saved').textContent=savedIds.size;
+  const sg=document.getElementById('prof-saved-grid');
+  if(!savedIds.size){sg.innerHTML='<div class="empty-state" style="grid-column:1/-1"><i class="ti ti-heart"></i>Nenhum lugar salvo ainda.</div>';return;}
+  const saved=allPlaces.filter(p=>savedIds.has(p.place_id));
+  sg.innerHTML=saved.map(p=>{
+    const c=cfg(p.types);const url=photoUrl(p,200);
+    const img=url?`<img src="${url}" alt="${p.name}" onerror="this.style.display='none'">`:`<i class="ti ${c.icon}"></i>`;
+    return `<div class="saved-card" data-pid="${p.place_id}"><div class="saved-img ${c.cls}">${img}</div><div class="saved-body"><div class="saved-name">${p.name}</div><div class="saved-sub">${c.label}</div></div></div>`;
+  }).join('');
+  sg.querySelectorAll('.saved-card').forEach(card=>card.addEventListener('click',()=>openDetail(card.dataset.pid)));
+}
+
+/* ================================================
+   MAPS
+================================================ */
+const mapStyle=[
+  {featureType:'poi',elementType:'labels',stylers:[{visibility:'off'}]},
+  {featureType:'landscape',elementType:'geometry',stylers:[{color:'#e8f0e8'}]},
+  {featureType:'water',elementType:'geometry',stylers:[{color:'#b8d4c8'}]},
+  {featureType:'road',elementType:'geometry',stylers:[{color:'#ffffff'}]},
+  {featureType:'road',elementType:'geometry.stroke',stylers:[{color:'#d8d8d8'}]}
+];
+
+function clearMarkers(arr){arr.forEach(m=>m.setMap(null));arr.length=0;}
+
+function addMarkers(map,places,arr){
+  clearMarkers(arr);
+  places.forEach(p=>{
+    const c=cfg(p.types);
+    const marker=new google.maps.Marker({
+      position:p.geometry.location,map,title:p.name,
+      icon:{path:google.maps.SymbolPath.CIRCLE,scale:8,fillColor:c.color,fillOpacity:1,strokeColor:'#fff',strokeWeight:2}
+    });
+    const url=photoUrl(p,220);
+    const imgTag=url?`<img src="${url}" style="width:100%;height:85px;object-fit:cover;border-radius:8px;margin-bottom:8px;display:block" onerror="this.style.display='none'">`:'';
+    marker.addListener('click',()=>{
+      new google.maps.InfoWindow({content:`
+        <div style="font-family:'DM Sans',sans-serif;padding:4px;width:188px">
+          ${imgTag}
+          <strong style="font-size:13px;color:#1a1a1a">${p.name}</strong>
+          <div style="font-size:11px;color:#888;margin-top:3px">${c.label}</div>
+          ${p.rating?`<div style="font-size:12px;color:#E9A93B;margin-top:4px">★ ${p.rating.toFixed(1)} <span style="color:#888">(${fmtN(p.user_ratings_total)})</span></div>`:''}
+          <div style="margin-top:8px;cursor:pointer;font-size:12px;color:#2D6A4F;font-weight:500" onclick="openDetail('${p.place_id}')">Ver detalhes →</div>
+        </div>`
+      }).open(map,marker);
+    });
+    arr.push(marker);
+  });
+}
+
+function initMapFull(){
+  if(fullInited)return;
+  fullInited=true;
+  mapFull=new google.maps.Map(document.getElementById('map-full'),{center:{lat:userLat,lng:userLng},zoom:14,disableDefaultUI:true,zoomControl:true,styles:mapStyle});
+  if(allPlaces.length) addMarkers(mapFull,allPlaces,fullMarkers);
+  document.getElementById('map-filters').addEventListener('click',e=>{
+    const pill=e.target.closest('.mfpill');if(!pill)return;
+    document.querySelectorAll('.mfpill').forEach(p=>p.classList.remove('active'));
+    pill.classList.add('active');
+    const t=pill.dataset.type;
+    addMarkers(mapFull,t==='all'?allPlaces:allPlaces.filter(p=>p.types&&p.types.includes(t)),fullMarkers);
+  });
+}
+
+/* ================================================
+   FETCH PLACES
+================================================ */
+function fetchPlaces(type){
+  const service=new google.maps.places.PlacesService(mapHome);
+  const types=type==='all'?['tourist_attraction','park','restaurant','cafe','bar']:[type];
+  document.getElementById('featured-cards').innerHTML='<div class="loading-box"><div class="spinner"></div></div>';
+  document.getElementById('near-list').innerHTML='<div class="loading-box"><div class="spinner"></div></div>';
+  const center=new google.maps.LatLng(userLat,userLng);
+  let collected=[],pending=types.length;
+  types.forEach(t=>{
+    service.nearbySearch({location:center,radius:searchRadius,type:t,keyword:'Campos do Jordão'},(results,status)=>{
+      if(status===google.maps.places.PlacesServiceStatus.OK&&results) collected=[...collected,...results];
+      pending--;
+      if(pending===0){
+        allPlaces=collected.filter((p,i,a)=>a.findIndex(x=>x.place_id===p.place_id)===i);
+        const sorted=[...allPlaces].sort((a,b)=>(b.rating||0)-(a.rating||0));
+        renderFeatured(sorted);
+        renderNear(allPlaces);
+        addMarkers(mapHome,allPlaces,homeMarkers);
+        if(fullInited) addMarkers(mapFull,allPlaces,fullMarkers);
+      }
+    });
+  });
+}
+
+/* ================================================
+   WEATHER
+================================================ */
+const WMO={
+  0:{desc:'Céu limpo',icon:'ti-sun',night:'ti-moon'},
+  1:{desc:'Principalmente limpo',icon:'ti-sun',night:'ti-moon-stars'},
+  2:{desc:'Parcialmente nublado',icon:'ti-cloud-sun',night:'ti-cloud-moon'},
+  3:{desc:'Nublado',icon:'ti-cloud',night:'ti-cloud'},
+  45:{desc:'Neblina',icon:'ti-mist',night:'ti-mist'},
+  48:{desc:'Neblina com geada',icon:'ti-mist',night:'ti-mist'},
+  51:{desc:'Garoa leve',icon:'ti-cloud-drizzle',night:'ti-cloud-drizzle'},
+  53:{desc:'Garoa moderada',icon:'ti-cloud-drizzle',night:'ti-cloud-drizzle'},
+  55:{desc:'Garoa intensa',icon:'ti-cloud-drizzle',night:'ti-cloud-drizzle'},
+  61:{desc:'Chuva leve',icon:'ti-cloud-rain',night:'ti-cloud-rain'},
+  63:{desc:'Chuva moderada',icon:'ti-cloud-rain',night:'ti-cloud-rain'},
+  65:{desc:'Chuva forte',icon:'ti-cloud-showers-heavy',night:'ti-cloud-showers-heavy'},
+  71:{desc:'Neve leve',icon:'ti-snowflake',night:'ti-snowflake'},
+  73:{desc:'Neve moderada',icon:'ti-snowflake',night:'ti-snowflake'},
+  75:{desc:'Neve intensa',icon:'ti-snowflake',night:'ti-snowflake'},
+  80:{desc:'Pancadas de chuva',icon:'ti-cloud-rain',night:'ti-cloud-rain'},
+  81:{desc:'Pancadas moderadas',icon:'ti-cloud-showers-heavy',night:'ti-cloud-showers-heavy'},
+  82:{desc:'Pancadas fortes',icon:'ti-cloud-showers-heavy',night:'ti-cloud-showers-heavy'},
+  95:{desc:'Tempestade',icon:'ti-storm',night:'ti-storm'},
+  99:{desc:'Tempestade forte',icon:'ti-storm',night:'ti-storm'}
+};
+function getWMO(code){return WMO[code]||WMO[Math.floor(code/10)*10]||{desc:'Variável',icon:'ti-cloud',night:'ti-cloud'};}
+function isNight(h){return h<6||h>=19;}
+function dayName(ds,i){
+  if(i===0)return 'Hoje';
+  if(i===1)return 'Amanhã';
+  const d=new Date(ds+'T12:00:00');
+  return d.toLocaleDateString('pt-BR',{weekday:'short'}).replace('.','').replace(/^\w/,c=>c.toUpperCase());
+}
+
+async function fetchWeather(){
+  const url=`https://api.open-meteo.com/v1/forecast?latitude=${CJ.lat}&longitude=${CJ.lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,precipitation&hourly=temperature_2m,weather_code,precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&timezone=America%2FSao_Paulo&forecast_days=7`;
+  const res=await fetch(url);
+  if(!res.ok)throw new Error('Erro clima');
+  return res.json();
+}
+
+function updateChip(data){
+  const temp=Math.round(data.current.temperature_2m);
+  const h=new Date().getHours();
+  const wmo=getWMO(data.current.weather_code);
+  document.getElementById('chip-temp').textContent=`${temp}°C`;
+  document.getElementById('chip-icon').className=`ti ${isNight(h)?wmo.night:wmo.icon}`;
+}
+
+function renderWeatherPopup(data){
+  const cur=data.current,daily=data.daily,hourly=data.hourly;
+  const h=new Date().getHours();
+  const temp=Math.round(cur.temperature_2m);
+  const feels=Math.round(cur.apparent_temperature);
+  const wmo=getWMO(cur.weather_code);
+  const icon=isNight(h)?wmo.night:wmo.icon;
+  const now=new Date();
+  const nowStr=now.toISOString().slice(0,13);
+  const hIdx=hourly.time.findIndex(t=>t.startsWith(nowStr));
+  const hStart=hIdx>=0?hIdx:0;
+  const hourlyHtml=hourly.time.slice(hStart,hStart+9).map((t,i)=>{
+    const hh=new Date(t).getHours();
+    const isNow=i===0;
+    const hw=getWMO(hourly.weather_code[hStart+i]);
+    const hicon=isNight(hh)?hw.night:hw.icon;
+    const htmp=Math.round(hourly.temperature_2m[hStart+i]);
+    return `<div class="hour-card ${isNow?'now':''}">
+      <div class="hc-time ${isNow?'now':''}">${isNow?'Agora':`${String(hh).padStart(2,'0')}h`}</div>
+      <i class="ti ${hicon} hc-icon ${isNow?'now':''}"></i>
+      <div class="hc-temp ${isNow?'now':''}">${htmp}°</div>
+    </div>`;
+  }).join('');
+  const dailyHtml=daily.time.map((date,i)=>{
+    const dw=getWMO(daily.weather_code[i]);
+    const dmax=Math.round(daily.temperature_2m_max[i]);
+    const dmin=Math.round(daily.temperature_2m_min[i]);
+    const rain=daily.precipitation_probability_max[i]||0;
+    return `<div class="day-row">
+      <div class="day-name">${dayName(date,i)}</div>
+      <div class="day-icon"><i class="ti ${dw.icon}"></i></div>
+      <div class="day-desc">${dw.desc}</div>
+      ${rain>15?`<div class="day-rain"><i class="ti ti-droplet"></i>${rain}%</div>`:'<div class="day-rain"></div>'}
+      <div class="day-minmax"><span class="day-min">${dmin}°</span><span class="day-max">${dmax}°</span></div>
+    </div>`;
+  }).join('');
+  document.getElementById('weather-content').innerHTML=`
+    <div class="w-hero">
+      <div class="w-hero-loc"><i class="ti ti-map-pin"></i>Campos do Jordão, SP · 1.628m de altitude</div>
+      <div class="w-hero-main">
+        <div>
+          <div class="w-big-temp">${temp}<sup>°C</sup></div>
+          <div class="w-feels">Sensação ${feels}°C</div>
+        </div>
+        <div class="w-hero-right">
+          <i class="ti ${icon} w-hero-icon"></i>
+          <div class="w-hero-desc">${wmo.desc}</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:3px">Máx ${Math.round(daily.temperature_2m_max[0])}° · Mín ${Math.round(daily.temperature_2m_min[0])}°</div>
+        </div>
+      </div>
+      <div class="w-hero-extra">
+        <div class="w-extra-item"><div class="wil">Umidade</div><div class="wiv"><i class="ti ti-droplet"></i>${cur.relative_humidity_2m}%</div></div>
+        <div class="w-extra-item"><div class="wil">Vento</div><div class="wiv"><i class="ti ti-wind"></i>${Math.round(cur.wind_speed_10m)}km/h</div></div>
+        <div class="w-extra-item"><div class="wil">Chuva</div><div class="wiv"><i class="ti ti-cloud-rain"></i>${cur.precipitation}mm</div></div>
+        <div class="w-extra-item"><div class="wil">Altitude</div><div class="wiv"><i class="ti ti-mountain"></i>1.628m</div></div>
+      </div>
+    </div>
+    <div class="w-section-label">Próximas horas</div>
+    <div class="hourly-row">${hourlyHtml}</div>
+    <div class="w-section-label">Próximos 7 dias</div>
+    <div class="daily-list">${dailyHtml}</div>
+    <div class="w-credit">Dados: Open-Meteo · Atualizado agora</div>
+  `;
+}
+
+async function openWeatherPopup(){
+  document.getElementById('weather-popup').style.display='flex';
+  if(weatherData){renderWeatherPopup(weatherData);return;}
+  document.getElementById('weather-content').innerHTML='<div class="loading-box" style="padding:40px"><div class="spinner"></div><p style="margin-top:12px;font-size:13px;color:var(--muted)">Buscando clima...</p></div>';
+  try{
+    weatherData=await fetchWeather();
+    updateChip(weatherData);
+    renderWeatherPopup(weatherData);
+  }catch(e){
+    document.getElementById('weather-content').innerHTML='<div class="empty-state"><i class="ti ti-cloud-off"></i>Não foi possível carregar o clima.</div>';
+  }
+}
+
+/* ================================================
+   INIT GOOGLE MAPS CALLBACK
+================================================ */
+window.initMap=function(){
+  mapHome=new google.maps.Map(document.getElementById('map-home'),{
+    center:CJ,zoom:14,disableDefaultUI:true,zoomControl:true,styles:mapStyle
+  });
+  document.getElementById('map-home-loading').style.display='none';
+
+  // geolocation
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(pos=>{
+      userLat=pos.coords.latitude;
+      userLng=pos.coords.longitude;
+      mapHome.setCenter({lat:userLat,lng:userLng});
+      new google.maps.Marker({
+        position:{lat:userLat,lng:userLng},map:mapHome,title:'Você está aqui',
+        icon:{path:google.maps.SymbolPath.CIRCLE,scale:10,fillColor:'#2D6A4F',fillOpacity:1,strokeColor:'#fff',strokeWeight:3}
+      });
+      document.getElementById('geo-status').textContent='Geolocalização ativa — mostrando lugares ao redor de você';
+    },()=>{
+      document.getElementById('geo-status').textContent='Usando localização central de Campos do Jordão';
+    });
+  }
+
+  fetchPlaces('all');
+
+  // category filter
+  document.getElementById('cats').addEventListener('click',e=>{
+    const cat=e.target.closest('.cat');if(!cat)return;
+    document.querySelectorAll('.cat').forEach(c=>c.classList.remove('active'));
+    cat.classList.add('active');
+    const t=cat.dataset.type;
+    if(t==='all'){
+      renderFeatured([...allPlaces].sort((a,b)=>(b.rating||0)-(a.rating||0)));
+      renderNear(allPlaces);
+      addMarkers(mapHome,allPlaces,homeMarkers);
+    } else {
+      const f=allPlaces.filter(p=>p.types&&p.types.includes(t));
+      if(f.length){renderFeatured([...f].sort((a,b)=>(b.rating||0)-(a.rating||0)));renderNear(f);addMarkers(mapHome,f,homeMarkers);}
+      else fetchPlaces(t);
+    }
+  });
+
+  // see all buttons — passa categoria ativa do home
+  document.getElementById('see-all-featured').addEventListener('click',()=>{
+    const activeCat=document.querySelector('#cats .cat.active')?.dataset.type||'all';
+    openListAll('Todos os lugares',[...allPlaces].sort((a,b)=>(b.rating||0)-(a.rating||0)), activeCat);
+  });
+  document.getElementById('see-all-near').addEventListener('click',()=>{
+    const activeCat=document.querySelector('#cats .cat.active')?.dataset.type||'all';
+    openListAll('Mais próximos',[...allPlaces].sort((a,b)=>dist(userLat,userLng,a.geometry.location.lat(),a.geometry.location.lng())-dist(userLat,userLng,b.geometry.location.lat(),b.geometry.location.lng())), activeCat);
+  });
+
+  // category pills na tela de lista
+  document.getElementById('list-cat-row').addEventListener('click',e=>{
+    const pill=e.target.closest('.list-cat-pill');if(!pill)return;
+    document.querySelectorAll('.list-cat-pill').forEach(p=>p.classList.remove('active'));
+    pill.classList.add('active');
+    listCatFilter=pill.dataset.type;
+    listSubFilter=null;
+    buildSubfilters(listCatFilter);
+    renderList();
+  });
+
+  // list sort + search
+  document.getElementById('sort-row').addEventListener('click',e=>{
+    const pill=e.target.closest('.sort-pill');if(!pill)return;
+    document.querySelectorAll('.sort-pill').forEach(p=>p.classList.remove('active'));
+    pill.classList.add('active');
+    listSort=pill.dataset.sort;
+    renderList();
+  });
+  document.getElementById('list-search-input').addEventListener('input',renderList);
+  document.getElementById('list-back').addEventListener('click',()=>showScreen('home'));
+
+  // bottom nav
+  document.querySelectorAll('.bni').forEach(btn=>btn.addEventListener('click',()=>showScreen(btn.dataset.screen)));
+
+  // roteiro
+  document.getElementById('rot-banner').addEventListener('click',()=>showScreen('roteiro'));
+  document.getElementById('criar-rot-btn').addEventListener('click',()=>{
+    // add top rated as suggestions
+    const top=[...allPlaces].sort((a,b)=>(b.rating||0)-(a.rating||0)).slice(0,4);
+    top.forEach(p=>{if(!roteiroPlaces.find(x=>x.place_id===p.place_id)) roteiroPlaces.push(p);});
+    renderRoteiro();
+  });
+
+  // weather
+  document.getElementById('weather-chip-btn').addEventListener('click',openWeatherPopup);
+  document.getElementById('weather-popup').addEventListener('click',e=>{
+    if(e.target.id==='weather-popup') document.getElementById('weather-popup').style.display='none';
+  });
+
+  // profile edit
+  document.getElementById('prof-edit-btn').addEventListener('click',()=>{
+    document.getElementById('edit-name').value=profile.name||'';
+    document.getElementById('edit-city').value=profile.city||'';
+    document.getElementById('edit-bio').value=profile.bio||'';
+    document.getElementById('modal-profile').style.display='flex';
+  });
+  document.getElementById('modal-prof-cancel').addEventListener('click',()=>document.getElementById('modal-profile').style.display='none');
+  document.getElementById('modal-prof-save').addEventListener('click',()=>{
+    profile.name=document.getElementById('edit-name').value||'Visitante';
+    profile.city=document.getElementById('edit-city').value;
+    profile.bio=document.getElementById('edit-bio').value;
+    document.getElementById('modal-profile').style.display='none';
+    refreshProfile();
+  });
+
+  // radius
+  document.getElementById('pref-radius').addEventListener('click',()=>document.getElementById('modal-radius').style.display='flex');
+  document.getElementById('radius-close').addEventListener('click',()=>document.getElementById('modal-radius').style.display='none');
+  document.getElementById('radius-opts').addEventListener('click',e=>{
+    const opt=e.target.closest('.radius-opt');if(!opt)return;
+    const km=parseInt(opt.dataset.km);
+    searchRadius=km*1000;
+    document.getElementById('pref-radius-val').textContent=`${km} km`;
+    document.querySelectorAll('.radius-opt').forEach(o=>{
+      o.classList.remove('active-opt');
+      o.style.borderColor='var(--border-light)';o.style.background='';
+    });
+    opt.classList.add('active-opt');
+    document.getElementById('modal-radius').style.display='none';
+    fetchPlaces('all');
+  });
+
+  // notif toggle
+  document.getElementById('pref-notif').addEventListener('click',()=>{
+    const el=document.getElementById('pref-notif-val');
+    el.textContent=el.textContent==='Ativas'?'Desativadas':'Ativas';
+  });
+
+  // fetch weather in background
+  fetchWeather().then(data=>{weatherData=data;updateChip(data);}).catch(()=>{});
+};
+</script>
+
+<!-- Google Maps API -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDfQIYqC6B8Q1AR-osYKDAkI9dkYJZd0rk&libraries=places&callback=initMap" async defer></script>
+</body>
+</html>
