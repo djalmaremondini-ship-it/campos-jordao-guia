@@ -545,6 +545,77 @@ html,body{height:100%;background:#e0ddd6;font-family:'DM Sans',sans-serif}
 .plan-cta{background:var(--green);color:#fff;border-radius:12px;padding:13px;text-align:center;font-weight:500;font-size:14px;cursor:pointer;margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px}
 .plan-cta i{font-size:18px}
 
+
+/* ===== ROTEIRO SOCIAL ===== */
+/* Abas da seção comunidade */
+.comunidade-tabs{display:flex;gap:0;background:#f0ede8;border-radius:10px;padding:3px;margin-bottom:16px}
+.com-tab{flex:1;text-align:center;padding:7px;border-radius:8px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s}
+.com-tab.active{background:var(--card);color:var(--green);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+
+/* Card de roteiro da comunidade */
+.community-card{background:var(--card);border-radius:16px;border:.5px solid var(--border);overflow:hidden;margin-bottom:12px;cursor:pointer;transition:border-color .15s}
+.community-card:hover{border-color:var(--mist)}
+.cc-photos{display:flex;height:80px;gap:2px;overflow:hidden}
+.cc-photo{flex:1;overflow:hidden;background:#e8f4e8;display:flex;align-items:center;justify-content:center}
+.cc-photo img{width:100%;height:100%;object-fit:cover}
+.cc-photo i{font-size:20px;opacity:.35}
+.cc-photo.nat{background:#d8efd8}.cc-photo.nat i{color:#2D6A4F}
+.cc-photo.food{background:#faeeda}.cc-photo.food i{color:#B7791F}
+.cc-photo.cult{background:#e8e4f8}.cc-photo.cult i{color:#534AB7}
+.cc-photo.coff{background:#f5edd8}.cc-photo.coff i{color:#8B5E3C}
+.cc-body{padding:12px 14px}
+.cc-title{font-family:'Playfair Display',serif;font-size:15px;color:var(--text);margin-bottom:4px;line-height:1.3}
+.cc-meta{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.cc-meta-item{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:3px}
+.cc-meta-item i{font-size:12px}
+.cc-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.cc-tag{font-size:10px;padding:3px 9px;border-radius:20px;background:#f0f8f4;color:var(--green);font-weight:500;border:.5px solid #b7dfc9}
+.cc-tag.rain{background:#EFF8FF;color:#2563EB;border-color:#BFDBFE}
+.cc-tag.premium{background:linear-gradient(135deg,#FFF7E6,#FEF3C7);color:#92400E;border-color:#FDE68A}
+.cc-footer{display:flex;align-items:center;justify-content:space-between}
+.cc-author{display:flex;align-items:center;gap:7px}
+.cc-avatar{width:24px;height:24px;border-radius:50%;background:var(--morning);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:var(--green);flex-shrink:0}
+.cc-author-name{font-size:12px;color:var(--stone)}
+.cc-stats{display:flex;gap:10px}
+.cc-stat{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:3px}
+.cc-stat i{font-size:12px;color:var(--mist)}
+.cc-rating-row{display:flex;gap:2px;align-items:center}
+.cc-rating-row i{font-size:11px;color:#E9A93B}
+.cc-rating-row span{font-size:11px;color:var(--stone);margin-left:3px}
+
+/* Detalhe do roteiro da comunidade */
+.com-detail-header{background:var(--green);padding:18px 18px 20px;flex-shrink:0}
+.com-detail-header h2{font-family:'Playfair Display',serif;font-size:18px;color:#fff;margin-bottom:6px;line-height:1.3}
+.com-detail-meta{display:flex;gap:12px;flex-wrap:wrap}
+.com-detail-meta span{font-size:11px;color:rgba(255,255,255,.65);display:flex;align-items:center;gap:4px}
+.com-detail-meta i{font-size:12px;color:var(--gl)}
+.com-import-btn{background:#fff;color:var(--green);border-radius:12px;padding:12px;text-align:center;font-weight:500;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin:14px 14px 0}
+.com-import-btn i{font-size:16px}
+
+/* Review pós-visita */
+.review-prompt{background:linear-gradient(135deg,var(--green),#3D7A5E);border-radius:16px;padding:16px;margin-top:14px;display:flex;gap:12px;align-items:center;cursor:pointer}
+.review-prompt i{font-size:28px;color:var(--gl);flex-shrink:0}
+.review-prompt-text p:first-child{font-size:14px;font-weight:500;color:#fff;margin-bottom:2px}
+.review-prompt-text p:last-child{font-size:11px;color:rgba(255,255,255,.65)}
+
+/* Modal de review */
+.review-stars-row{display:flex;gap:8px;justify-content:center;margin:16px 0}
+.rev-star-btn{font-size:32px;color:#e0ddd6;cursor:pointer;transition:color .1s;background:none;border:none;padding:0;line-height:1}
+.rev-star-btn.active{color:#E9A93B}
+.review-aspects{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.rev-aspect{background:#f8f6f2;border-radius:12px;padding:11px 13px}
+.rev-aspect-label{font-size:12px;font-weight:500;color:var(--text);margin-bottom:8px}
+.rev-aspect-pills{display:flex;gap:6px;flex-wrap:wrap}
+.rev-pill{font-size:11px;padding:4px 11px;border-radius:20px;border:.5px solid var(--border-light);background:var(--card);color:var(--stone);cursor:pointer;transition:all .12s}
+.rev-pill.selected{background:var(--green);color:#fff;border-color:var(--green)}
+.rev-pill.selected-bad{background:#FEE2E2;color:#c0392b;border-color:#FECACA}
+
+/* Roteiro compartilhado recebido */
+.shared-banner{background:linear-gradient(135deg,#FFF7E6,#FFFBEB);border:.5px solid #F6D860;border-radius:14px;padding:14px 16px;margin-bottom:14px;display:flex;gap:12px;align-items:center}
+.shared-banner i{font-size:24px;color:var(--gold);flex-shrink:0}
+.shared-banner p:first-child{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px}
+.shared-banner p:last-child{font-size:11px;color:var(--stone)}
+
 /* ===== SPINNER ===== */
 .spinner{width:22px;height:22px;border:2.5px solid var(--border-light);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -688,6 +759,7 @@ html,body{height:100%;background:#e0ddd6;font-family:'DM Sans',sans-serif}
       <div class="plan-tabs">
         <div class="plan-tab active" id="tab-planejamento" onclick="setPlanTab('planejamento')"><i class="ti ti-calendar" style="font-size:12px;margin-right:4px"></i>Planejar</div>
         <div class="plan-tab" id="tab-roteiro" onclick="setPlanTab('roteiro')"><i class="ti ti-route" style="font-size:12px;margin-right:4px"></i>Roteiro</div>
+        <div class="plan-tab" id="tab-comunidade" onclick="setPlanTab('comunidade')"><i class="ti ti-users" style="font-size:12px;margin-right:4px"></i>Comunidade</div>
       </div>
     </div>
 
@@ -734,6 +806,16 @@ html,body{height:100%;background:#e0ddd6;font-family:'DM Sans',sans-serif}
         <p style="font-weight:500;color:#555;margin-bottom:6px">Planeje antes de chegar</p>
         <p style="font-size:13px;line-height:1.6">Escolha as datas da sua viagem e veja a previsão do tempo com sugestões de lugares para cada dia.</p>
       </div>
+    </div>
+
+    <!-- ABA COMUNIDADE -->
+    <div class="plan-body" id="plan-body-comunidade" style="display:none">
+      <div class="comunidade-tabs">
+        <div class="com-tab active" id="com-tab-recentes" onclick="setComTab('recentes')">Recentes</div>
+        <div class="com-tab" id="com-tab-melhores" onclick="setComTab('melhores')">Mais curtidos</div>
+        <div class="com-tab" id="com-tab-meus" onclick="setComTab('meus')">Meus roteiros</div>
+      </div>
+      <div id="community-list"></div>
     </div>
 
     <!-- ABA ROTEIRO -->
@@ -974,6 +1056,100 @@ html,body{height:100%;background:#e0ddd6;font-family:'DM Sans',sans-serif}
         <div style="margin-top:16px">
           <button class="modal-btn cancel" style="width:100%;padding:12px;border-radius:12px" id="painel-logout-btn">Sair da conta</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ROTEIRO COMUNIDADE DETALHE ===== -->
+  <div class="screen" id="screen-community-detail" style="padding-bottom:70px">
+    <div class="com-detail-header">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div class="back-btn" id="com-detail-back"><i class="ti ti-arrow-left"></i></div>
+        <div style="font-size:11px;color:rgba(255,255,255,.5);letter-spacing:1px;text-transform:uppercase">Roteiro da comunidade</div>
+      </div>
+      <h2 id="com-detail-title">Roteiro</h2>
+      <div class="com-detail-meta" id="com-detail-meta"></div>
+    </div>
+    <div class="com-import-btn" id="com-import-btn">
+      <i class="ti ti-route"></i>Usar este roteiro
+    </div>
+    <div style="padding:14px" id="com-detail-body"></div>
+  </div>
+
+  <!-- ===== MODAL: REVIEW PÓS-VISITA ===== -->
+  <div class="modal-overlay" id="modal-review" style="display:none">
+    <div class="modal-sheet" style="max-height:90vh;overflow-y:auto">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Como foi seu roteiro?</div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:4px">Avalie sua experiência e ajude outros viajantes</p>
+
+      <!-- Nota geral em estrelas -->
+      <div style="text-align:center;margin-bottom:4px">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px">Nota geral</div>
+        <div class="review-stars-row" id="review-stars">
+          <button class="rev-star-btn" data-star="1">★</button>
+          <button class="rev-star-btn" data--star="2">★</button>
+          <button class="rev-star-btn" data-star="3">★</button>
+          <button class="rev-star-btn" data-star="4">★</button>
+          <button class="rev-star-btn" data-star="5">★</button>
+        </div>
+        <div style="font-size:12px;color:var(--muted);min-height:18px" id="review-star-label"></div>
+      </div>
+
+      <!-- Aspectos positivos -->
+      <div class="review-aspects">
+        <div class="rev-aspect">
+          <div class="rev-aspect-label">👍 O que você mais gostou?</div>
+          <div class="rev-aspect-pills" id="pills-positivo">
+            <div class="rev-pill" data-val="Organização">Organização</div>
+            <div class="rev-pill" data-val="Variedade">Variedade</div>
+            <div class="rev-pill" data-val="Tempo bem usado">Tempo bem usado</div>
+            <div class="rev-pill" data-val="Lugares incríveis">Lugares incríveis</div>
+            <div class="rev-pill" data-val="Fácil de seguir">Fácil de seguir</div>
+            <div class="rev-pill" data-val="Ótimo custo-benefício">Custo-benefício</div>
+            <div class="rev-pill" data-val="Perfeito para casais">Casais</div>
+            <div class="rev-pill" data-val="Ótimo para família">Família</div>
+          </div>
+        </div>
+        <div class="rev-aspect">
+          <div class="rev-aspect-label">👎 O que poderia melhorar?</div>
+          <div class="rev-aspect-pills" id="pills-negativo">
+            <div class="rev-pill" data-val="Muito corrido">Muito corrido</div>
+            <div class="rev-pill" data-val="Muito parado">Muito parado</div>
+            <div class="rev-pill" data-val="Lugares cheios">Lugares cheios</div>
+            <div class="rev-pill" data-val="Distâncias longas">Distâncias longas</div>
+            <div class="rev-pill" data-val="Horários ruins">Horários ruins</div>
+            <div class="rev-pill" data-val="Caro demais">Caro demais</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comentário livre -->
+      <div class="form-field">
+        <label class="form-label">Conta mais (opcional)</label>
+        <textarea class="form-input" id="review-texto" rows="3" placeholder="Dica extra, o que não pode perder, o que evitar..." style="resize:none;font-family:'DM Sans',sans-serif"></textarea>
+      </div>
+
+      <!-- Nome -->
+      <div class="form-field">
+        <label class="form-label">Seu nome (como vai aparecer)</label>
+        <input class="form-input" id="review-nome" type="text" placeholder="Ex: Ana de SP"/>
+      </div>
+
+      <!-- Perfil do viajante -->
+      <div class="form-field">
+        <label class="form-label">Você viajou como?</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap" id="review-perfil">
+          <div class="rev-pill" data-val="Casal">💑 Casal</div>
+          <div class="rev-pill" data-val="Família">👨‍👩‍👧 Família</div>
+          <div class="rev-pill" data-val="Amigos">👫 Amigos</div>
+          <div class="rev-pill" data-val="Solo">🧍 Solo</div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="modal-btn cancel" id="review-cancel">Agora não</button>
+        <button class="modal-btn save" id="review-submit">Publicar review</button>
       </div>
     </div>
   </div>
@@ -1622,7 +1798,23 @@ function renderRoteiro(){
     <div class="share-rot-btn" id="share-rot-btn">
       <i class="ti ti-share"></i>Compartilhar roteiro
     </div>
-  `;
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <div style="flex:1;background:#f0f8f4;color:var(--green);border:.5px solid #b7dfc9;border-radius:12px;padding:11px;text-align:center;cursor:pointer;font-weight:500;font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px" id="publish-rot-btn">
+        <i class="ti ti-world-upload" style="font-size:15px"></i>Publicar na comunidade
+      </div>
+      <div style="flex:1;background:#FFF7E6;color:#92400E;border:.5px solid #FDE68A;border-radius:12px;padding:11px;text-align:center;cursor:pointer;font-weight:500;font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px" id="review-rot-btn">
+        <i class="ti ti-star" style="font-size:15px"></i>Avaliar roteiro
+      </div>
+    </div>
+    <div style="background:var(--card);border:.5px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:10px;cursor:pointer;display:flex;align-items:center;gap:10px" onclick="setPlanTab('comunidade');showScreen('roteiro')">
+      <i class="ti ti-users" style="font-size:18px;color:var(--mist);flex-shrink:0"></i>
+      <div>
+        <div style="font-size:13px;font-weight:500;color:var(--text)">Ver roteiros da comunidade</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:1px">Inspire-se com roteiros de outros viajantes</div>
+      </div>
+      <i class="ti ti-arrow-right" style="font-size:16px;color:#ccc;margin-left:auto"></i>
+    </div>
+  \`;
   document.getElementById('clear-rot').addEventListener('click',()=>{roteiroPlaces=[];LS.save();renderRoteiro();});
   document.getElementById('start-rot-btn').addEventListener('click',()=>{
     if(sorted.length>0){
@@ -1631,6 +1823,8 @@ function renderRoteiro(){
     }
   });
   document.getElementById('share-rot-btn').addEventListener('click',shareRoteiro);
+  document.getElementById('publish-rot-btn').addEventListener('click',publishRoteiro);
+  document.getElementById('review-rot-btn').addEventListener('click',()=>openReviewModal('geral_'+Date.now()));
   steps.querySelectorAll('.rot-card').forEach(card=>card.addEventListener('click',()=>openDetail(card.dataset.pid)));
 }
 
@@ -2086,10 +2280,11 @@ let planSelectedPlan = 'Gratuito';
 let planDates = {chegada: null, saida: null};
 
 function setPlanTab(tab) {
-  document.getElementById('tab-planejamento').classList.toggle('active', tab==='planejamento');
-  document.getElementById('tab-roteiro').classList.toggle('active', tab==='roteiro');
-  document.getElementById('plan-body-planejamento').style.display = tab==='planejamento'?'block':'none';
-  document.getElementById('plan-body-roteiro').style.display = tab==='roteiro'?'block':'none';
+  ['planejamento','roteiro','comunidade'].forEach(t => {
+    document.getElementById('tab-'+t).classList.toggle('active', t===tab);
+    document.getElementById('plan-body-'+t).style.display = t===tab?'block':'none';
+  });
+  if(tab==='comunidade') renderCommunityList(currentComTab);
 }
 
 function onDatesChange() {
@@ -2366,6 +2561,437 @@ function initCadastro() {
   document.getElementById('cad-enviar-btn').addEventListener('click', enviarCadastro);
 }
 
+
+/* ================================================
+   ROTEIRO SOCIAL — COMUNIDADE
+================================================ */
+
+// Storage key para roteiros publicados (localStorage simula o "banco")
+const LS_ROTEIROS_KEY = 'rotera_community_roteiros';
+const LS_REVIEWS_KEY  = 'rotera_community_reviews';
+
+// Estado do review
+let reviewState = {
+  nota: 0,
+  positivos: [],
+  negativos: [],
+  perfil: null,
+  texto: '',
+  nome: ''
+};
+
+// Labels das estrelas
+const STAR_LABELS = ['','Péssimo','Ruim','Regular','Bom','Excelente!'];
+
+/* ── ROTEIROS DEMO DA COMUNIDADE ── */
+function getCommunityRoteiros() {
+  // Pega salvos + demos pré-carregados
+  let saved = [];
+  try { saved = JSON.parse(localStorage.getItem(LS_ROTEIROS_KEY)||'[]'); } catch(e){}
+
+  const demos = [
+    {
+      id:'demo_001',
+      title:'Tarde perfeita em Capivari',
+      author:'Ana de SP',
+      perfil:'Casal',
+      avatar:'AC',
+      duration:'4h',
+      date:'08/06/2025',
+      places:['Chocoland','Vila Capivari','Baden Baden','Teleférico de CJ'],
+      placeTypes:['coff','cult','food','cult'],
+      tags:['Casais','Tarde','Centro'],
+      rating:4.8,
+      reviews:23,
+      uses:87,
+      nota_media:4.8,
+      positivos_top:['Organização','Lugares incríveis'],
+      negativos_top:['Lugares cheios'],
+      destaques:'Baden Baden no fim do dia é perfeito. Reserve mesa com antecedência!',
+    },
+    {
+      id:'demo_002',
+      title:'Dia de aventura na Serra',
+      author:'Carlos e Turma',
+      perfil:'Amigos',
+      avatar:'CT',
+      duration:'8h',
+      date:'02/06/2025',
+      places:['Parque Estadual','Horto Florestal','Pedra do Baú','Restaurante Pórtico'],
+      placeTypes:['nat','nat','nat','food'],
+      tags:['Aventura','Trilha','Natureza'],
+      rating:4.9,
+      reviews:41,
+      uses:156,
+      nota_media:4.9,
+      positivos_top:['Lugares incríveis','Tempo bem usado'],
+      negativos_top:['Muito corrido'],
+      destaques:'Saia cedo, antes das 8h. A trilha da Pedra do Baú vale cada segundo!',
+    },
+    {
+      id:'demo_003',
+      title:'Manhã do chocolate e café',
+      author:'Maria e filhos',
+      perfil:'Família',
+      avatar:'MF',
+      duration:'3h',
+      date:'25/05/2025',
+      places:['Chocoland','Café Colonial Bela','Chocoland Museu do Cacau'],
+      placeTypes:['coff','coff','coff'],
+      tags:['Família','Manhã','Chocolate'],
+      rating:4.6,
+      reviews:18,
+      uses:62,
+      nota_media:4.6,
+      positivos_top:['Ótimo para família','Variedade'],
+      negativos_top:[],
+      destaques:'As crianças amaram! Visita à fábrica às 10h tem degustação inclusa.',
+    },
+    {
+      id:'demo_004',
+      title:'Roteiro rápido: 1 dia completo',
+      author:'Pedro de BH',
+      perfil:'Solo',
+      avatar:'PB',
+      duration:'Full day',
+      date:'18/05/2025',
+      places:['Teleférico','Vila Capivari','Parque Estadual','Baden Baden','Pórtico'],
+      placeTypes:['cult','cult','nat','food','food'],
+      tags:['Full day','Completo','Top'],
+      rating:5.0,
+      reviews:67,
+      uses:210,
+      nota_media:5.0,
+      positivos_top:['Tempo bem usado','Fácil de seguir','Lugares incríveis'],
+      negativos_top:[],
+      destaques:'Se tiver só 1 dia, esse é o roteiro. Teleférico abre às 9h, vá primeiro.',
+    }
+  ];
+
+  // Mescla demos + salvos pelo usuário, mais recentes primeiro
+  return [...saved.reverse(), ...demos];
+}
+
+/* ── RENDERIZAR LISTA ── */
+function renderCommunityList(filter) {
+  const el  = document.getElementById('community-list');
+  let roteiros = getCommunityRoteiros();
+
+  if(filter === 'melhores') roteiros.sort((a,b) => (b.uses||0)-(a.uses||0));
+  else if(filter === 'meus')  roteiros = roteiros.filter(r => r._mine);
+
+  if(!roteiros.length) {
+    el.innerHTML = `<div class="plan-empty"><i class="ti ti-users"></i><p style="font-weight:500;color:#555;margin-bottom:6px">Nenhum roteiro ainda</p><p style="font-size:13px">Crie e compartilhe o primeiro roteiro da comunidade!</p></div>`;
+    return;
+  }
+
+  el.innerHTML = roteiros.map(r => {
+    const photos = (r.placeTypes||[]).slice(0,3).map(cls =>
+      `<div class="cc-photo ${cls}"><i class="ti ${cls==='nat'?'ti-trees':cls==='food'?'ti-tools-kitchen-2':cls==='coff'?'ti-coffee':'ti-building-arch'}"></i></div>`
+    ).join('');
+    const starsHtml = Array.from({length:5},(_,i) =>
+      `<i class="ti ${i < Math.floor(r.nota_media||r.rating||0) ? 'ti-star-filled' : 'ti-star'}" style="font-size:11px;color:#E9A93B"></i>`
+    ).join('');
+    const tagHtml = (r.tags||[]).map(t=>`<div class="cc-tag">${t}</div>`).join('');
+    const posTop = (r.positivos_top||[]).slice(0,2).map(p=>`<div class="cc-tag">👍 ${p}</div>`).join('');
+    return `<div class="community-card" data-rid="${r.id}" onclick="openCommunityDetail('${r.id}')">
+      <div class="cc-photos">${photos}</div>
+      <div class="cc-body">
+        <div class="cc-title">${r.title}</div>
+        <div class="cc-meta">
+          <span class="cc-meta-item"><i class="ti ti-clock"></i>${r.duration}</span>
+          <span class="cc-meta-item"><i class="ti ti-map-pin"></i>${(r.places||[]).length} paradas</span>
+          <span class="cc-meta-item"><i class="ti ti-user"></i>${r.perfil||''}</span>
+          <span class="cc-meta-item"><i class="ti ti-calendar"></i>${r.date||''}</span>
+        </div>
+        <div class="cc-tags">${tagHtml}${posTop}</div>
+        <div class="cc-footer">
+          <div class="cc-author">
+            <div class="cc-avatar">${(r.avatar||r.author||'?').slice(0,2).toUpperCase()}</div>
+            <span class="cc-author-name">${r.author||'Anônimo'}</span>
+          </div>
+          <div class="cc-stats">
+            <span class="cc-stat"><i class="ti ti-route"></i>${r.uses||0} usaram</span>
+            <span class="cc-stat">
+              <div class="cc-rating-row">${starsHtml}<span>${(r.nota_media||r.rating||0).toFixed(1)} (${r.reviews||0})</span></div>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+let currentComTab = 'recentes';
+function setComTab(tab) {
+  currentComTab = tab;
+  ['recentes','melhores','meus'].forEach(t => {
+    document.getElementById('com-tab-'+t).classList.toggle('active', t===tab);
+  });
+  renderCommunityList(tab);
+}
+
+/* ── DETALHE DO ROTEIRO ── */
+function openCommunityDetail(rid) {
+  const roteiros = getCommunityRoteiros();
+  const r = roteiros.find(x => x.id === rid);
+  if(!r) return;
+
+  document.getElementById('com-detail-title').textContent = r.title;
+  document.getElementById('com-detail-meta').innerHTML = `
+    <span><i class="ti ti-clock"></i>${r.duration}</span>
+    <span><i class="ti ti-map-pin"></i>${(r.places||[]).length} paradas</span>
+    <span><i class="ti ti-user"></i>${r.perfil||''}</span>
+    <span><i class="ti ti-users"></i>${r.uses||0} pessoas usaram</span>
+  `;
+
+  // Busca places reais que batem com os nomes
+  const matchedPlaces = (r.places||[]).map(name =>
+    allPlaces.find(p => p.name.toLowerCase().includes(name.toLowerCase().split(' ')[0])) || {name, _mock:true, place_id:'mock_'+name}
+  );
+
+  const reviews = getReviewsForRoteiro(rid);
+  const starsAvg = reviews.length ? (reviews.reduce((s,rv)=>s+rv.nota,0)/reviews.length).toFixed(1) : (r.nota_media||r.rating||0).toFixed(1);
+  const totalRevs = reviews.length || r.reviews || 0;
+
+  document.getElementById('com-detail-body').innerHTML = `
+    <!-- Avaliação geral -->
+    <div style="background:var(--card);border-radius:14px;border:.5px solid var(--border);padding:14px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="text-align:center">
+          <div style="font-family:'Playfair Display',serif;font-size:36px;color:var(--text);line-height:1">${starsAvg}</div>
+          <div style="display:flex;gap:2px;justify-content:center;margin:4px 0">
+            ${Array.from({length:5},(_,i)=>`<i class="ti ${i<Math.floor(starsAvg)?'ti-star-filled':'ti-star'}" style="font-size:14px;color:#E9A93B"></i>`).join('')}
+          </div>
+          <div style="font-size:11px;color:var(--muted)">${totalRevs} avaliações</div>
+        </div>
+        <div style="flex:1">
+          ${(r.positivos_top||[]).map(p=>`<div style="font-size:12px;color:#1a5c36;margin-bottom:4px">👍 ${p}</div>`).join('')}
+          ${(r.negativos_top||[]).map(p=>`<div style="font-size:12px;color:#c0392b;margin-bottom:4px">👎 ${p}</div>`).join('')}
+        </div>
+      </div>
+      ${r.destaques?`<div style="margin-top:10px;padding-top:10px;border-top:.5px solid var(--border);font-size:13px;color:var(--stone);line-height:1.6"><i class="ti ti-quote" style="color:var(--mist);margin-right:4px"></i>${r.destaques}</div>`:''}
+    </div>
+
+    <!-- Paradas -->
+    <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:10px">Paradas do roteiro</div>
+    <div class="rot-steps" style="margin-bottom:16px">
+      ${matchedPlaces.map((p,i) => {
+        const c = p._mock ? TC.default : cfg(p.types, p._specialType);
+        const url = p._mock ? null : photoUrl(p, 200);
+        const img = imgOrFallback(url, c.cls, c.icon,'width:100%;height:100%;object-fit:cover');
+        return `<div class="rot-step">
+          <div class="rot-step-left">
+            <div class="rot-num">${i+1}</div>
+            ${i<matchedPlaces.length-1?'<div class="rot-line"></div>':''}
+          </div>
+          <div class="rot-card" ${!p._mock?`data-pid="${p.place_id}"`:''}
+               ${!p._mock?`onclick="openDetail('${p.place_id}')"`:''}
+               style="${!p._mock?'':'opacity:.8'}">
+            <div class="rot-card-img ${c.cls}">${img}</div>
+            <div class="rot-card-body">
+              <div class="rot-card-name">${p.name}</div>
+              <div class="rot-card-meta">
+                <span><i class="ti ti-clock"></i>${c.time||'1–2h'}</span>
+                ${p.rating?`<span><i class="ti ti-star-filled" style="color:#E9A93B"></i>${p.rating.toFixed(1)}</span>`:''}
+              </div>
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <!-- Reviews da comunidade -->
+    ${reviews.length ? `
+    <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:10px">O que disseram</div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+      ${reviews.slice(0,5).map(rv => `
+        <div class="rev-item">
+          <div class="rev-top">
+            <span class="rev-author">${rv.autor||'Visitante'} <span style="font-size:10px;color:var(--fog);font-weight:400">${rv.perfil?'· '+rv.perfil:''}</span></span>
+            <div class="rev-stars">${Array.from({length:5},(_,i)=>`<i class="ti ${i<rv.nota?'ti-star-filled':'ti-star'}" style="font-size:11px;color:#E9A93B"></i>`).join('')}</div>
+          </div>
+          ${rv.positivos&&rv.positivos.length?`<div style="display:flex;gap:4px;flex-wrap:wrap;margin:5px 0">${rv.positivos.map(p=>`<span style="font-size:10px;background:#d8efd8;color:#1a5c36;padding:2px 7px;border-radius:8px">👍 ${p}</span>`).join('')}</div>`:''}
+          ${rv.negativos&&rv.negativos.length?`<div style="display:flex;gap:4px;flex-wrap:wrap;margin:4px 0">${rv.negativos.map(p=>`<span style="font-size:10px;background:#fee2e2;color:#c0392b;padding:2px 7px;border-radius:8px">👎 ${p}</span>`).join('')}</div>`:''}
+          ${rv.texto?`<div class="rev-text">${rv.texto}</div>`:''}
+        </div>`).join('')}
+    </div>` : ''}
+  `;
+
+  document.getElementById('com-import-btn').onclick = () => importCommunityRoteiro(r, matchedPlaces);
+  document.getElementById('com-detail-back').onclick = () => { showScreen('roteiro'); setPlanTab('comunidade'); };
+  prevScreen = 'roteiro';
+  showScreen('community-detail');
+}
+
+function importCommunityRoteiro(r, matchedPlaces) {
+  const realPlaces = matchedPlaces.filter(p => !p._mock);
+  realPlaces.forEach(p => { if(!roteiroPlaces.find(x=>x.place_id===p.place_id)) roteiroPlaces.push(p); });
+  renderRoteiro();
+  LS.save();
+  // Incrementa contador de usos
+  try {
+    let saved = JSON.parse(localStorage.getItem(LS_ROTEIROS_KEY)||'[]');
+    const idx = saved.findIndex(x=>x.id===r.id);
+    if(idx>=0) saved[idx].uses=(saved[idx].uses||0)+1;
+    localStorage.setItem(LS_ROTEIROS_KEY, JSON.stringify(saved));
+  } catch(e){}
+  showScreen('roteiro');
+  setPlanTab('roteiro');
+  // Toast
+  const toast = document.createElement('div');
+  toast.style.cssText='position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#2D6A4F;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2)';
+  toast.textContent = '✓ Roteiro importado com '+(realPlaces.length)+' parada'+(realPlaces.length>1?'s':'')+'!';
+  document.body.appendChild(toast);
+  setTimeout(()=>toast.remove(), 3000);
+}
+
+/* ── PUBLICAR ROTEIRO ── */
+function publishRoteiro() {
+  if(!roteiroPlaces.length) return;
+  // Pede nome e título antes de publicar
+  const nome  = profile.name !== 'Visitante' ? profile.name : prompt('Seu nome (como vai aparecer):') || 'Visitante';
+  const title = prompt('Dê um nome para seu roteiro:', 'Meu roteiro em Campos do Jordão') || 'Meu roteiro';
+  if(!title) return;
+
+  const newRoteiro = {
+    id: 'user_'+Date.now(),
+    _mine: true,
+    title,
+    author: nome,
+    avatar: nome.slice(0,2).toUpperCase(),
+    perfil: profile.city ? 'De '+profile.city : 'Visitante',
+    duration: roteiroPlaces.length <= 3 ? 'Meio dia' : roteiroPlaces.length <= 5 ? '1 dia' : 'Full day',
+    date: new Date().toLocaleDateString('pt-BR'),
+    places: roteiroPlaces.map(p=>p.name),
+    placeTypes: roteiroPlaces.map(p=>cfg(p.types,p._specialType).cls),
+    tags: [...new Set(roteiroPlaces.map(p=>cfg(p.types,p._specialType).label))].slice(0,3),
+    rating: 0,
+    reviews: 0,
+    uses: 1,
+    nota_media: 0,
+    positivos_top: [],
+    negativos_top: [],
+    destaques: ''
+  };
+
+  try {
+    const saved = JSON.parse(localStorage.getItem(LS_ROTEIROS_KEY)||'[]');
+    saved.push(newRoteiro);
+    localStorage.setItem(LS_ROTEIROS_KEY, JSON.stringify(saved));
+  } catch(e){}
+
+  // Abre modal de review logo em seguida
+  setTimeout(() => openReviewModal(newRoteiro.id), 400);
+
+  setPlanTab('comunidade');
+  setComTab('meus');
+  showScreen('roteiro');
+
+  const toast = document.createElement('div');
+  toast.style.cssText='position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#2D6A4F;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2)';
+  toast.textContent = '✓ Roteiro publicado na comunidade!';
+  document.body.appendChild(toast);
+  setTimeout(()=>toast.remove(), 3000);
+}
+
+/* ── REVIEW MODAL ── */
+function getReviewsForRoteiro(rid) {
+  try {
+    const all = JSON.parse(localStorage.getItem(LS_REVIEWS_KEY)||'[]');
+    return all.filter(r => r.roteiroId === rid);
+  } catch(e){ return []; }
+}
+
+function openReviewModal(roteiroId) {
+  reviewState = {nota:0, positivos:[], negativos:[], perfil:null, texto:'', nome:'', roteiroId};
+  // Reset UI
+  document.querySelectorAll('.rev-star-btn').forEach((btn,i) => {
+    btn.classList.remove('active');
+    btn.dataset.star = i+1;
+  });
+  document.getElementById('review-star-label').textContent = '';
+  document.querySelectorAll('#pills-positivo .rev-pill, #pills-negativo .rev-pill, #review-perfil .rev-pill').forEach(p=>{
+    p.classList.remove('selected','selected-bad');
+  });
+  document.getElementById('review-texto').value = '';
+  document.getElementById('review-nome').value = profile.name !== 'Visitante' ? profile.name : '';
+  document.getElementById('modal-review').style.display = 'flex';
+}
+
+function initReviewModal() {
+  // Estrelas
+  document.getElementById('review-stars').addEventListener('click', e => {
+    const btn = e.target.closest('.rev-star-btn');
+    if(!btn) return;
+    reviewState.nota = parseInt(btn.dataset.star);
+    document.querySelectorAll('.rev-star-btn').forEach((b,i) => b.classList.toggle('active', i < reviewState.nota));
+    document.getElementById('review-star-label').textContent = STAR_LABELS[reviewState.nota] || '';
+  });
+
+  // Pills positivos
+  document.getElementById('pills-positivo').addEventListener('click', e => {
+    const pill = e.target.closest('.rev-pill');
+    if(!pill) return;
+    pill.classList.toggle('selected');
+    const v = pill.dataset.val;
+    reviewState.positivos = pill.classList.contains('selected')
+      ? [...reviewState.positivos, v]
+      : reviewState.positivos.filter(x=>x!==v);
+  });
+
+  // Pills negativos
+  document.getElementById('pills-negativo').addEventListener('click', e => {
+    const pill = e.target.closest('.rev-pill');
+    if(!pill) return;
+    pill.classList.toggle('selected-bad');
+    const v = pill.dataset.val;
+    reviewState.negativos = pill.classList.contains('selected-bad')
+      ? [...reviewState.negativos, v]
+      : reviewState.negativos.filter(x=>x!==v);
+  });
+
+  // Perfil do viajante
+  document.getElementById('review-perfil').addEventListener('click', e => {
+    const pill = e.target.closest('.rev-pill');
+    if(!pill) return;
+    document.querySelectorAll('#review-perfil .rev-pill').forEach(p=>p.classList.remove('selected'));
+    pill.classList.add('selected');
+    reviewState.perfil = pill.dataset.val;
+  });
+
+  // Cancelar
+  document.getElementById('review-cancel').addEventListener('click', () => {
+    document.getElementById('modal-review').style.display = 'none';
+  });
+
+  // Publicar
+  document.getElementById('review-submit').addEventListener('click', () => {
+    if(!reviewState.nota) { alert('Selecione uma nota antes de publicar'); return; }
+    const review = {
+      roteiroId:  reviewState.roteiroId || 'geral',
+      nota:       reviewState.nota,
+      positivos:  reviewState.positivos,
+      negativos:  reviewState.negativos,
+      perfil:     reviewState.perfil,
+      texto:      document.getElementById('review-texto').value,
+      autor:      document.getElementById('review-nome').value || 'Visitante',
+      data:       new Date().toLocaleDateString('pt-BR')
+    };
+    try {
+      const all = JSON.parse(localStorage.getItem(LS_REVIEWS_KEY)||'[]');
+      all.push(review);
+      localStorage.setItem(LS_REVIEWS_KEY, JSON.stringify(all));
+    } catch(e){}
+    document.getElementById('modal-review').style.display = 'none';
+    const toast = document.createElement('div');
+    toast.style.cssText='position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#2D6A4F;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2)';
+    toast.textContent = '✓ Review publicado! Obrigado por ajudar outros viajantes.';
+    document.body.appendChild(toast);
+    setTimeout(()=>toast.remove(), 3000);
+  });
+}
+
 /* ================================================
    INIT GOOGLE MAPS CALLBACK
 ================================================ */
@@ -2519,6 +3145,7 @@ window.initMap=function(){
   document.getElementById('open-painel-btn').addEventListener('click',()=>showScreen('painel'));
   initPainel();
   initCadastro();
+  initReviewModal();
   loadPlanDates();
 
   // Salva datas quando mudam
