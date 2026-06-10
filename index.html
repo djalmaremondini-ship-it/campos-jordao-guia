@@ -471,6 +471,80 @@ html,body{height:100%;background:#e0ddd6;font-family:'DM Sans',sans-serif}
 .painel-plan .plan-btn.current{background:#d8efd8;color:#1a5c36}
 .painel-plan .plan-btn.upgrade{background:var(--green);color:#fff}
 
+
+/* ===== CADASTRO PARCEIRO ===== */
+.cad-step{display:none;flex-direction:column;gap:14px}
+.cad-step.active{display:flex}
+.cad-progress{display:flex;gap:6px;margin-bottom:20px}
+.cad-prog-dot{flex:1;height:3px;border-radius:2px;background:var(--border-light);transition:background .3s}
+.cad-prog-dot.done{background:var(--green)}
+.cad-section-ttl{font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px}
+.cad-tip{background:#f0f8f4;border-radius:10px;padding:10px 13px;font-size:12px;color:#1a5c36;line-height:1.6;border:.5px solid #b7dfc9}
+.cad-tip i{font-size:14px;vertical-align:-2px;margin-right:4px}
+.cad-success{text-align:center;padding:24px 0}
+.cad-success i{font-size:52px;color:var(--green);display:block;margin-bottom:14px}
+.cad-success h3{font-family:'Playfair Display',serif;font-size:20px;color:var(--text);margin-bottom:8px}
+.cad-success p{font-size:13px;color:var(--muted);line-height:1.65}
+.plan-select{display:flex;flex-direction:column;gap:8px}
+.plan-opt{border:.5px solid var(--border-light);border-radius:12px;padding:12px 14px;cursor:pointer;transition:all .15s}
+.plan-opt.selected{border-color:var(--green);background:#f0f8f4}
+.plan-opt-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
+.plan-opt-name{font-size:13px;font-weight:500;color:var(--text)}
+.plan-opt-price{font-size:12px;font-weight:500;color:var(--green)}
+.plan-opt-desc{font-size:11px;color:var(--muted);line-height:1.5}
+.plan-opt-radio{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--border-light);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.plan-opt.selected .plan-opt-radio{border-color:var(--green);background:var(--green)}
+.plan-opt.selected .plan-opt-radio::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff}
+
+/* ===== PLANEJAMENTO PRÉ-VIAGEM ===== */
+.plan-header{background:var(--green);padding:20px 18px 22px;flex-shrink:0}
+.plan-header h2{font-family:'Playfair Display',serif;font-size:20px;color:#fff;margin-bottom:14px}
+.plan-date-row{display:flex;gap:10px}
+.plan-date-card{flex:1;background:rgba(255,255,255,.12);border:.5px solid rgba(255,255,255,.2);border-radius:12px;padding:10px 12px;cursor:pointer}
+.plan-date-label{font-size:10px;color:rgba(255,255,255,.6);margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px}
+.plan-date-val{font-size:15px;font-weight:500;color:#fff}
+.plan-date-card.active-date{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.4)}
+.plan-tabs{display:flex;gap:0;background:rgba(255,255,255,.1);border-radius:10px;padding:3px;margin-top:14px}
+.plan-tab{flex:1;text-align:center;padding:6px;border-radius:8px;font-size:12px;font-weight:500;color:rgba(255,255,255,.6);cursor:pointer;transition:all .15s}
+.plan-tab.active{background:#fff;color:var(--green)}
+.plan-body{padding:14px;flex:1;overflow-y:auto}
+.weather-strip{display:flex;gap:8px;overflow-x:auto;margin-bottom:16px;padding-bottom:2px;scrollbar-width:none}
+.weather-strip::-webkit-scrollbar{display:none}
+.wday-card{background:var(--card);border-radius:12px;border:.5px solid var(--border);padding:10px 12px;text-align:center;flex-shrink:0;min-width:62px;cursor:pointer;transition:all .15s}
+.wday-card.selected-day{background:var(--green);border-color:var(--green)}
+.wday-card.selected-day .wdc-name,.wday-card.selected-day .wdc-temp,.wday-card.selected-day .wdc-max{color:#fff}
+.wday-card.selected-day .wdc-name{color:rgba(255,255,255,.7)}
+.wdc-name{font-size:10px;color:var(--muted);margin-bottom:4px}
+.wdc-icon{font-size:18px;color:var(--green);margin-bottom:3px}
+.wday-card.selected-day .wdc-icon{color:var(--gl)}
+.wdc-max{font-size:13px;font-weight:500;color:var(--text)}
+.wdc-temp{font-size:10px;color:var(--sub)}
+.plan-day-detail{background:var(--card);border-radius:14px;border:.5px solid var(--border);padding:14px;margin-bottom:14px}
+.plan-day-hero{display:flex;align-items:center;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:.5px solid var(--border)}
+.plan-day-hero i{font-size:28px;color:var(--green)}
+.plan-day-info h3{font-size:14px;font-weight:500;color:var(--text);margin-bottom:2px}
+.plan-day-info p{font-size:12px;color:var(--muted)}
+.plan-day-stats{display:flex;gap:0}
+.pds{flex:1;text-align:center;border-right:.5px solid var(--border)}
+.pds:last-child{border-right:none}
+.pds-val{font-size:14px;font-weight:500;color:var(--text)}
+.pds-lbl{font-size:10px;color:var(--muted);margin-top:1px}
+.plan-suggest-list{display:flex;flex-direction:column;gap:8px}
+.plan-suggest-item{background:var(--card);border-radius:12px;border:.5px solid var(--border);padding:10px 12px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.psi-img{width:42px;height:42px;border-radius:9px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.psi-img img{width:100%;height:100%;object-fit:cover}
+.psi-info{flex:1;min-width:0}
+.psi-name{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.psi-meta{font-size:11px;color:var(--muted);margin-top:1px}
+.psi-add{width:30px;height:30px;border-radius:8px;background:#f0f8f4;border:.5px solid #b7dfc9;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.psi-add i{font-size:16px;color:var(--green)}
+.psi-add.added{background:var(--green)}
+.psi-add.added i{color:#fff}
+.plan-empty{text-align:center;padding:30px 16px;color:var(--muted)}
+.plan-empty i{font-size:40px;color:#ccc;display:block;margin-bottom:10px}
+.plan-cta{background:var(--green);color:#fff;border-radius:12px;padding:13px;text-align:center;font-weight:500;font-size:14px;cursor:pointer;margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px}
+.plan-cta i{font-size:18px}
+
 /* ===== SPINNER ===== */
 .spinner{width:22px;height:22px;border:2.5px solid var(--border-light);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -596,17 +670,81 @@ html,body{height:100%;background:#e0ddd6;font-family:'DM Sans',sans-serif}
     </div>
   </div>
 
-  <!-- ===== ROTEIRO ===== -->
+  <!-- ===== PLANEJAMENTO + ROTEIRO ===== -->
   <div class="screen" id="screen-roteiro">
-    <div class="map-full-hdr" style="padding-bottom:18px"><h2>Meu Roteiro</h2></div>
-    <div class="rot-body">
+    <!-- HEADER com seletor de data e abas -->
+    <div class="plan-header">
+      <h2>Meu Roteiro</h2>
+      <div class="plan-date-row">
+        <div class="plan-date-card" id="plan-date-chegada" onclick="setPlanTab('planejamento')">
+          <div class="plan-date-label">Chegada</div>
+          <div class="plan-date-val" id="plan-chegada-val">Escolher data</div>
+        </div>
+        <div class="plan-date-card" id="plan-date-saida" onclick="setPlanTab('planejamento')">
+          <div class="plan-date-label">Saída</div>
+          <div class="plan-date-val" id="plan-saida-val">Escolher data</div>
+        </div>
+      </div>
+      <div class="plan-tabs">
+        <div class="plan-tab active" id="tab-planejamento" onclick="setPlanTab('planejamento')"><i class="ti ti-calendar" style="font-size:12px;margin-right:4px"></i>Planejar</div>
+        <div class="plan-tab" id="tab-roteiro" onclick="setPlanTab('roteiro')"><i class="ti ti-route" style="font-size:12px;margin-right:4px"></i>Roteiro</div>
+      </div>
+    </div>
+
+    <!-- ABA PLANEJAMENTO -->
+    <div class="plan-body" id="plan-body-planejamento">
+      <!-- Input de datas -->
+      <div style="background:var(--card);border-radius:14px;border:.5px solid var(--border);padding:14px;margin-bottom:14px" id="plan-date-picker">
+        <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:12px">Quando você vai a Campos do Jordão?</div>
+        <div style="display:flex;gap:10px">
+          <div style="flex:1">
+            <label class="form-label" style="margin-bottom:5px;display:block">Chegada</label>
+            <input type="date" class="form-input" id="input-chegada" oninput="onDatesChange()">
+          </div>
+          <div style="flex:1">
+            <label class="form-label" style="margin-bottom:5px;display:block">Saída</label>
+            <input type="date" class="form-input" id="input-saida" oninput="onDatesChange()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Previsão do tempo para o período -->
+      <div id="plan-weather-section" style="display:none">
+        <div class="sec-hdr" style="margin-bottom:10px">
+          <div class="sec-ttl">Previsão para sua viagem</div>
+        </div>
+        <div class="weather-strip" id="plan-weather-strip"></div>
+        <div id="plan-day-detail"></div>
+      </div>
+
+      <!-- Sugestões por tipo de clima -->
+      <div id="plan-suggestions-section" style="display:none">
+        <div class="sec-hdr" style="margin-bottom:10px">
+          <div class="sec-ttl" id="plan-suggest-title">Sugestões para o dia</div>
+          <div class="see-all" onclick="setPlanTab('roteiro')">Ver roteiro <i class="ti ti-arrow-right" style="font-size:12px"></i></div>
+        </div>
+        <div class="plan-suggest-list" id="plan-suggest-list"></div>
+        <div class="plan-cta" id="plan-add-all-btn">
+          <i class="ti ti-route"></i>Adicionar todos ao roteiro
+        </div>
+      </div>
+
+      <div class="plan-empty" id="plan-empty-state">
+        <i class="ti ti-calendar"></i>
+        <p style="font-weight:500;color:#555;margin-bottom:6px">Planeje antes de chegar</p>
+        <p style="font-size:13px;line-height:1.6">Escolha as datas da sua viagem e veja a previsão do tempo com sugestões de lugares para cada dia.</p>
+      </div>
+    </div>
+
+    <!-- ABA ROTEIRO -->
+    <div class="plan-body" id="plan-body-roteiro" style="display:none">
       <div id="rot-content">
         <div class="rot-empty">
           <i class="ti ti-route"></i>
           <p style="font-weight:500;color:#555;font-size:15px;margin-bottom:6px">Monte seu roteiro</p>
-          <p style="font-size:13px;line-height:1.6">A IA analisa pontos próximos, avaliações e tempo estimado para criar o roteiro ideal.</p>
+          <p style="font-size:13px;line-height:1.6">Salve lugares pelo app ou use o planejamento por data para montar seu roteiro ideal.</p>
         </div>
-        <div class="rot-btn-main" id="criar-rot-btn">Criar roteiro com IA ↗</div>
+        <div class="rot-btn-main" id="criar-rot-btn">Gerar roteiro automático ↗</div>
       </div>
       <div id="roteiro-steps" style="margin-top:16px"></div>
     </div>
@@ -698,7 +836,109 @@ html,body{height:100%;background:#e0ddd6;font-family:'DM Sans',sans-serif}
         <div class="form-field"><label class="form-label">E-mail ou CNPJ</label><input class="form-input" id="painel-user" type="text" placeholder="seu@estabelecimento.com"/></div>
         <div class="form-field"><label class="form-label">Senha</label><input class="form-input" id="painel-pass" type="password" placeholder="••••••••"/></div>
         <button class="modal-btn save" style="width:100%;padding:13px;border-radius:12px;font-size:14px;margin-top:4px" id="painel-login-btn">Entrar</button>
-        <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:14px">Não é parceiro ainda? <span style="color:var(--green);cursor:pointer;font-weight:500" id="painel-cadastro-link">Saiba mais</span></p>
+        <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:14px">Não é parceiro ainda? <span style="color:var(--green);cursor:pointer;font-weight:500" id="painel-cadastro-link">Cadastre seu estabelecimento</span></p>
+      </div>
+
+      <!-- ÁREA DE CADASTRO -->
+      <div id="painel-cadastro-area" style="display:none">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+          <div style="cursor:pointer;color:var(--green);font-size:13px;display:flex;align-items:center;gap:4px" id="cad-voltar-login"><i class="ti ti-arrow-left"></i>Voltar</div>
+          <div style="font-family:'Playfair Display',serif;font-size:17px;color:var(--text)">Cadastro de Parceiro</div>
+        </div>
+        <!-- Barra de progresso -->
+        <div class="cad-progress">
+          <div class="cad-prog-dot done" id="cp-1"></div>
+          <div class="cad-prog-dot" id="cp-2"></div>
+          <div class="cad-prog-dot" id="cp-3"></div>
+          <div class="cad-prog-dot" id="cp-4"></div>
+        </div>
+
+        <!-- STEP 1: Dados do estabelecimento -->
+        <div class="cad-step active" id="cad-step-1">
+          <div class="cad-section-ttl">Sobre o estabelecimento</div>
+          <div class="form-field"><label class="form-label">Nome do estabelecimento *</label><input class="form-input" id="cad-nome-est" type="text" placeholder="Ex: Chocoland Fábrica de Chocolate"/></div>
+          <div class="form-field"><label class="form-label">Categoria *</label>
+            <select class="form-input" id="cad-categoria" style="appearance:auto">
+              <option value="">Selecione...</option>
+              <option>Restaurante</option>
+              <option>Café / Cafeteria</option>
+              <option>Bar / Cervejaria</option>
+              <option>Fábrica de Chocolate</option>
+              <option>Passeio / Aventura</option>
+              <option>Ponto turístico</option>
+              <option>Loja / Comércio</option>
+              <option>Outro</option>
+            </select>
+          </div>
+          <div class="form-field"><label class="form-label">Endereço completo *</label><input class="form-input" id="cad-endereco" type="text" placeholder="Rua, número, bairro — Campos do Jordão"/></div>
+          <div class="form-field"><label class="form-label">Link do Google Maps</label><input class="form-input" id="cad-gmaps" type="url" placeholder="maps.google.com/..."/></div>
+          <div class="cad-tip"><i class="ti ti-info-circle"></i>Cole o link do seu estabelecimento no Google Maps. Usamos para verificar sua identidade.</div>
+          <button class="modal-btn save" style="width:100%;padding:12px;border-radius:12px" onclick="cadNext(2)">Próximo →</button>
+        </div>
+
+        <!-- STEP 2: Responsável -->
+        <div class="cad-step" id="cad-step-2">
+          <div class="cad-section-ttl">Responsável pelo cadastro</div>
+          <div class="form-field"><label class="form-label">Nome completo *</label><input class="form-input" id="cad-nome-resp" type="text" placeholder="Seu nome"/></div>
+          <div class="form-field"><label class="form-label">Cargo / Função *</label><input class="form-input" id="cad-cargo" type="text" placeholder="Ex: Proprietário, Gerente"/></div>
+          <div class="form-field"><label class="form-label">E-mail de contato *</label><input class="form-input" id="cad-email" type="email" placeholder="seu@email.com"/></div>
+          <div class="form-field"><label class="form-label">WhatsApp / Telefone *</label><input class="form-input" id="cad-tel" type="tel" placeholder="(12) 99999-9999"/></div>
+          <div class="form-field"><label class="form-label">CNPJ</label><input class="form-input" id="cad-cnpj" type="text" placeholder="00.000.000/0000-00 (opcional)"/></div>
+          <div class="cad-tip"><i class="ti ti-shield-check"></i>Seus dados são usados apenas para verificação. Entraremos em contato no telefone informado para confirmar.</div>
+          <div style="display:flex;gap:8px">
+            <button class="modal-btn cancel" style="flex:1;padding:12px;border-radius:12px" onclick="cadNext(1)">← Voltar</button>
+            <button class="modal-btn save" style="flex:2;padding:12px;border-radius:12px" onclick="cadNext(3)">Próximo →</button>
+          </div>
+        </div>
+
+        <!-- STEP 3: Plano de interesse -->
+        <div class="cad-step" id="cad-step-3">
+          <div class="cad-section-ttl">Plano de interesse</div>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Escolha o plano que melhor se encaixa. Não há cobrança agora — nossa equipe entrará em contato.</p>
+          <div class="plan-select" id="plan-select-group">
+            <div class="plan-opt selected" data-plan="Gratuito" onclick="selectPlan(this)">
+              <div class="plan-opt-top"><span class="plan-opt-name">Gratuito</span><span class="plan-opt-price">R$ 0/mês</span><div class="plan-opt-radio"></div></div>
+              <div class="plan-opt-desc">Listagem básica nos resultados de busca.</div>
+            </div>
+            <div class="plan-opt" data-plan="Visibilidade" onclick="selectPlan(this)">
+              <div class="plan-opt-top"><span class="plan-opt-name">⭐ Visibilidade</span><span class="plan-opt-price">R$ 199/mês</span><div class="plan-opt-radio"></div></div>
+              <div class="plan-opt-desc">Topo da categoria, badge Destaque, notificação por proximidade.</div>
+            </div>
+            <div class="plan-opt" data-plan="Cupom" onclick="selectPlan(this)">
+              <div class="plan-opt-top"><span class="plan-opt-name">🎫 Cupom</span><span class="plan-opt-price">R$ 299/mês</span><div class="plan-opt-radio"></div></div>
+              <div class="plan-opt-desc">Visibilidade + cupons exclusivos com QR Code para usuários do app.</div>
+            </div>
+            <div class="plan-opt" data-plan="Reserva" onclick="selectPlan(this)">
+              <div class="plan-opt-top"><span class="plan-opt-name">📅 Reserva</span><span class="plan-opt-price">R$ 499/mês + 4%</span><div class="plan-opt-radio"></div></div>
+              <div class="plan-opt-desc">Cupom + reservas direto no app, turista reserva sem sair do guia.</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:6px">
+            <button class="modal-btn cancel" style="flex:1;padding:12px;border-radius:12px" onclick="cadNext(2)">← Voltar</button>
+            <button class="modal-btn save" style="flex:2;padding:12px;border-radius:12px" onclick="cadNext(4)">Próximo →</button>
+          </div>
+        </div>
+
+        <!-- STEP 4: Confirmação e envio -->
+        <div class="cad-step" id="cad-step-4">
+          <div class="cad-section-ttl">Confirmar e enviar</div>
+          <div style="background:#f8f6f2;border-radius:14px;padding:14px;margin-bottom:14px" id="cad-resumo"></div>
+          <div class="cad-tip" style="margin-bottom:14px"><i class="ti ti-clock"></i>Após envio, nossa equipe analisa em até <strong>24 horas úteis</strong> e entra em contato no WhatsApp informado.</div>
+          <div style="display:flex;gap:8px">
+            <button class="modal-btn cancel" style="flex:1;padding:12px;border-radius:12px" onclick="cadNext(3)">← Voltar</button>
+            <button class="modal-btn save" style="flex:2;padding:12px;border-radius:12px" id="cad-enviar-btn">Enviar cadastro ✓</button>
+          </div>
+        </div>
+
+        <!-- STEP 5: Sucesso -->
+        <div class="cad-step" id="cad-step-5">
+          <div class="cad-success">
+            <i class="ti ti-circle-check-filled" style="color:var(--green)"></i>
+            <h3>Cadastro enviado!</h3>
+            <p>Recebemos suas informações e nossa equipe entrará em contato em até 24 horas úteis no WhatsApp informado.<br><br>Enquanto isso, você já pode explorar o Rotera como turista!</p>
+          </div>
+          <button class="modal-btn save" style="width:100%;padding:12px;border-radius:12px;margin-top:8px" onclick="showScreen('home')">Explorar o app</button>
+        </div>
       </div>
       <div id="painel-dash" style="display:none">
         <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--text);margin-bottom:16px" id="painel-welcome">Bem-vindo!</div>
@@ -1839,6 +2079,296 @@ const DEMO_FEATURED={
   ]
 };
 
+
+/* ================================================
+   PLANEJAMENTO PRÉ-VIAGEM
+================================================ */
+let planWeatherData = null;
+let planSelectedDay = 0;
+let planSelectedPlan = 'Gratuito';
+let planDates = {chegada: null, saida: null};
+
+function setPlanTab(tab) {
+  document.getElementById('tab-planejamento').classList.toggle('active', tab==='planejamento');
+  document.getElementById('tab-roteiro').classList.toggle('active', tab==='roteiro');
+  document.getElementById('plan-body-planejamento').style.display = tab==='planejamento'?'block':'none';
+  document.getElementById('plan-body-roteiro').style.display = tab==='roteiro'?'block':'none';
+}
+
+function onDatesChange() {
+  const chegada = document.getElementById('input-chegada').value;
+  const saida   = document.getElementById('input-saida').value;
+  if(!chegada) return;
+  planDates = {chegada, saida};
+  // Atualiza display no header
+  const fmtDate = s => s ? new Date(s+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}) : 'Escolher';
+  document.getElementById('plan-chegada-val').textContent = fmtDate(chegada);
+  document.getElementById('plan-saida-val').textContent   = fmtDate(saida);
+  loadPlanWeather(chegada, saida);
+}
+
+async function loadPlanWeather(chegada, saida) {
+  document.getElementById('plan-empty-state').style.display = 'none';
+  document.getElementById('plan-weather-section').style.display = 'block';
+  document.getElementById('plan-suggestions-section').style.display = 'none';
+  document.getElementById('plan-weather-strip').innerHTML = '<div class="loading-box"><div class="spinner"></div></div>';
+
+  try {
+    // Pega previsão de 14 dias
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${CJ.lat}&longitude=${CJ.lng}&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=America%2FSao_Paulo&forecast_days=14`;
+    const res  = await fetch(url);
+    const data = await res.json();
+    planWeatherData = data.daily;
+    renderPlanWeatherStrip(chegada, saida);
+  } catch(e) {
+    document.getElementById('plan-weather-strip').innerHTML = '<p style="font-size:13px;color:var(--muted)">Não foi possível carregar o clima.</p>';
+  }
+}
+
+function renderPlanWeatherStrip(chegada, saida) {
+  const daily = planWeatherData;
+  if(!daily) return;
+
+  // Filtra dias dentro do período da viagem
+  const c = new Date(chegada+'T12:00:00');
+  const s = saida ? new Date(saida+'T12:00:00') : new Date(c.getTime() + 6*86400000);
+  const stripDays = daily.time.map((d,i) => ({
+    date: d, i,
+    code: daily.weather_code[i],
+    max: Math.round(daily.temperature_2m_max[i]||0),
+    min: Math.round(daily.temperature_2m_min[i]||0),
+    rain: daily.precipitation_probability_max[i]||0
+  })).filter(d => {
+    const dt = new Date(d.date+'T12:00:00');
+    return dt >= c && dt <= s;
+  });
+
+  if(!stripDays.length) {
+    document.getElementById('plan-weather-strip').innerHTML = '<p style="font-size:12px;color:var(--muted)">Previsão disponível para os próximos 14 dias.</p>';
+    return;
+  }
+
+  const h = new Date().getHours();
+  document.getElementById('plan-weather-strip').innerHTML = stripDays.map((d,idx) => {
+    const wmo  = getWMO(d.code);
+    const icon = isNight(h) ? wmo.night : wmo.icon;
+    const dt   = new Date(d.date+'T12:00:00');
+    const nm   = idx===0 ? 'Chegada' : dt.toLocaleDateString('pt-BR',{weekday:'short'}).replace('.','').replace(/^./,c=>c.toUpperCase());
+    return `<div class="wday-card ${idx===0?'selected-day':''}" onclick="selectPlanDay(${idx},${d.i},'${d.date}',${d.max},${d.min},${d.rain},${d.code})" id="wdc-${idx}">
+      <div class="wdc-name">${nm}</div>
+      <i class="ti ${icon} wdc-icon"></i>
+      <div class="wdc-max">${d.max}°</div>
+      <div class="wdc-temp">${d.min}°</div>
+    </div>`;
+  }).join('');
+
+  // Seleciona primeiro dia automaticamente
+  if(stripDays.length) {
+    const d = stripDays[0];
+    selectPlanDay(0, d.i, d.date, d.max, d.min, d.rain, d.code);
+  }
+}
+
+function selectPlanDay(idx, dayIdx, date, max, min, rain, code) {
+  planSelectedDay = idx;
+  document.querySelectorAll('.wday-card').forEach((c,i) => c.classList.toggle('selected-day', i===idx));
+  const wmo = getWMO(code);
+  const dt  = new Date(date+'T12:00:00');
+  const dayName = dt.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^./, c=>c.toUpperCase());
+  const rainTip = rain >= 70 ? 'Alta chance de chuva — prefira locais cobertos' : rain >= 30 ? 'Possibilidade de chuva — leve um casaco' : 'Tempo bom — ótimo para passeios ao ar livre';
+  const h = new Date().getHours();
+  document.getElementById('plan-day-detail').innerHTML = `
+    <div class="plan-day-detail">
+      <div class="plan-day-hero">
+        <i class="ti ${isNight(h)?wmo.night:wmo.icon}"></i>
+        <div class="plan-day-info">
+          <h3>${dayName}</h3>
+          <p>${wmo.desc} · ${rainTip}</p>
+        </div>
+      </div>
+      <div class="plan-day-stats">
+        <div class="pds"><div class="pds-val">${max}°</div><div class="pds-lbl">Máxima</div></div>
+        <div class="pds"><div class="pds-val">${min}°</div><div class="pds-lbl">Mínima</div></div>
+        <div class="pds"><div class="pds-val">${rain}%</div><div class="pds-lbl">Chuva</div></div>
+      </div>
+    </div>
+  `;
+  renderPlanSuggestions(rain, code);
+}
+
+function renderPlanSuggestions(rain, code) {
+  document.getElementById('plan-suggestions-section').style.display = 'block';
+  const isRainy = rain >= 50;
+  // Filtra lugares por clima: chuva → prioriza cobertos (restaurante, café, cultura), sol → natureza, passeio
+  let suggested = [...allPlaces];
+  if(isRainy) {
+    suggested = suggested.filter(p => {
+      const t = p.types||[];
+      return t.includes('restaurant')||t.includes('cafe')||t.includes('museum')||p._specialType==='chocolate'||p._specialType==='culture';
+    });
+    document.getElementById('plan-suggest-title').textContent = 'Sugestões para dia chuvoso 🌧';
+  } else {
+    suggested = suggested.filter(p => {
+      const t = p.types||[];
+      return t.includes('park')||t.includes('tourist_attraction')||p._specialType==='adventure'||p._specialType==='transport';
+    });
+    document.getElementById('plan-suggest-title').textContent = 'Sugestões para dia de sol ☀️';
+  }
+
+  // Ordena por rating e pega top 5
+  suggested = suggested.sort((a,b) => ((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0))).slice(0,6);
+
+  if(!suggested.length) {
+    // Fallback: top rated geral
+    suggested = [...allPlaces].sort((a,b)=>(b.rating||0)-(a.rating||0)).slice(0,5);
+  }
+
+  const el = document.getElementById('plan-suggest-list');
+  el.innerHTML = suggested.map(p => {
+    const c   = cfg(p.types, p._specialType);
+    const url = photoUrl(p, 100);
+    const img = imgOrFallback(url, c.nc, c.icon, 'width:100%;height:100%;object-fit:cover');
+    const inRot = roteiroPlaces.find(x=>x.place_id===p.place_id);
+    return `<div class="plan-suggest-item" data-pid="${p.place_id}">
+      <div class="psi-img ${c.nc}">${img}</div>
+      <div class="psi-info">
+        <div class="psi-name">${p.name}</div>
+        <div class="psi-meta">${c.label}${p.rating?' · ★ '+p.rating.toFixed(1):''}</div>
+      </div>
+      <div class="psi-add ${inRot?'added':''}" onclick="addToRoteiroFromPlan('${p.place_id}',this)">
+        <i class="ti ${inRot?'ti-check':'ti-plus'}"></i>
+      </div>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('.plan-suggest-item').forEach(item => {
+    item.querySelector('.psi-info').addEventListener('click', () => openDetail(item.dataset.pid));
+  });
+
+  document.getElementById('plan-add-all-btn').onclick = () => {
+    suggested.forEach(p => { if(!roteiroPlaces.find(x=>x.place_id===p.place_id)) roteiroPlaces.push(p); });
+    renderRoteiro();
+    LS.save();
+    setPlanTab('roteiro');
+  };
+}
+
+function addToRoteiroFromPlan(pid, btn) {
+  const p = allPlaces.find(x=>x.place_id===pid);
+  if(!p) return;
+  if(!roteiroPlaces.find(x=>x.place_id===pid)) roteiroPlaces.push(p);
+  btn.classList.add('added');
+  btn.innerHTML = '<i class="ti ti-check"></i>';
+  renderRoteiro();
+  LS.save();
+}
+
+// Salva datas no LS
+function savePlanDates() {
+  try { localStorage.setItem('cj_plan_dates', JSON.stringify(planDates)); } catch(e){}
+}
+function loadPlanDates() {
+  try {
+    const d = JSON.parse(localStorage.getItem('cj_plan_dates')||'{}');
+    if(d.chegada) {
+      document.getElementById('input-chegada').value = d.chegada;
+      document.getElementById('input-saida').value   = d.saida||'';
+      planDates = d;
+      onDatesChange();
+    }
+  } catch(e){}
+}
+
+/* ================================================
+   CADASTRO DE PARCEIRO + GOOGLE SHEETS
+================================================ */
+// SUBSTITUA pela URL do seu Google Apps Script Web App
+const SHEETS_URL = 'https://script.google.com/macros/s/SEU_SCRIPT_ID/exec';
+
+function selectPlan(el) {
+  document.querySelectorAll('.plan-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  planSelectedPlan = el.dataset.plan;
+}
+
+function cadNext(step) {
+  // Validação básica
+  if(step === 2) {
+    if(!document.getElementById('cad-nome-est').value.trim()) { alert('Informe o nome do estabelecimento'); return; }
+    if(!document.getElementById('cad-categoria').value) { alert('Selecione uma categoria'); return; }
+    if(!document.getElementById('cad-endereco').value.trim()) { alert('Informe o endereço'); return; }
+  }
+  if(step === 3) {
+    if(!document.getElementById('cad-nome-resp').value.trim()) { alert('Informe o nome do responsável'); return; }
+    if(!document.getElementById('cad-email').value.trim()) { alert('Informe o e-mail'); return; }
+    if(!document.getElementById('cad-tel').value.trim()) { alert('Informe o telefone'); return; }
+  }
+  if(step === 4) {
+    // Monta resumo
+    document.getElementById('cad-resumo').innerHTML = `
+      <div style="font-size:13px;line-height:2;color:var(--text)">
+        <strong>Estabelecimento:</strong> ${document.getElementById('cad-nome-est').value}<br>
+        <strong>Categoria:</strong> ${document.getElementById('cad-categoria').value}<br>
+        <strong>Responsável:</strong> ${document.getElementById('cad-nome-resp').value}<br>
+        <strong>E-mail:</strong> ${document.getElementById('cad-email').value}<br>
+        <strong>Telefone:</strong> ${document.getElementById('cad-tel').value}<br>
+        <strong>Plano de interesse:</strong> ${planSelectedPlan}
+      </div>`;
+  }
+  // Troca step
+  document.querySelectorAll('.cad-step').forEach(s => s.classList.remove('active'));
+  document.getElementById('cad-step-'+step).classList.add('active');
+  // Atualiza barra de progresso
+  [1,2,3,4].forEach(i => {
+    const dot = document.getElementById('cp-'+i);
+    if(dot) dot.classList.toggle('done', i <= step);
+  });
+}
+
+async function enviarCadastro() {
+  const btn = document.getElementById('cad-enviar-btn');
+  btn.textContent = 'Enviando...';
+  btn.disabled = true;
+  const payload = {
+    timestamp:        new Date().toLocaleString('pt-BR'),
+    estabelecimento:  document.getElementById('cad-nome-est').value,
+    categoria:        document.getElementById('cad-categoria').value,
+    endereco:         document.getElementById('cad-endereco').value,
+    gmaps:            document.getElementById('cad-gmaps').value,
+    responsavel:      document.getElementById('cad-nome-resp').value,
+    cargo:            document.getElementById('cad-cargo').value,
+    email:            document.getElementById('cad-email').value,
+    telefone:         document.getElementById('cad-tel').value,
+    cnpj:             document.getElementById('cad-cnpj').value,
+    plano:            planSelectedPlan,
+    origem:           'Rotera App'
+  };
+  try {
+    await fetch(SHEETS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+  } catch(e) {
+    // no-cors não retorna resposta — sempre avança
+  }
+  // Vai para tela de sucesso independente
+  cadNext(5);
+}
+
+function initCadastro() {
+  document.getElementById('painel-cadastro-link').addEventListener('click', () => {
+    document.getElementById('painel-login-area').style.display = 'none';
+    document.getElementById('painel-cadastro-area').style.display = 'block';
+    cadNext(1);
+  });
+  document.getElementById('cad-voltar-login').addEventListener('click', () => {
+    document.getElementById('painel-cadastro-area').style.display = 'none';
+    document.getElementById('painel-login-area').style.display = 'block';
+  });
+  document.getElementById('cad-enviar-btn').addEventListener('click', enviarCadastro);
+}
+
 /* ================================================
    INIT GOOGLE MAPS CALLBACK
 ================================================ */
@@ -1991,6 +2521,12 @@ window.initMap=function(){
   document.getElementById('coupon-back').addEventListener('click',()=>showScreen(prevScreen));
   document.getElementById('open-painel-btn').addEventListener('click',()=>showScreen('painel'));
   initPainel();
+  initCadastro();
+  loadPlanDates();
+
+  // Salva datas quando mudam
+  document.getElementById('input-chegada').addEventListener('change', savePlanDates);
+  document.getElementById('input-saida').addEventListener('change', savePlanDates);
 
   // weather
   document.getElementById('weather-chip-btn').addEventListener('click',openWeatherPopup);
