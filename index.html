@@ -811,9 +811,6 @@ const SUBFILTERS = {
   ],
 };
 
-let listCatFilter = 'all';
-let listSubFilter = null;
-
 function placeMatchesSubfilter(p, sf) {
   if (!sf) return true;
   const types = p.types || [];
@@ -1394,6 +1391,6 @@ window.initMap=function(){
 </script>
 
 <!-- Google Maps API -->
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDfQIYqC6B8Q1AR-osYKDAkI9dkYJZd0rk&libraries=places&callback=initMap" async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDfQIYqC6B8Q1AR-osYKDAkI9dkYJZd0rk&libraries=places&callback=initMap&loading=async"></script>
 </body>
 </html>
