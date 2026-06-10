@@ -1407,10 +1407,11 @@ function renderFeatured(places){
 function renderNear(places){
   const el=document.getElementById('near-list');
   if(!places.length){el.innerHTML='<p style="padding:10px;font-size:13px;color:var(--muted)">Nenhum lugar próximo.</p>';return;}
-  const sorted=[...places].sort((a,b)=>
-    dist(userLat,userLng,latVal(a),lngVal(a))-
-    dist(userLat,userLng,latVal(b),lngVal(b))
-  );
+  // Ordena por distância mas sempre empurra sem foto pro final
+  const byDist=(a,b)=>dist(userLat,userLng,latVal(a),lngVal(a))-dist(userLat,userLng,latVal(b),lngVal(b));
+  const comFoto = [...places].filter(p=>photoUrl(p)).sort(byDist);
+  const semFoto = [...places].filter(p=>!photoUrl(p)).sort(byDist);
+  const sorted  = [...comFoto, ...semFoto];
   el.innerHTML=sorted.slice(0,8).map(p=>{
     const c=cfg(p.types,p._specialType);
     const d=dist(userLat,userLng,latVal(p),lngVal(p));
@@ -1605,11 +1606,15 @@ function renderList() {
   // busca por texto
   const q = document.getElementById('list-search-input').value.toLowerCase();
   if (q) places = places.filter(p => p.name.toLowerCase().includes(q) || (p.vicinity||'').toLowerCase().includes(q));
-  // ordenação
-  if (listSort === 'rating')   places.sort((a,b) => (b.rating||0) - (a.rating||0));
+  // Ordenação — sem foto sempre vai pro final independente do critério
+  if (listSort === 'rating')    places.sort((a,b) => (b.rating||0) - (a.rating||0));
   else if (listSort === 'dist') places.sort((a,b) => dist(userLat,userLng,latVal(a),lngVal(a)) - dist(userLat,userLng,latVal(b),lngVal(b)));
   else if (listSort === 'reviews') places.sort((a,b) => (b.user_ratings_total||0) - (a.user_ratings_total||0));
-  else if (listSort === 'az')  places.sort((a,b) => a.name.localeCompare(b.name,'pt-BR'));
+  else if (listSort === 'az')   places.sort((a,b) => a.name.localeCompare(b.name,'pt-BR'));
+  // Separa com e sem foto — sem foto sempre no final
+  const comFotoList = places.filter(p => photoUrl(p));
+  const semFotoList = places.filter(p => !photoUrl(p));
+  places = [...comFotoList, ...semFotoList];
   document.getElementById('list-subtitle').textContent = `${places.length} lugar${places.length !== 1 ? 'es' : ''} encontrado${places.length !== 1 ? 's' : ''}`;
   const el = document.getElementById('list-grid');
   if (!places.length) { el.innerHTML = '<div class="empty-state"><i class="ti ti-search"></i>Nenhum resultado encontrado.</div>'; return; }
@@ -1948,8 +1953,9 @@ function fetchPlaces(type){
       const res=(status===google.maps.places.PlacesServiceStatus.OK&&results)?results:[];
       // marca o tipo especial nos resultados
       res.forEach(r=>{ r._specialType=type; if(!allPlaces.find(x=>x.place_id===r.place_id)) allPlaces.push(r); });
-      renderFeatured(res.sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0))));
-      renderNear(res);
+      const resSorted=res.sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0)));
+      renderFeatured(resSorted.filter(p=>p._featured||photoUrl(p)));
+      renderNear([...res.filter(p=>photoUrl(p)),...res.filter(p=>!photoUrl(p))]);
       addMarkers(mapHome,res,homeMarkers);
       if(fullInited) addMarkers(mapFull,res,fullMarkers);
     });
@@ -1965,12 +1971,14 @@ function fetchPlaces(type){
     pending--;
     if(pending===0){
       allPlaces=collected.filter((p,i,a)=>a.findIndex(x=>x.place_id===p.place_id)===i);
-      // Re-injeta demo destaque sempre que allPlaces é reconstruído
       if(!allPlaces.find(p=>p.place_id==='DEMO_CHOCOLAND_001')) allPlaces.unshift(DEMO_FEATURED);
-      // Destaques primeiro, depois por rating
+      // Destaque: _featured primeiro, depois por rating — SÓ com foto
       const sorted=[...allPlaces].sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0)));
-      renderFeatured(sorted);
-      renderNear(allPlaces);
+      const comFoto  = sorted.filter(p => p._featured || photoUrl(p));
+      renderFeatured(comFoto);
+      // Mais próximos: com foto primeiro, sem foto no final
+      const nearAll  = [...allPlaces].sort((a,b)=>dist(userLat,userLng,latVal(a),lngVal(a))-dist(userLat,userLng,latVal(b),lngVal(b)));
+      renderNear([...nearAll.filter(p=>photoUrl(p)), ...nearAll.filter(p=>!photoUrl(p))]);
       addMarkers(mapHome,allPlaces,homeMarkers);
       if(fullInited) addMarkers(mapFull,allPlaces,fullMarkers);
       LS.restoreRoteiro();
@@ -3106,17 +3114,19 @@ window.initMap=function(){
     const t=cat.dataset.type;
     const specialCats=['chocolate','adventure','culture','transport'];
     if(t==='all'){
-      renderFeatured([...allPlaces].sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0))));
-      renderNear(allPlaces);
+      const allS=[...allPlaces].sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0)));
+      renderFeatured(allS.filter(p=>p._featured||photoUrl(p)));
+      const allN=[...allPlaces].sort((a,b)=>dist(userLat,userLng,latVal(a),lngVal(a))-dist(userLat,userLng,latVal(b),lngVal(b)));
+      renderNear([...allN.filter(p=>photoUrl(p)),...allN.filter(p=>!photoUrl(p))]);
       addMarkers(mapHome,allPlaces,homeMarkers);
     } else if(specialCats.includes(t)){
       // categoria especial: filtra por _specialType ou busca se vazio
       const f=allPlaces.filter(p=>p._specialType===t);
-      if(f.length){renderFeatured([...f].sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0))));renderNear(f);addMarkers(mapHome,f,homeMarkers);}
+      if(f.length){const fS=[...f].sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0)));renderFeatured(fS.filter(p=>p._featured||photoUrl(p)));renderNear([...f.filter(p=>photoUrl(p)),...f.filter(p=>!photoUrl(p))]);addMarkers(mapHome,f,homeMarkers);}
       else fetchPlaces(t);
     } else {
       const f=allPlaces.filter(p=>p.types&&p.types.includes(t));
-      if(f.length){renderFeatured([...f].sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0))));renderNear(f);addMarkers(mapHome,f,homeMarkers);}
+      if(f.length){const fS=[...f].sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0)));renderFeatured(fS.filter(p=>p._featured||photoUrl(p)));renderNear([...f.filter(p=>photoUrl(p)),...f.filter(p=>!photoUrl(p))]);addMarkers(mapHome,f,homeMarkers);}
       else fetchPlaces(t);
     }
   });
