@@ -555,10 +555,10 @@ html,body{height:100%;background:#e0ddd6;font-family:'DM Sans',sans-serif}
 /* Card de roteiro da comunidade */
 .community-card{background:var(--card);border-radius:16px;border:.5px solid var(--border);overflow:hidden;margin-bottom:12px;cursor:pointer;transition:border-color .15s}
 .community-card:hover{border-color:var(--mist)}
-.cc-photos{display:flex;height:80px;gap:2px;overflow:hidden}
-.cc-photo{flex:1;overflow:hidden;background:#e8f4e8;display:flex;align-items:center;justify-content:center}
-.cc-photo img{width:100%;height:100%;object-fit:cover}
-.cc-photo i{font-size:20px;opacity:.35}
+.cc-photos{display:flex;height:90px;gap:2px;overflow:hidden;border-radius:0}
+.cc-photo{flex:1;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;min-width:0}
+.cc-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.cc-photo i{font-size:22px;opacity:.4;position:relative;z-index:1}
 .cc-photo.nat{background:#d8efd8}.cc-photo.nat i{color:#2D6A4F}
 .cc-photo.food{background:#faeeda}.cc-photo.food i{color:#B7791F}
 .cc-photo.cult{background:#e8e4f8}.cc-photo.cult i{color:#534AB7}
@@ -2692,11 +2692,12 @@ function renderCommunityList(filter) {
       const cls  = (r.placeTypes||[])[idx] || 'nat';
       const icon = iconMap[cls]||'ti-map-pin';
       const bg   = gradMap[cls]||'#e8f4e8';
-      // Tenta casar com place real pelo nome
-      const kw   = name.toLowerCase().split(' ').filter(w=>w.length>3)[0] || name.toLowerCase().split(' ')[0];
-      const mp   = allPlaces.find(p => p.name.toLowerCase().includes(kw));
-      const url  = mp ? photoUrl(mp,200) : null;
-      if(url) return `<div class="cc-photo ${cls}"><img src="${url}" alt="${name}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML='<i class=\\"ti ${icon}\\"></i>'"></div>`;
+      // Tenta casar com place real — busca pela palavra mais longa do nome
+      const words = name.toLowerCase().split(' ').filter(w => w.length > 3);
+      const kw    = words.sort((a,b) => b.length - a.length)[0] || name.toLowerCase().split(' ')[0];
+      const mp    = allPlaces.find(p => p.name.toLowerCase().includes(kw));
+      const url   = mp ? photoUrl(mp, 200) : null;
+      if(url) return `<div class="cc-photo ${cls}"><img src="${url}" alt="${name}" onerror="this.style.display='none'"></div>`;
       return `<div class="cc-photo ${cls}"><i class="ti ${icon}"></i></div>`;
     }).join('');
     const starsHtml = Array.from({length:5},(_,i) =>
