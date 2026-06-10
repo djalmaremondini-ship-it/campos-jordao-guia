@@ -769,8 +769,8 @@ function renderNear(places){
 ================================================ */
 
 // Subfiltros por categoria
-// mode:'type'  → filtra pelo array types do Google Places (funciona bem)
-// mode:'search' → faz nova busca no Places API com keyword (para culinária, onde o tipo é sempre 'restaurant')
+// mode:'type'   → filtra pelos types do Google Places
+// mode:'search' → textSearch no Places API (mais preciso para culinária)
 const SUBFILTERS = {
   tourist_attraction: [
     {label:'Museu',           mode:'type',   match:['museum']},
@@ -779,64 +779,63 @@ const SUBFILTERS = {
     {label:'Ponto histórico', mode:'type',   match:['tourist_attraction']},
   ],
   park: [
-    {label:'Trilha',          mode:'search', placeType:'park',        kw:'trilha Campos do Jordão'},
-    {label:'Jardim',          mode:'search', placeType:'park',        kw:'jardim Campos do Jordão'},
-    {label:'Cachoeira',       mode:'search', placeType:'park',        kw:'cachoeira Campos do Jordão'},
-    {label:'Camping',         mode:'type',   match:['campground']},
+    {label:'Trilha',    mode:'search', placeType:'park', kw:'trilha'},
+    {label:'Jardim',    mode:'search', placeType:'park', kw:'jardim'},
+    {label:'Cachoeira', mode:'search', placeType:'park', kw:'cachoeira'},
+    {label:'Camping',   mode:'type',   match:['campground']},
   ],
   restaurant: [
-    {label:'Italiano',        mode:'search', placeType:'restaurant',  kw:'restaurante italiano Campos do Jordão'},
-    {label:'Suíço / Europeu', mode:'search', placeType:'restaurant',  kw:'restaurante suíço europeu Campos do Jordão'},
-    {label:'Churrasco',       mode:'search', placeType:'restaurant',  kw:'churrascaria Campos do Jordão'},
-    {label:'Pizza',           mode:'search', placeType:'restaurant',  kw:'pizzaria Campos do Jordão'},
-    {label:'Frutos do mar',   mode:'search', placeType:'restaurant',  kw:'frutos do mar Campos do Jordão'},
-    {label:'Japonês',         mode:'search', placeType:'restaurant',  kw:'restaurante japonês Campos do Jordão'},
-    {label:'Vegano',          mode:'search', placeType:'restaurant',  kw:'restaurante vegano vegetariano Campos do Jordão'},
-    {label:'Café & Bistrô',   mode:'search', placeType:'restaurant',  kw:'bistrô café Campos do Jordão'},
+    {label:'Italiano',        mode:'search', placeType:'restaurant', kw:'italiano'},
+    {label:'Suíço / Europeu', mode:'search', placeType:'restaurant', kw:'suico'},
+    {label:'Churrasco',       mode:'search', placeType:'restaurant', kw:'churrasco'},
+    {label:'Pizza',           mode:'search', placeType:'restaurant', kw:'pizza'},
+    {label:'Frutos do mar',   mode:'search', placeType:'restaurant', kw:'frutos mar'},
+    {label:'Japonês',         mode:'search', placeType:'restaurant', kw:'japones'},
+    {label:'Vegano',          mode:'search', placeType:'restaurant', kw:'vegano'},
+    {label:'Bistrô',          mode:'search', placeType:'restaurant', kw:'bistro'},
   ],
   cafe: [
-    {label:'Chocolate',       mode:'search', placeType:'cafe',        kw:'chocolate café Campos do Jordão'},
-    {label:'Café colonial',   mode:'search', placeType:'cafe',        kw:'café colonial Campos do Jordão'},
-    {label:'Padaria',         mode:'type',   match:['bakery']},
-    {label:'Sorveteria',      mode:'search', placeType:'cafe',        kw:'sorveteria Campos do Jordão'},
+    {label:'Chocolate', mode:'search', placeType:'cafe', kw:'chocolate'},
+    {label:'Colonial',  mode:'search', placeType:'cafe', kw:'colonial'},
+    {label:'Padaria',   mode:'type',   match:['bakery']},
+    {label:'Sorveteria',mode:'search', placeType:'cafe', kw:'sorveteria'},
   ],
   bar: [
-    {label:'Cervejaria',      mode:'search', placeType:'bar',         kw:'cervejaria Campos do Jordão'},
-    {label:'Pub',             mode:'search', placeType:'bar',         kw:'pub bar Campos do Jordão'},
-    {label:'Vinho',           mode:'search', placeType:'bar',         kw:'vinho adega Campos do Jordão'},
+    {label:'Cervejaria', mode:'search', placeType:'bar', kw:'cerveja'},
+    {label:'Pub',        mode:'search', placeType:'bar', kw:'pub'},
+    {label:'Vinho',      mode:'search', placeType:'bar', kw:'vinho'},
   ],
   shopping_mall: [
-    {label:'Artesanato',      mode:'search', placeType:'store',       kw:'artesanato Campos do Jordão'},
-    {label:'Chocolates',      mode:'search', placeType:'store',       kw:'loja chocolate Campos do Jordão'},
-    {label:'Roupas',          mode:'type',   match:['clothing_store']},
-    {label:'Souvenirs',       mode:'search', placeType:'store',       kw:'souvenir lembrança Campos do Jordão'},
+    {label:'Artesanato', mode:'search', placeType:'store', kw:'artesanato'},
+    {label:'Chocolates', mode:'search', placeType:'store', kw:'chocolate'},
+    {label:'Roupas',     mode:'type',   match:['clothing_store']},
+    {label:'Souvenirs',  mode:'search', placeType:'store', kw:'souvenir'},
   ],
 };
 
-// Cache de buscas por subfiltro pra não repetir chamadas
 const subfiltroCache = {};
 
 function placeMatchesSubfilter(p, sf) {
-  if (!sf || sf.mode === 'search') return true; // search usa fetchSubfilter
+  if (!sf || sf.mode === 'search') return true;
   const types = p.types || [];
   return sf.match.some(t => types.includes(t));
 }
 
-// Busca Places API por keyword quando mode==='search'
+// Usa textSearch — muito mais preciso que nearbySearch para culinária
 function fetchSubfilter(sf, callback) {
   const cacheKey = sf.kw;
   if (subfiltroCache[cacheKey]) { callback(subfiltroCache[cacheKey]); return; }
   const service = new google.maps.places.PlacesService(mapHome);
   const center  = new google.maps.LatLng(userLat, userLng);
-  service.nearbySearch({
+  // textSearch com query = keyword + Campos do Jordão, rankBy=DISTANCE
+  service.textSearch({
+    query: sf.kw + ' Campos do Jordao',
     location: center,
     radius: searchRadius,
-    type: sf.placeType,
-    keyword: sf.kw
+    type: sf.placeType
   }, (results, status) => {
     const res = (status === google.maps.places.PlacesServiceStatus.OK && results) ? results : [];
     subfiltroCache[cacheKey] = res;
-    // merge nos allPlaces pra não perder dados
     res.forEach(r => { if (!allPlaces.find(x => x.place_id === r.place_id)) allPlaces.push(r); });
     callback(res);
   });
