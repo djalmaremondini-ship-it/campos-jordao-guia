@@ -455,10 +455,14 @@ html,body{height:100%;background:#e0ddd6;font-family:'DM Sans',sans-serif}
         <div class="cat active" data-type="all"><i class="ti ti-layout-grid"></i> Todos</div>
         <div class="cat" data-type="tourist_attraction"><i class="ti ti-building-arch"></i> Pontos turísticos</div>
         <div class="cat" data-type="park"><i class="ti ti-trees"></i> Natureza</div>
+        <div class="cat" data-type="chocolate"><i class="ti ti-box"></i> Chocolate</div>
+        <div class="cat" data-type="adventure"><i class="ti ti-parachute"></i> Aventura</div>
         <div class="cat" data-type="restaurant"><i class="ti ti-tools-kitchen-2"></i> Restaurantes</div>
         <div class="cat" data-type="cafe"><i class="ti ti-coffee"></i> Cafés</div>
         <div class="cat" data-type="bar"><i class="ti ti-beer"></i> Bares</div>
         <div class="cat" data-type="shopping_mall"><i class="ti ti-shopping-bag"></i> Compras</div>
+        <div class="cat" data-type="culture"><i class="ti ti-palette"></i> Arte & Cultura</div>
+        <div class="cat" data-type="transport"><i class="ti ti-train"></i> Passeios</div>
       </div>
     </div>
     <div class="body">
@@ -497,10 +501,14 @@ html,body{height:100%;background:#e0ddd6;font-family:'DM Sans',sans-serif}
         <div class="list-cat-pill active" data-type="all"><i class="ti ti-layout-grid"></i>Todos</div>
         <div class="list-cat-pill" data-type="tourist_attraction"><i class="ti ti-building-arch"></i>Pontos turísticos</div>
         <div class="list-cat-pill" data-type="park"><i class="ti ti-trees"></i>Natureza</div>
+        <div class="list-cat-pill" data-type="chocolate"><i class="ti ti-box"></i>Chocolate</div>
+        <div class="list-cat-pill" data-type="adventure"><i class="ti ti-parachute"></i>Aventura</div>
         <div class="list-cat-pill" data-type="restaurant"><i class="ti ti-tools-kitchen-2"></i>Restaurantes</div>
         <div class="list-cat-pill" data-type="cafe"><i class="ti ti-coffee"></i>Cafés</div>
         <div class="list-cat-pill" data-type="bar"><i class="ti ti-beer"></i>Bares</div>
         <div class="list-cat-pill" data-type="shopping_mall"><i class="ti ti-shopping-bag"></i>Compras</div>
+        <div class="list-cat-pill" data-type="culture"><i class="ti ti-palette"></i>Arte & Cultura</div>
+        <div class="list-cat-pill" data-type="transport"><i class="ti ti-train"></i>Passeios</div>
       </div>
     </div>
     <!-- SUBFILTROS (aparecem dinamicamente por categoria) -->
@@ -664,9 +672,19 @@ const TC = {
   cafe:{icon:'ti-coffee',cls:'coff',label:'Café',time:'30–60min',color:'#8B5E3C',nc:'p'},
   bar:{icon:'ti-beer',cls:'food',label:'Bar',time:'1–2h',color:'#D85A30',nc:'f'},
   shopping_mall:{icon:'ti-shopping-bag',cls:'cult',label:'Compras',time:'1–3h',color:'#534AB7',nc:'c'},
+  // Categorias especiais Campos do Jordão
+  chocolate:{icon:'ti-box',cls:'coff',label:'Fábrica de Chocolate',time:'1–2h',color:'#6B3A2A',nc:'p'},
+  adventure:{icon:'ti-parachute',cls:'nat',label:'Aventura',time:'2–4h',color:'#0F6E56',nc:'n'},
+  culture:{icon:'ti-palette',cls:'cult',label:'Arte & Cultura',time:'1–2h',color:'#534AB7',nc:'c'},
+  transport:{icon:'ti-train',cls:'cult',label:'Passeio Turístico',time:'1h',color:'#8B6914',nc:'c'},
   default:{icon:'ti-map-pin',cls:'nat',label:'Local',time:'1h',color:'#2D6A4F',nc:'n'}
 };
-function cfg(types){if(!types)return TC.default;for(const t of Object.keys(TC)){if(types.includes(t))return TC[t];}return TC.default;}
+function cfg(types,specialType){
+  if(specialType&&TC[specialType]) return TC[specialType];
+  if(!types) return TC.default;
+  for(const t of Object.keys(TC)){if(types.includes(t))return TC[t];}
+  return TC.default;
+}
 
 /* ================================================
    UTILS
@@ -725,7 +743,7 @@ function renderFeatured(places){
   const el=document.getElementById('featured-cards');
   if(!places.length){el.innerHTML='<p style="padding:10px;font-size:13px;color:var(--muted)">Nenhum lugar encontrado.</p>';return;}
   el.innerHTML=places.slice(0,12).map(p=>{
-    const c=cfg(p.types);
+    const c=cfg(p.types,p._specialType);
     const d=dist(userLat,userLng,p.geometry.location.lat(),p.geometry.location.lng());
     const url=photoUrl(p);
     const ob=p.opening_hours?(p.opening_hours.isOpen()?'<span class="cbadge open">Aberto</span>':'<span class="cbadge closed">Fechado</span>'):'';
@@ -751,7 +769,7 @@ function renderNear(places){
     dist(userLat,userLng,b.geometry.location.lat(),b.geometry.location.lng())
   );
   el.innerHTML=sorted.slice(0,8).map(p=>{
-    const c=cfg(p.types);
+    const c=cfg(p.types,p._specialType);
     const d=dist(userLat,userLng,p.geometry.location.lat(),p.geometry.location.lng());
     const url=photoUrl(p,150);
     const img=url?`<img src="${url}" alt="${p.name}" onerror="this.style.display='none'">`:`<i class="ti ${c.icon}"></i>`;
@@ -777,6 +795,31 @@ const SUBFILTERS = {
     {label:'Igreja / Capela', mode:'type',   match:['church','place_of_worship']},
     {label:'Parque',          mode:'type',   match:['park']},
     {label:'Ponto histórico', mode:'type',   match:['tourist_attraction']},
+  ],
+  chocolate: [
+    {label:'Fábrica / Loja',  mode:'search', placeType:'store',            kw:'fabrica chocolate'},
+    {label:'Chocolateria',    mode:'search', placeType:'cafe',             kw:'chocolateria'},
+    {label:'Cacau & Origem',  mode:'search', placeType:'store',            kw:'cacau chocolate artesanal'},
+  ],
+  adventure: [
+    {label:'Tirolesa',        mode:'search', placeType:'tourist_attraction', kw:'tirolesa'},
+    {label:'Arvorismo',       mode:'search', placeType:'tourist_attraction', kw:'arvorismo'},
+    {label:'Trilha',          mode:'search', placeType:'park',              kw:'trilha'},
+    {label:'Parque aventura', mode:'search', placeType:'tourist_attraction', kw:'parque aventura'},
+    {label:'Pedra do Baú',    mode:'search', placeType:'tourist_attraction', kw:'Pedra do Bau'},
+    {label:'Mirante',         mode:'search', placeType:'tourist_attraction', kw:'mirante'},
+  ],
+  culture: [
+    {label:'Museu',           mode:'search', placeType:'museum',            kw:'museu'},
+    {label:'Palácio Boa Vista',mode:'search',placeType:'tourist_attraction', kw:'Palacio Boa Vista'},
+    {label:'Música & Teatro', mode:'search', placeType:'tourist_attraction', kw:'auditorio teatro'},
+    {label:'Galerias',        mode:'search', placeType:'art_gallery',        kw:'galeria arte'},
+  ],
+  transport: [
+    {label:'Bonde / Trem',    mode:'search', placeType:'tourist_attraction', kw:'bonde trem turistico'},
+    {label:'Teleférico',      mode:'search', placeType:'tourist_attraction', kw:'teleferico'},
+    {label:'City Tour',       mode:'search', placeType:'tourist_attraction', kw:'city tour'},
+    {label:'Cavalo',          mode:'search', placeType:'tourist_attraction', kw:'passeio cavalo'},
   ],
   park: [
     {label:'Trilha',    mode:'search', placeType:'park', kw:'trilha'},
@@ -848,7 +891,7 @@ function buildSubfilters(catType) {
   const subs = SUBFILTERS[catType];
   if (!subs || catType === 'all') { bar.classList.remove('visible'); listSubFilter=null; return; }
   bar.classList.add('visible');
-  const labels = { tourist_attraction:'Tipo de ponto', park:'Tipo de natureza', restaurant:'Cozinha', cafe:'Tipo de café', bar:'Tipo de bar', shopping_mall:'Segmento' };
+  const labels = { tourist_attraction:'Tipo de ponto', park:'Tipo de natureza', restaurant:'Cozinha', cafe:'Tipo de café', bar:'Tipo de bar', shopping_mall:'Segmento', chocolate:'Tipo de chocolate', adventure:'Tipo de aventura', culture:'Tipo de cultura', transport:'Tipo de passeio' };
   lbl.textContent = labels[catType] || 'Especialidade';
   row.innerHTML = `<div class="subf-pill active" data-sub="all">Todos</div>` +
     subs.map((s,i) => `<div class="subf-pill" data-sub="${i}">${s.label}</div>`).join('');
@@ -903,7 +946,14 @@ function renderList() {
   } else {
     places = [...listPlaces];
     if (listCatFilter !== 'all') {
-      places = places.filter(p => p.types && p.types.includes(listCatFilter));
+      const specialCats=['chocolate','adventure','culture','transport'];
+      if(specialCats.includes(listCatFilter)){
+        places = places.filter(p => p._specialType === listCatFilter);
+        // se vazio, busca e volta
+        if(!places.length){ fetchPlaces(listCatFilter); return; }
+      } else {
+        places = places.filter(p => p.types && p.types.includes(listCatFilter));
+      }
     }
     if (listSubFilter && listSubFilter.mode === 'type') {
       places = places.filter(p => placeMatchesSubfilter(p, listSubFilter));
@@ -921,7 +971,7 @@ function renderList() {
   const el = document.getElementById('list-grid');
   if (!places.length) { el.innerHTML = '<div class="empty-state"><i class="ti ti-search"></i>Nenhum resultado encontrado.</div>'; return; }
   el.innerHTML = places.map(p => {
-    const c = cfg(p.types);
+    const c = cfg(p.types,p._specialType);
     const d = dist(userLat, userLng, p.geometry.location.lat(), p.geometry.location.lng());
     const url = photoUrl(p, 200);
     const img = url ? `<img src="${url}" alt="${p.name}" onerror="this.style.display='none'">` : `<i class="ti ${c.icon}"></i>`;
@@ -945,7 +995,7 @@ function renderList() {
 function openDetail(pid){
   const p=allPlaces.find(x=>x.place_id===pid);
   if(!p)return;
-  const c=cfg(p.types);
+  const c=cfg(p.types,p._specialType);
   const url=photoUrl(p,700);
   const hero=document.getElementById('det-hero');
   // clear
@@ -1030,7 +1080,7 @@ function renderRoteiro(){
     </div>
     <div class="rot-steps">
       ${sorted.map((p,i)=>{
-        const c=cfg(p.types);
+        const c=cfg(p.types,p._specialType);
         const url=photoUrl(p,300);
         const img=url?`<img src="${url}" alt="${p.name}" onerror="this.style.display='none'">`:`<i class="ti ${c.icon}"></i>`;
         const d=dist(userLat,userLng,p.geometry.location.lat(),p.geometry.location.lng());
@@ -1078,7 +1128,7 @@ function refreshProfile(){
   if(!savedIds.size){sg.innerHTML='<div class="empty-state" style="grid-column:1/-1"><i class="ti ti-heart"></i>Nenhum lugar salvo ainda.</div>';return;}
   const saved=allPlaces.filter(p=>savedIds.has(p.place_id));
   sg.innerHTML=saved.map(p=>{
-    const c=cfg(p.types);const url=photoUrl(p,200);
+    const c=cfg(p.types,p._specialType);const url=photoUrl(p,200);
     const img=url?`<img src="${url}" alt="${p.name}" onerror="this.style.display='none'">`:`<i class="ti ${c.icon}"></i>`;
     return `<div class="saved-card" data-pid="${p.place_id}"><div class="saved-img ${c.cls}">${img}</div><div class="saved-body"><div class="saved-name">${p.name}</div><div class="saved-sub">${c.label}</div></div></div>`;
   }).join('');
@@ -1101,7 +1151,7 @@ function clearMarkers(arr){arr.forEach(m=>m.setMap(null));arr.length=0;}
 function addMarkers(map,places,arr){
   clearMarkers(arr);
   places.forEach(p=>{
-    const c=cfg(p.types);
+    const c=cfg(p.types,p._specialType);
     const marker=new google.maps.Marker({
       position:p.geometry.location,map,title:p.name,
       icon:{path:google.maps.SymbolPath.CIRCLE,scale:8,fillColor:c.color,fillOpacity:1,strokeColor:'#fff',strokeWeight:2}
@@ -1140,27 +1190,66 @@ function initMapFull(){
 /* ================================================
    FETCH PLACES
 ================================================ */
+// Categorias especiais que usam textSearch em vez de nearbySearch
+const SPECIAL_CATS = {
+  chocolate: {query:'fabrica chocolate Campos do Jordao', placeType:'store'},
+  adventure:  {query:'aventura tirolesa arvorismo Campos do Jordao', placeType:'tourist_attraction'},
+  culture:    {query:'museu arte cultura Campos do Jordao', placeType:'museum'},
+  transport:  {query:'bonde trem teleferico passeio Campos do Jordao', placeType:'tourist_attraction'},
+};
+
 function fetchPlaces(type){
   const service=new google.maps.places.PlacesService(mapHome);
-  const types=type==='all'?['tourist_attraction','park','restaurant','cafe','bar']:[type];
   document.getElementById('featured-cards').innerHTML='<div class="loading-box"><div class="spinner"></div></div>';
   document.getElementById('near-list').innerHTML='<div class="loading-box"><div class="spinner"></div></div>';
   const center=new google.maps.LatLng(userLat,userLng);
-  let collected=[],pending=types.length;
-  types.forEach(t=>{
+
+  // Categoria especial — usa textSearch
+  if(SPECIAL_CATS[type]){
+    const sc=SPECIAL_CATS[type];
+    service.textSearch({query:sc.query,location:center,radius:searchRadius},(results,status)=>{
+      const res=(status===google.maps.places.PlacesServiceStatus.OK&&results)?results:[];
+      // marca o tipo especial nos resultados
+      res.forEach(r=>{ r._specialType=type; if(!allPlaces.find(x=>x.place_id===r.place_id)) allPlaces.push(r); });
+      renderFeatured(res.sort((a,b)=>(b.rating||0)-(a.rating||0)));
+      renderNear(res);
+      addMarkers(mapHome,res,homeMarkers);
+      if(fullInited) addMarkers(mapFull,res,fullMarkers);
+    });
+    return;
+  }
+
+  // ALL — inclui categorias especiais + tipos normais
+  const baseTypes=type==='all'?['tourist_attraction','park','restaurant','cafe','bar']:[type];
+  let collected=[],pending=baseTypes.length+(type==='all'?Object.keys(SPECIAL_CATS).length:0);
+
+  function done(results){
+    collected=[...collected,...(results||[])];
+    pending--;
+    if(pending===0){
+      allPlaces=collected.filter((p,i,a)=>a.findIndex(x=>x.place_id===p.place_id)===i);
+      const sorted=[...allPlaces].sort((a,b)=>(b.rating||0)-(a.rating||0));
+      renderFeatured(sorted);
+      renderNear(allPlaces);
+      addMarkers(mapHome,allPlaces,homeMarkers);
+      if(fullInited) addMarkers(mapFull,allPlaces,fullMarkers);
+    }
+  }
+
+  baseTypes.forEach(t=>{
     service.nearbySearch({location:center,radius:searchRadius,type:t,keyword:'Campos do Jordão'},(results,status)=>{
-      if(status===google.maps.places.PlacesServiceStatus.OK&&results) collected=[...collected,...results];
-      pending--;
-      if(pending===0){
-        allPlaces=collected.filter((p,i,a)=>a.findIndex(x=>x.place_id===p.place_id)===i);
-        const sorted=[...allPlaces].sort((a,b)=>(b.rating||0)-(a.rating||0));
-        renderFeatured(sorted);
-        renderNear(allPlaces);
-        addMarkers(mapHome,allPlaces,homeMarkers);
-        if(fullInited) addMarkers(mapFull,allPlaces,fullMarkers);
-      }
+      done(status===google.maps.places.PlacesServiceStatus.OK?results:[]);
     });
   });
+
+  if(type==='all'){
+    Object.entries(SPECIAL_CATS).forEach(([key,sc])=>{
+      service.textSearch({query:sc.query,location:center,radius:searchRadius},(results,status)=>{
+        if(status===google.maps.places.PlacesServiceStatus.OK&&results) results.forEach(r=>r._specialType=key);
+        done(status===google.maps.places.PlacesServiceStatus.OK?results:[]);
+      });
+    });
+  }
 }
 
 /* ================================================
@@ -1188,7 +1277,10 @@ const WMO={
   95:{desc:'Tempestade',icon:'ti-storm',night:'ti-storm'},
   99:{desc:'Tempestade forte',icon:'ti-storm',night:'ti-storm'}
 };
-function getWMO(code){return WMO[code]||WMO[Math.floor(code/10)*10]||{desc:'Variável',icon:'ti-cloud',night:'ti-cloud'};}
+function getWMO(code){
+  if(code==null) return {desc:'Variável',icon:'ti-cloud',night:'ti-cloud'};
+  return WMO[code] || WMO[Math.floor(code/10)*10] || {desc:'Variável',icon:'ti-cloud',night:'ti-cloud'};
+}
 function isNight(h){return h<6||h>=19;}
 function dayName(ds,i){
   if(i===0)return 'Hoje';
@@ -1236,15 +1328,19 @@ function renderWeatherPopup(data){
     </div>`;
   }).join('');
   const dailyHtml=daily.time.map((date,i)=>{
-    const dw=getWMO(daily.weather_code[i]);
-    const dmax=Math.round(daily.temperature_2m_max[i]);
-    const dmin=Math.round(daily.temperature_2m_min[i]);
-    const rain=daily.precipitation_probability_max[i]||0;
+    const rawCode = daily.weather_code[i];
+    const dw = rawCode != null ? getWMO(rawCode) : {desc:'Variável',icon:'ti-cloud'};
+    const dmax = daily.temperature_2m_max[i] != null ? Math.round(daily.temperature_2m_max[i]) : '--';
+    const dmin = daily.temperature_2m_min[i] != null ? Math.round(daily.temperature_2m_min[i]) : '--';
+    const rain = daily.precipitation_probability_max[i] != null ? daily.precipitation_probability_max[i] : 0;
+    const rainHtml = rain > 0
+      ? `<div class="day-rain" style="color:${rain>=70?'#2980b9':rain>=30?'#5b9bd5':'#a0bfd5'}"><i class="ti ti-droplet"></i>${rain}%</div>`
+      : `<div class="day-rain" style="color:#ccc"><i class="ti ti-droplet" style="opacity:.3"></i>—</div>`;
     return `<div class="day-row">
       <div class="day-name">${dayName(date,i)}</div>
       <div class="day-icon"><i class="ti ${dw.icon}"></i></div>
       <div class="day-desc">${dw.desc}</div>
-      ${rain>15?`<div class="day-rain"><i class="ti ti-droplet"></i>${rain}%</div>`:'<div class="day-rain"></div>'}
+      ${rainHtml}
       <div class="day-minmax"><span class="day-min">${dmin}°</span><span class="day-max">${dmax}°</span></div>
     </div>`;
   }).join('');
@@ -1323,10 +1419,16 @@ window.initMap=function(){
     document.querySelectorAll('.cat').forEach(c=>c.classList.remove('active'));
     cat.classList.add('active');
     const t=cat.dataset.type;
+    const specialCats=['chocolate','adventure','culture','transport'];
     if(t==='all'){
       renderFeatured([...allPlaces].sort((a,b)=>(b.rating||0)-(a.rating||0)));
       renderNear(allPlaces);
       addMarkers(mapHome,allPlaces,homeMarkers);
+    } else if(specialCats.includes(t)){
+      // categoria especial: filtra por _specialType ou busca se vazio
+      const f=allPlaces.filter(p=>p._specialType===t);
+      if(f.length){renderFeatured([...f].sort((a,b)=>(b.rating||0)-(a.rating||0)));renderNear(f);addMarkers(mapHome,f,homeMarkers);}
+      else fetchPlaces(t);
     } else {
       const f=allPlaces.filter(p=>p.types&&p.types.includes(t));
       if(f.length){renderFeatured([...f].sort((a,b)=>(b.rating||0)-(a.rating||0)));renderNear(f);addMarkers(mapHome,f,homeMarkers);}
