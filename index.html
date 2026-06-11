@@ -2040,10 +2040,13 @@ function renderList() {
 function openDetail(pid){
   const p=allPlaces.find(x=>x.place_id===pid);
   if(!p)return;
+
+  prevScreen = currentScreen || 'home';
+  showScreen('detail');
+
   const c=cfg(p.types,p._specialType);
   const url=photoUrl(p,700);
   const hero=document.getElementById('det-hero');
-  // clear
   Array.from(hero.children).forEach(ch=>{if(!ch.classList.contains('det-hero-back')&&!ch.classList.contains('det-hero-save'))ch.remove();});
   if(url){
     const img=new Image();
@@ -2071,9 +2074,56 @@ function openDetail(pid){
   savedBtn.className='det-hero-save'+(savedIds.has(pid)?' saved':'');
   document.getElementById('det-back').onclick=()=>showScreen(prevScreen);
   savedBtn.onclick=()=>toggleSave(pid);
+
+  // Renderiza com dados básicos imediatamente
+  renderDetailBody(p);
+
+  // Busca detalhes completos em background (telefone, preço, horários reais)
+  const svc = new google.maps.places.PlacesService(mapHome);
+  svc.getDetails({
+    placeId: pid,
+    fields: ['formatted_phone_number','price_level','opening_hours',
+             'website','reviews','business_status']
+  }, (result, status) => {
+    if(status === google.maps.places.PlacesServiceStatus.OK && result){
+      // Mescla dados no objeto existente
+      if(result.formatted_phone_number) p.formatted_phone_number = result.formatted_phone_number;
+      if(result.price_level !== undefined) p.price_level = result.price_level;
+      if(result.opening_hours) p.opening_hours = result.opening_hours;
+      if(result.website) p.website = result.website;
+      if(result.reviews) p.reviews = result.reviews;
+      if(result.business_status) p.business_status = result.business_status;
+      // Re-renderiza com dados completos
+      renderDetailBody(p);
+    }
+  });
+}
+
+function renderDetailBody(p){
   const addr=p.vicinity||'Campos do Jordão, SP';
   const d=dist(userLat,userLng,latVal(p),lngVal(p));
-  const openStr=p.opening_hours?(p.opening_hours.isOpen()?'<span style="color:#2D6A4F;font-weight:500">Aberto agora</span>':'<span style="color:#c0392b;font-weight:500">Fechado</span>'):'N/D';
+  // Horário — trata todos os casos com segurança
+  let openStr = '<span style="color:#888">Horário não disponível</span>';
+  try {
+    const bs = p.business_status;
+    if(bs && bs !== 'OPERATIONAL'){
+      openStr = '<span style="color:#c0392b;font-weight:500">Temporariamente fechado</span>';
+    } else if(p.opening_hours){
+      const oh = p.opening_hours;
+      // isOpen() pode lançar erro se não tiver dados suficientes
+      const isOpen = typeof oh.isOpen === 'function' ? oh.isOpen() : null;
+      if(isOpen === true){
+        // Mostra horário de fechamento de hoje se disponível
+        const todayPeriod = getTodayClosingTime(oh);
+        openStr = '<span style="color:#2D6A4F;font-weight:500">Aberto agora</span>'
+          + (todayPeriod ? ' · <span style="color:#5C6960;font-size:11px">Fecha '+todayPeriod+'</span>' : '');
+      } else if(isOpen === false){
+        const nextOpen = getNextOpenTime(oh);
+        openStr = '<span style="color:#c0392b;font-weight:500">Fechado</span>'
+          + (nextOpen ? ' · <span style="color:#5C6960;font-size:11px">Abre '+nextOpen+'</span>' : '');
+      }
+    }
+  } catch(e){ openStr = '<span style="color:#888">Consulte o local</span>'; }
   const revsHtml=p.reviews&&p.reviews.length
     ?`<div class="det-section-ttl">Avaliações do Google</div><div class="reviews-list">${p.reviews.slice(0,3).map(r=>`<div class="rev-item"><div class="rev-top"><span class="rev-author">${r.author_name}</span><div class="rev-stars">${starsH(r.rating,11)}</div></div><div class="rev-text">${r.text?r.text.slice(0,150)+(r.text.length>150?'...':''):'Sem comentário.'}</div></div>`).join('')}</div>`
     :'';
@@ -2084,14 +2134,39 @@ function openDetail(pid){
   const distInfo   = getDistanceInfo(d);
   const phoneNum   = p.formatted_phone_number;
   const phoneLink  = phoneNum ? 'https://wa.me/55'+phoneNum.replace(/\D/g,'') : null;
+  const weekHours  = getWeekHours(p.opening_hours);
+
   const profilesHtml = profiles.length
     ? '<div class="det-section-ttl" style="margin-bottom:8px">Indicado para</div><div class="det-profiles">'+
       profiles.map(pr=>'<div class="det-profile-chip"><i class="ti '+pr.icon+'"></i>'+pr.label+'</div>').join('')+
       '</div>' : '';
+
   const extraHtml = extraChips.length
     ? '<div class="det-extra-row">'+
       extraChips.map(ch=>'<div class="det-extra-chip '+ch.cls+'"><i class="ti '+ch.icon+'"></i>'+ch.label+'</div>').join('')+
+      (priceLabel?'<div class="det-extra-chip '+priceLabel.cls+'"><i class="ti ti-currency-dollar"></i>'+priceLabel.label+'</div>':'') +
+      (phoneLink?'<div class="det-extra-chip dec-whats"><i class="ti ti-brand-whatsapp"></i>Tem WhatsApp</div>':'')+
+      '</div>'
+    : (priceLabel||phoneLink) ? '<div class="det-extra-row">'+
+      (priceLabel?'<div class="det-extra-chip '+priceLabel.cls+'"><i class="ti ti-currency-dollar"></i>'+priceLabel.label+'</div>':'')+
+      (phoneLink?'<div class="det-extra-chip dec-whats"><i class="ti ti-brand-whatsapp"></i>Tem WhatsApp</div>':'')+
       '</div>' : '';
+
+  // Horários da semana expansível
+  const weekHoursHtml = weekHours ? `
+    <div class="det-hours-bar" style="margin-bottom:16px">
+      <div class="det-hours-title" style="cursor:pointer" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
+        <i class="ti ti-clock"></i>Horários de funcionamento
+        <i class="ti ti-chevron-down" style="margin-left:auto;font-size:12px"></i>
+      </div>
+      <div style="display:none;margin-top:8px">
+        ${weekHours.map((line,i)=>{
+          const isToday = i === (new Date().getDay()+6)%7; // ajuste pt-BR
+          return '<div style="font-size:12px;color:'+(isToday?'var(--green)':'var(--stone)')+';font-weight:'+(isToday?'500':'400')+';padding:2px 0">'+line+'</div>';
+        }).join('')}
+      </div>
+    </div>` : '';
+
   const hoursHtml =
     '<div class="det-hours-bar">'+
     '<div class="det-hours-title"><i class="ti ti-chart-bar"></i>Horários populares</div>'+
@@ -2115,10 +2190,11 @@ function openDetail(pid){
     <div class="det-info-grid">
       <div class="det-info-card"><i class="ti ti-map-pin"></i><div><div class="dil">Endereço</div><div class="div">${addr}</div></div></div>
       <div class="det-info-card"><i class="ti ti-walk"></i><div><div class="dil">Distância</div><div class="div">${distInfo}</div></div></div>
-      <div class="det-info-card"><i class="ti ti-clock"></i><div><div class="dil">Funcionamento</div><div class="div">${openStr}</div></div></div>
+      <div class="det-info-card"><i class="ti ti-clock"></i><div><div class="dil">Agora</div><div class="div">${openStr}</div></div></div>
       <div class="det-info-card"><i class="ti ti-clock-hour-4"></i><div><div class="dil">Tempo estimado</div><div class="div">${c.time||'1–2h'}</div></div></div>
     </div>
     ${extraHtml}
+    ${weekHoursHtml}
     ${profilesHtml}
     ${hoursHtml}
     <button class="det-checkin-btn ${checkedInIds.has(pid)?'done':''}" id="det-checkin-btn" onclick="toggleCheckin('${pid}')">
@@ -2136,6 +2212,77 @@ function openDetail(pid){
     ${revsHtml}
   `;
   showScreen('detail');
+}
+
+function removeFromRoteiro(pid, event){
+  event.stopPropagation(); // não abre o detalhe do lugar
+  roteiroPlaces  = roteiroPlaces.filter(p => p.place_id !== pid);
+  roteiroTransits = []; // recalcula deslocamentos
+  roteiroOptimized = false;
+  renderRoteiro();
+  LS.save();
+}
+
+// Retorna horário de fechamento de hoje
+function getTodayClosingTime(oh){
+  try {
+    if(!oh.periods) return null;
+    const now   = new Date();
+    const wday  = now.getDay(); // 0=dom
+    const nowMin= now.getHours()*60 + now.getMinutes();
+    const period= oh.periods.find(p => p.open && p.open.day === wday && nowMin >= p.open.hours*60+p.open.minutes);
+    if(period && period.close){
+      const h = String(period.close.hours).padStart(2,'0');
+      const m = String(period.close.minutes).padStart(2,'0');
+      return h+':'+m;
+    }
+  } catch(e){}
+  return null;
+}
+
+// Retorna próximo horário de abertura
+function getNextOpenTime(oh){
+  try {
+    if(!oh.periods) return null;
+    const now   = new Date();
+    const wday  = now.getDay();
+    const nowMin= now.getHours()*60 + now.getMinutes();
+    const days  = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+    // Busca nos próximos 7 dias
+    for(let delta=0; delta<7; delta++){
+      const day = (wday+delta)%7;
+      const periods = (oh.periods||[]).filter(p=>p.open&&p.open.day===day);
+      for(const period of periods){
+        const openMin = period.open.hours*60+period.open.minutes;
+        if(delta===0 && openMin <= nowMin) continue; // já passou hoje
+        const h = String(period.open.hours).padStart(2,'0');
+        const m = String(period.open.minutes).padStart(2,'0');
+        return (delta===0?'hoje':delta===1?'amanhã':days[day])+' às '+h+':'+m;
+      }
+    }
+  } catch(e){}
+  return null;
+}
+
+// Faixa de preço — exibe os horários de funcionamento do dia
+function getWeekHours(oh){
+  try {
+    if(!oh || !oh.weekday_text) return null;
+    return oh.weekday_text;
+  } catch(e){ return null; }
+}
+
+function getPriceLabel(p){
+  const lvl = p.price_level;
+  if(lvl === undefined || lvl === null) return null;
+  const map = {
+    0: {label:'Gratuito', cls:'dec-access'},
+    1: {label:'R$ · Econômico', cls:'dec-price'},
+    2: {label:'R$$ · Moderado', cls:'dec-price'},
+    3: {label:'R$$$ · Caro', cls:'dec-price'},
+    4: {label:'R$$$$ · Muito caro', cls:'dec-price'},
+  };
+  return map[lvl] || null;
 }
 
 function openGoogleMaps(name,lat,lng){
@@ -2347,7 +2494,18 @@ function renderRoteiro(){
             <div class="rot-card" data-pid="${p.place_id}" style="margin-bottom:${transit?'0':'0'}">
               <div class="rot-card-img ${c.cls}">${img}</div>
               <div class="rot-card-body">
-                <div class="rot-card-name">${p.name}</div>
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px">
+                  <div class="rot-card-name" style="flex:1">${p.name}</div>
+                  <button onclick="removeFromRoteiro('${p.place_id}',event)"
+                    style="background:none;border:none;cursor:pointer;padding:2px 4px;
+                    color:#ccc;font-size:16px;line-height:1;flex-shrink:0;
+                    border-radius:6px;transition:all .15s"
+                    onmouseover="this.style.background='#fee2e2';this.style.color='#c0392b'"
+                    onmouseout="this.style.background='none';this.style.color='#ccc'"
+                    title="Remover do roteiro">
+                    <i class="ti ti-x"></i>
+                  </button>
+                </div>
                 <div class="rot-card-meta">
                   <span><i class="ti ti-clock"></i>${s.departure} · ${s.visitMins}min</span>
                   ${p.rating?`<span><i class="ti ti-star-filled" style="color:#E9A93B"></i>${p.rating.toFixed(1)}</span>`:''}
@@ -3625,12 +3783,6 @@ function initReviewModal() {
 ================================================ */
 
 // Faixa de preço baseada no price_level do Google (0-4)
-function getPriceLabel(p){
-  const lvl = p.price_level;
-  if(lvl === undefined || lvl === null) return null;
-  const labels = ['Gratuito','R$','R$$','R$$$','R$$$$'];
-  return labels[lvl] || null;
-}
 
 // Perfis indicados baseados na categoria e reviews
 function getProfiles(p){
@@ -3805,20 +3957,58 @@ async function gerarRoteiroInteligente(){
 
   // ── FILTROS POR INTERESSE ──
   const typeMap = {
-    natureza:    p => (p.types||[]).some(t=>['park','natural_feature','campground'].includes(t)) || p._specialType==='viewpoint',
-    gastronomia: p => (p.types||[]).some(t=>['restaurant','cafe','bar','bakery','food'].includes(t)) || p._specialType==='gastronomy',
-    chocolate:   p => p._specialType==='chocolate' || (p.name||'').toLowerCase().includes('chocol'),
-    cultura:     p => (p.types||[]).some(t=>['museum','art_gallery','tourist_attraction'].includes(t)) || p._specialType==='culture',
-    aventura:    p => p._specialType==='adventure' || (p.name||'').toLowerCase().match(/trilha|tirolesa|escalada|rafting|teleférico/),
-    compras:     p => (p.types||[]).some(t=>['shopping_mall','store','clothing_store'].includes(t)) || p._specialType==='gastronomy',
+    natureza:    p => {
+      const t=p.types||[], nm=(p.name||'').toLowerCase();
+      return t.includes('park')||t.includes('natural_feature')||
+             p._specialType==='viewpoint'||p._specialType==='adventure'||
+             (t.includes('tourist_attraction')&&nm.match(/parque|horto|pedra|morro|trilha|cachoeira|mirante|pico/));
+    },
+    gastronomia: p => {
+      const t=p.types||[];
+      // Gastronomia turística: restaurante OU café com 100+ reviews e 4.0+ — exclui padaria simples
+      const isTuristico=(p.user_ratings_total||0)>=100&&(p.rating||0)>=4.0;
+      return (t.includes('restaurant')&&!t.includes('meal_takeaway')&&isTuristico)||
+             (t.includes('cafe')&&isTuristico)||
+             (t.includes('bar')&&isTuristico)||
+             p._specialType==='gastronomy';
+    },
+    chocolate:   p => {
+      const nm=(p.name||'').toLowerCase();
+      return p._specialType==='chocolate'||nm.includes('chocol')||nm.includes('cacau')||nm.includes('trufa');
+    },
+    cultura:     p => {
+      const t=p.types||[], nm=(p.name||'').toLowerCase();
+      return p._specialType==='culture'||t.includes('museum')||t.includes('art_gallery')||
+             (t.includes('tourist_attraction')&&nm.match(/museu|galeria|teatro|cultural|capivari|palácio/));
+    },
+    aventura:    p => {
+      const nm=(p.name||'').toLowerCase();
+      return p._specialType==='adventure'||
+             nm.match(/teleférico|tirolesa|escalada|rafting|canion|trilha|aventura|bike/);
+    },
+    compras:     p => {
+      const t=p.types||[], nm=(p.name||'').toLowerCase();
+      const isTuristico=(p.user_ratings_total||0)>=50;
+      return p._specialType==='gastronomy'||
+             (t.includes('store')&&isTuristico&&nm.match(/artesanato|lã|colonial|queijo|vinho|boutique/))||
+             (t.includes('shopping_mall')&&isTuristico);
+    },
   };
 
   // ── FILTROS POR PERFIL ──
   const profileBonus = {
-    familia: p => (p.types||[]).some(t=>['park','amusement_park','tourist_attraction'].includes(t)) || p._specialType==='chocolate',
-    casal:   p => (p.types||[]).some(t=>['restaurant','cafe','tourist_attraction'].includes(t)),
-    amigos:  p => (p.types||[]).some(t=>['bar','restaurant','park'].includes(t)) || p._specialType==='adventure',
-    solo:    p => true,
+    familia: p => {
+      const t=p.types||[], nm=(p.name||'').toLowerCase();
+      return !t.includes('bar')&&
+             (t.includes('park')||t.includes('tourist_attraction')||
+              p._specialType==='chocolate'||nm.match(/parque|jardim|kids/));
+    },
+    casal:   p => (p.rating||0)>=4.2&&
+             ((p.types||[]).includes('restaurant')||(p.types||[]).includes('cafe')||
+              (p.types||[]).includes('tourist_attraction')||p._specialType==='viewpoint'),
+    amigos:  p => (p.types||[]).includes('bar')||(p.types||[]).includes('restaurant')||
+             p._specialType==='adventure'||(p.types||[]).includes('tourist_attraction'),
+    solo:    p => (p.rating||0)>=4.0,
   };
 
   // ── QUANTAS PARADAS ──
@@ -3830,18 +4020,26 @@ async function gerarRoteiroInteligente(){
   const tempoKey  = rwState.tempo <= 2 ? 2 : rwState.tempo <= 4 ? 4 : 8;
   const qtdParadas = qtdMap[tempoKey][rwState.ritmo] || 4;
 
-  // ── CANDIDATOS ──
+  // ── CANDIDATOS — filtragem turística rigorosa ──
+  const badTypes = [
+    'real_estate_agency','insurance_agency','lawyer','doctor','dentist',
+    'hospital','pharmacy','gas_station','car_dealer','car_repair','car_wash',
+    'electrician','plumber','locksmith','moving_company','storage','bank','atm',
+    'supermarket','grocery_or_supermarket','convenience_store','laundry',
+    'hair_care','beauty_salon','gym','lodging','funeral_home',
+    'accounting','finance','local_government_office','post_office'
+  ];
+  const badNames = /padaria|mercearia|supermercado|farmácia|banco|posto de gasolina|oficina|borracharia|salão|barbearia|pet shop|academia|locação|aluguel/i;
+
   let candidates = [...allPlaces].filter(p => {
-    // Exclui lugares sem foto e sem rating mínimo
     if(!photoUrl(p)) return false;
-    if((p.rating||0) < 3.5) return false;
-    // Exclui tipos irrelevantes — aluguel, serviços, etc.
-    const badTypes = ['real_estate_agency','insurance_agency','lawyer','doctor',
-      'hospital','pharmacy','gas_station','car_dealer','car_repair','electrician',
-      'plumber','locksmith','moving_company','storage','bank','atm'];
+    if((p.rating||0) < 3.8) return false;
+    if((p.user_ratings_total||0) < 20) return false; // mínimo de credibilidade
     if((p.types||[]).some(t => badTypes.includes(t))) return false;
+    if(badNames.test(p.name||'')) return false;
     return true;
   });
+
 
   // Filtra por interesses escolhidos
   if(rwState.interesses.length > 0){
