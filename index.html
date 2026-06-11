@@ -3,7 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Campos do Jordão — Guia Turístico</title>
+<meta name="theme-color" content="#1C4A35">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Rotera">
+<meta name="description" content="Descubra cada destino. Guia turístico inteligente de Campos do Jordão.">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-apple.png">
+<title>Rotera — Guia Turístico de Campos do Jordão</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -3678,5 +3686,86 @@ window.initMap=function(){
 
 <!-- Google Maps API -->
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDfQIYqC6B8Q1AR-osYKDAkI9dkYJZd0rk&libraries=places&callback=initMap&loading=async"></script>
+
+<!-- PWA: Service Worker + Install Banner -->
+<script>
+// Registra Service Worker
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => console.log('SW registrado:', reg.scope))
+      .catch(err => console.log('SW falhou:', err));
+  });
+}
+
+// Banner de instalação PWA
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Mostra banner após 30 segundos de uso ou na segunda visita
+  const visits = parseInt(localStorage.getItem('rotera_visits')||'0') + 1;
+  localStorage.setItem('rotera_visits', visits);
+  const dismissed = localStorage.getItem('rotera_pwa_dismissed');
+  if(!dismissed && visits >= 2){
+    setTimeout(showInstallBanner, 3000);
+  }
+});
+
+function showInstallBanner(){
+  if(!deferredPrompt) return;
+  const banner = document.createElement('div');
+  banner.id = 'pwa-banner';
+  banner.style.cssText = `
+    position:fixed;bottom:80px;left:12px;right:12px;
+    background:#1C4A35;border-radius:16px;padding:14px 16px;
+    display:flex;align-items:center;gap:12px;
+    box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:9999;
+    animation:slideUp .3s ease;
+  `;
+  banner.innerHTML = `
+    <div style="width:40px;height:40px;background:rgba(255,255,255,.15);border-radius:10px;
+      display:flex;align-items:center;justify-content:center;flex-shrink:0">
+      <i class="ti ti-download" style="font-size:20px;color:#74C69D"></i>
+    </div>
+    <div style="flex:1">
+      <div style="font-size:13px;font-weight:500;color:#fff;margin-bottom:2px">Adicionar à tela inicial</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.6)">Acesse o Rotera como um app</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button onclick="installPWA()" style="background:#fff;color:#1C4A35;border:none;
+        border-radius:10px;padding:8px 14px;font-size:12px;font-weight:500;cursor:pointer;
+        font-family:'DM Sans',sans-serif">Instalar</button>
+      <button onclick="dismissPWA()" style="background:rgba(255,255,255,.15);color:#fff;border:none;
+        border-radius:10px;padding:8px 10px;font-size:12px;cursor:pointer;
+        font-family:'DM Sans',sans-serif">✕</button>
+    </div>
+  `;
+  document.body.appendChild(banner);
+}
+
+function installPWA(){
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(result => {
+    if(result.outcome === 'accepted') localStorage.setItem('rotera_pwa_dismissed','1');
+    deferredPrompt = null;
+    const b = document.getElementById('pwa-banner');
+    if(b) b.remove();
+  });
+}
+
+function dismissPWA(){
+  localStorage.setItem('rotera_pwa_dismissed','1');
+  const b = document.getElementById('pwa-banner');
+  if(b) b.remove();
+}
+
+// Detecta se já está instalado como PWA
+window.addEventListener('appinstalled', ()=>{
+  localStorage.setItem('rotera_pwa_dismissed','1');
+  deferredPrompt = null;
+});
+</script>
 </body>
 </html>
