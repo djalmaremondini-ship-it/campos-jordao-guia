@@ -704,6 +704,88 @@ html,body{height:100%;background:#e0ddd6;font-family:'DM Sans',sans-serif}
 .rot-optimize-btn.loading{opacity:.6;pointer-events:none}
 .rot-optimize-btn i{font-size:15px}
 
+
+/* ===== TELA DE LOGIN ===== */
+#screen-login{
+  position:fixed;inset:0;background:var(--green);
+  z-index:1000;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:40px 32px;text-align:center;
+}
+.login-logo{margin-bottom:32px}
+.login-title{font-family:'Playfair Display',serif;font-size:36px;color:#fff;
+  letter-spacing:-1px;line-height:1;margin-bottom:8px}
+.login-subtitle{font-size:14px;color:rgba(255,255,255,.65);font-weight:300;
+  letter-spacing:.5px;margin-bottom:48px}
+.login-benefits{display:flex;flex-direction:column;gap:12px;margin-bottom:48px;width:100%;max-width:280px}
+.login-benefit{display:flex;align-items:center;gap:12px;text-align:left}
+.login-benefit i{font-size:20px;color:var(--gl);flex-shrink:0}
+.login-benefit span{font-size:13px;color:rgba(255,255,255,.8);line-height:1.4}
+.btn-google{display:flex;align-items:center;justify-content:center;gap:10px;
+  width:100%;max-width:280px;padding:14px 20px;
+  background:#fff;border-radius:14px;border:none;
+  font-size:15px;font-weight:500;color:#151C17;
+  font-family:'DM Sans',sans-serif;cursor:pointer;
+  box-shadow:0 4px 16px rgba(0,0,0,.15);
+  transition:transform .1s,box-shadow .1s;
+  -webkit-tap-highlight-color:transparent}
+.btn-google:active{transform:scale(.97);box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.btn-google img{width:20px;height:20px}
+.btn-guest{margin-top:16px;font-size:13px;color:rgba(255,255,255,.5);
+  cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.login-loading{display:none;flex-direction:column;align-items:center;gap:12px}
+.login-loading .spinner{border-color:rgba(255,255,255,.2);border-top-color:#fff}
+.login-loading p{font-size:13px;color:rgba(255,255,255,.6)}
+
+/* Header do usuário logado */
+.user-avatar{width:32px;height:32px;border-radius:50%;overflow:hidden;
+  border:2px solid rgba(255,255,255,.3);flex-shrink:0;cursor:pointer}
+.user-avatar img{width:100%;height:100%;object-fit:cover}
+.user-avatar-placeholder{width:100%;height:100%;background:rgba(255,255,255,.2);
+  display:flex;align-items:center;justify-content:center;font-size:13px;
+  font-weight:500;color:#fff}
+
+/* Badge sync no perfil */
+.sync-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;
+  padding:3px 10px;border-radius:20px;font-weight:500}
+.sync-ok{background:#d8efd8;color:#1a5c36}
+.sync-off{background:#f0ede8;color:#888}
+
+
+/* ===== MODAL ROTEIRO INTELIGENTE ===== */
+.rot-wizard-step{display:none;flex-direction:column;gap:14px}
+.rot-wizard-step.active{display:flex}
+.rot-wizard-progress{display:flex;gap:5px;margin-bottom:20px}
+.rwp-dot{flex:1;height:3px;border-radius:2px;background:var(--border-light);transition:background .3s}
+.rwp-dot.done{background:var(--green)}
+.rot-wizard-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--text);margin-bottom:4px}
+.rot-wizard-sub{font-size:13px;color:var(--muted);margin-bottom:8px;line-height:1.5}
+.rot-option-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rot-option{border:.5px solid var(--border-light);border-radius:14px;padding:14px 12px;
+  cursor:pointer;transition:all .15s;text-align:center;background:var(--card)}
+.rot-option:active{transform:scale(.97)}
+.rot-option.selected{border-color:var(--green);background:#f0f8f4}
+.rot-option i{font-size:26px;color:var(--mist);display:block;margin-bottom:6px;transition:color .15s}
+.rot-option.selected i{color:var(--green)}
+.rot-option span{font-size:12px;font-weight:500;color:var(--text)}
+.rot-option small{display:block;font-size:10px;color:var(--muted);margin-top:2px;line-height:1.3}
+.rot-single-opts{display:flex;flex-direction:column;gap:8px}
+.rot-single-opt{display:flex;align-items:center;gap:12px;padding:12px 14px;
+  border:.5px solid var(--border-light);border-radius:12px;cursor:pointer;
+  background:var(--card);transition:all .15s}
+.rot-single-opt.selected{border-color:var(--green);background:#f0f8f4}
+.rot-single-opt i{font-size:20px;color:var(--mist);flex-shrink:0}
+.rot-single-opt.selected i{color:var(--green)}
+.rot-single-opt div{flex:1}
+.rot-single-opt .opt-name{font-size:13px;font-weight:500;color:var(--text)}
+.rot-single-opt .opt-desc{font-size:11px;color:var(--muted);margin-top:1px}
+.rot-single-opt .opt-radio{width:18px;height:18px;border-radius:50%;
+  border:1.5px solid var(--border-light);flex-shrink:0;transition:all .15s}
+.rot-single-opt.selected .opt-radio{border-color:var(--green);background:var(--green)}
+.rot-generating{display:none;flex-direction:column;align-items:center;gap:14px;padding:20px 0}
+.rot-generating .spinner{width:36px;height:36px}
+.rot-generating p{font-size:13px;color:var(--muted);text-align:center;line-height:1.6}
+
 /* ===== SPINNER ===== */
 .spinner{width:22px;height:22px;border:2.5px solid var(--border-light);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -712,6 +794,56 @@ html,body{height:100%;background:#e0ddd6;font-family:'DM Sans',sans-serif}
 </head>
 <body>
 <div class="app" id="app">
+
+
+  <!-- ===== TELA DE LOGIN ===== -->
+  <div id="screen-login">
+    <!-- Logo -->
+    <div class="login-logo">
+      <svg width="72" height="98" viewBox="0 0 88 118" fill="none">
+        <path d="M44 3C25.8 3 11 17.8 11 36C11 58 44 106 44 106C44 106 77 58 77 36C77 17.8 62.2 3 44 3Z" fill="rgba(255,255,255,0.15)"/>
+        <circle cx="44" cy="36" r="20" fill="rgba(255,255,255,0.9)"/>
+        <path d="M44 20L52 50L44 44L36 50L44 20Z" fill="#1C4A35"/>
+      </svg>
+    </div>
+    <div class="login-title">Rotera</div>
+    <div class="login-subtitle">DESCUBRA CADA DESTINO</div>
+
+    <!-- Benefícios -->
+    <div class="login-benefits">
+      <div class="login-benefit">
+        <i class="ti ti-device-floppy"></i>
+        <span>Salvos e check-ins sincronizados em qualquer dispositivo</span>
+      </div>
+      <div class="login-benefit">
+        <i class="ti ti-route"></i>
+        <span>Seus roteiros guardados para sempre, nunca se perdem</span>
+      </div>
+      <div class="login-benefit">
+        <i class="ti ti-users"></i>
+        <span>Publique roteiros e avalie na comunidade</span>
+      </div>
+      <div class="login-benefit">
+        <i class="ti ti-ticket"></i>
+        <span>Acesse cupons exclusivos dos parceiros</span>
+      </div>
+    </div>
+
+    <!-- Botão Google -->
+    <button class="btn-google" id="btn-google-login">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+      Entrar com Google
+    </button>
+
+    <!-- Loading state -->
+    <div class="login-loading" id="login-loading">
+      <div class="spinner"></div>
+      <p>Entrando...</p>
+    </div>
+
+    <!-- Continuar sem login -->
+    <div class="btn-guest" id="btn-guest">Continuar sem conta</div>
+  </div>
 
   <!-- ===== HOME ===== -->
   <div class="screen active" id="screen-home">
@@ -725,9 +857,14 @@ html,body{height:100%;background:#e0ddd6;font-family:'DM Sans',sans-serif}
             <svg id="rotera-logo-svg" xmlns="http://www.w3.org/2000/svg" style="display:block"></svg>
           </div>
         </div>
-        <div class="wchip" id="weather-chip-btn">
-          <i class="ti ti-cloud-snow" id="chip-icon"></i>
-          <span id="chip-temp">--°C</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="wchip" id="weather-chip-btn">
+            <i class="ti ti-cloud-snow" id="chip-icon"></i>
+            <span id="chip-temp">--°C</span>
+          </div>
+          <div class="user-avatar" id="header-avatar" onclick="showScreen('profile')" style="display:none">
+            <div class="user-avatar-placeholder" id="header-avatar-inner">?</div>
+          </div>
         </div>
       </div>
       <div class="searchbar"><i class="ti ti-search"></i><input type="text" placeholder="Buscar restaurantes, parques..." id="search-input"/></div>
@@ -1249,6 +1386,134 @@ html,body{height:100%;background:#e0ddd6;font-family:'DM Sans',sans-serif}
         <button class="modal-btn cancel" id="review-cancel">Agora não</button>
         <button class="modal-btn save" id="review-submit">Publicar review</button>
       </div>
+    </div>
+  </div>
+
+
+  <!-- ===== MODAL: ROTEIRO INTELIGENTE ===== -->
+  <div class="modal-overlay" id="modal-roteiro-wizard" style="display:none">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+
+      <!-- Barra de progresso -->
+      <div class="rot-wizard-progress">
+        <div class="rwp-dot done" id="rwp-1"></div>
+        <div class="rwp-dot" id="rwp-2"></div>
+        <div class="rwp-dot" id="rwp-3"></div>
+        <div class="rwp-dot" id="rwp-4"></div>
+      </div>
+
+      <!-- STEP 1: Perfil do viajante -->
+      <div class="rot-wizard-step active" id="rws-1">
+        <div class="rot-wizard-title">Quem vai nessa viagem?</div>
+        <div class="rot-wizard-sub">Isso ajuda a sugerir os melhores lugares para o seu grupo.</div>
+        <div class="rot-option-grid">
+          <div class="rot-option" data-val="solo" onclick="rwSelect(this,'perfil')">
+            <i class="ti ti-user"></i><span>Solo</span><small>Só eu</small>
+          </div>
+          <div class="rot-option" data-val="casal" onclick="rwSelect(this,'perfil')">
+            <i class="ti ti-heart"></i><span>Casal</span><small>Dois</small>
+          </div>
+          <div class="rot-option" data-val="familia" onclick="rwSelect(this,'perfil')">
+            <i class="ti ti-users"></i><span>Família</span><small>Com crianças</small>
+          </div>
+          <div class="rot-option" data-val="amigos" onclick="rwSelect(this,'perfil')">
+            <i class="ti ti-confetti"></i><span>Amigos</span><small>Turma</small>
+          </div>
+        </div>
+        <button class="modal-btn save" style="width:100%;padding:12px;border-radius:12px;margin-top:4px" onclick="rwNext(2)">Próximo →</button>
+      </div>
+
+      <!-- STEP 2: Interesses -->
+      <div class="rot-wizard-step" id="rws-2">
+        <div class="rot-wizard-title">O que mais te interessa?</div>
+        <div class="rot-wizard-sub">Pode escolher mais de um.</div>
+        <div class="rot-option-grid">
+          <div class="rot-option" data-val="natureza" onclick="rwToggle(this,'interesses')">
+            <i class="ti ti-trees"></i><span>Natureza</span><small>Trilhas, parques</small>
+          </div>
+          <div class="rot-option" data-val="gastronomia" onclick="rwToggle(this,'interesses')">
+            <i class="ti ti-tools-kitchen-2"></i><span>Gastronomia</span><small>Restaurantes, cafés</small>
+          </div>
+          <div class="rot-option" data-val="chocolate" onclick="rwToggle(this,'interesses')">
+            <i class="ti ti-box"></i><span>Chocolate</span><small>Fábricas, lojas</small>
+          </div>
+          <div class="rot-option" data-val="cultura" onclick="rwToggle(this,'interesses')">
+            <i class="ti ti-palette"></i><span>Cultura</span><small>Arte, museus</small>
+          </div>
+          <div class="rot-option" data-val="aventura" onclick="rwToggle(this,'interesses')">
+            <i class="ti ti-parachute"></i><span>Aventura</span><small>Esportes, adrenalina</small>
+          </div>
+          <div class="rot-option" data-val="compras" onclick="rwToggle(this,'interesses')">
+            <i class="ti ti-shopping-bag"></i><span>Compras</span><small>Artesanato, lembranças</small>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <button class="modal-btn cancel" style="flex:1;padding:12px;border-radius:12px" onclick="rwNext(1)">← Voltar</button>
+          <button class="modal-btn save" style="flex:2;padding:12px;border-radius:12px" onclick="rwNext(3)">Próximo →</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: Tempo disponível -->
+      <div class="rot-wizard-step" id="rws-3">
+        <div class="rot-wizard-title">Quanto tempo você tem?</div>
+        <div class="rot-wizard-sub">Vamos montar um roteiro que caiba no seu dia.</div>
+        <div class="rot-single-opts">
+          <div class="rot-single-opt" data-val="2" onclick="rwSelect(this,'tempo')">
+            <i class="ti ti-clock"></i>
+            <div><div class="opt-name">Algumas horas</div><div class="opt-desc">2–3 horas · 2 a 3 lugares</div></div>
+            <div class="opt-radio"></div>
+          </div>
+          <div class="rot-single-opt" data-val="4" onclick="rwSelect(this,'tempo')">
+            <i class="ti ti-sun"></i>
+            <div><div class="opt-name">Meio período</div><div class="opt-desc">4–5 horas · 3 a 4 lugares</div></div>
+            <div class="opt-radio"></div>
+          </div>
+          <div class="rot-single-opt selected" data-val="8" onclick="rwSelect(this,'tempo')">
+            <i class="ti ti-calendar"></i>
+            <div><div class="opt-name">Dia completo</div><div class="opt-desc">6–8 horas · 5 a 6 lugares</div></div>
+            <div class="opt-radio"></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <button class="modal-btn cancel" style="flex:1;padding:12px;border-radius:12px" onclick="rwNext(2)">← Voltar</button>
+          <button class="modal-btn save" style="flex:2;padding:12px;border-radius:12px" onclick="rwNext(4)">Próximo →</button>
+        </div>
+      </div>
+
+      <!-- STEP 4: Ritmo -->
+      <div class="rot-wizard-step" id="rws-4">
+        <div class="rot-wizard-title">Qual o ritmo da viagem?</div>
+        <div class="rot-wizard-sub">Prefere aproveitar com calma ou ver o máximo possível?</div>
+        <div class="rot-single-opts">
+          <div class="rot-single-opt" data-val="tranquilo" onclick="rwSelect(this,'ritmo')">
+            <i class="ti ti-coffee"></i>
+            <div><div class="opt-name">Tranquilo</div><div class="opt-desc">Menos lugares, mais tempo em cada</div></div>
+            <div class="opt-radio"></div>
+          </div>
+          <div class="rot-single-opt selected" data-val="equilibrado" onclick="rwSelect(this,'ritmo')">
+            <i class="ti ti-route"></i>
+            <div><div class="opt-name">Equilibrado</div><div class="opt-desc">Bom balanço entre lugares e descanso</div></div>
+            <div class="opt-radio"></div>
+          </div>
+          <div class="rot-single-opt" data-val="intenso" onclick="rwSelect(this,'ritmo')">
+            <i class="ti ti-bolt"></i>
+            <div><div class="opt-name">Intenso</div><div class="opt-desc">Máximo de lugares no menor tempo</div></div>
+            <div class="opt-radio"></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <button class="modal-btn cancel" style="flex:1;padding:12px;border-radius:12px" onclick="rwNext(3)">← Voltar</button>
+          <button class="modal-btn save" style="flex:2;padding:12px;border-radius:12px" id="rw-gerar-btn" onclick="gerarRoteiroInteligente()">Gerar meu roteiro ✨</button>
+        </div>
+      </div>
+
+      <!-- Gerando... -->
+      <div class="rot-generating" id="rot-generating">
+        <div class="spinner"></div>
+        <p>Analisando lugares, avaliações<br>e montando seu roteiro personalizado...</p>
+      </div>
+
     </div>
   </div>
 
@@ -3457,6 +3722,209 @@ function getDistanceInfo(d){
   return walkStr + ' · ' + carStr;
 }
 
+
+/* ================================================
+   ROTEIRO INTELIGENTE — WIZARD
+================================================ */
+const rwState = {
+  perfil:     null,   // solo | casal | familia | amigos
+  interesses: [],     // natureza | gastronomia | chocolate | cultura | aventura | compras
+  tempo:      8,      // horas disponíveis
+  ritmo:      'equilibrado' // tranquilo | equilibrado | intenso
+};
+
+function rwSelect(el, key){
+  // Single select — desmarca outros do mesmo grupo
+  el.closest('.rot-wizard-step, .rot-single-opts')
+    .querySelectorAll('[data-val]').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  rwState[key] = el.dataset.val;
+  if(key==='tempo')  rwState.tempo  = parseInt(el.dataset.val);
+  if(key==='ritmo')  rwState.ritmo  = el.dataset.val;
+  if(key==='perfil') rwState.perfil = el.dataset.val;
+}
+
+function rwToggle(el, key){
+  // Multi select
+  el.classList.toggle('selected');
+  const val = el.dataset.val;
+  if(el.classList.contains('selected')){
+    if(!rwState[key].includes(val)) rwState[key].push(val);
+  } else {
+    rwState[key] = rwState[key].filter(v => v !== val);
+  }
+}
+
+function rwNext(step){
+  // Validação
+  if(step === 2 && !rwState.perfil){
+    const opts = document.querySelectorAll('#rws-1 .rot-option');
+    opts.forEach(o => o.style.borderColor = '#FECACA');
+    setTimeout(() => opts.forEach(o => o.style.borderColor = ''), 1500);
+    return;
+  }
+  // Esconde todos os steps
+  document.querySelectorAll('.rot-wizard-step').forEach(s => s.classList.remove('active'));
+  // Atualiza progresso
+  [1,2,3,4].forEach(i => {
+    const dot = document.getElementById('rwp-'+i);
+    if(dot) dot.classList.toggle('done', i <= step);
+  });
+  const nextStep = document.getElementById('rws-'+step);
+  if(nextStep) nextStep.classList.add('active');
+}
+
+function openRoteiroWizard(){
+  // Reseta estado
+  rwState.perfil     = null;
+  rwState.interesses = [];
+  rwState.tempo      = 8;
+  rwState.ritmo      = 'equilibrado';
+  // Reseta UI
+  document.querySelectorAll('.rot-wizard-step').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('[data-val]').forEach(o => o.classList.remove('selected'));
+  document.getElementById('rws-1').classList.add('active');
+  [1,2,3,4].forEach(i => {
+    const dot = document.getElementById('rwp-'+i);
+    if(dot) dot.classList.toggle('done', i===1);
+  });
+  // Marca defaults
+  document.querySelector('#rws-3 [data-val="8"]')?.classList.add('selected');
+  document.querySelector('#rws-4 [data-val="equilibrado"]')?.classList.add('selected');
+  document.getElementById('rot-generating').style.display = 'none';
+  document.getElementById('modal-roteiro-wizard').style.display = 'flex';
+}
+
+async function gerarRoteiroInteligente(){
+  const modal = document.getElementById('modal-roteiro-wizard');
+  // Mostra loading
+  document.querySelectorAll('.rot-wizard-step').forEach(s => s.classList.remove('active'));
+  document.getElementById('rot-generating').style.display = 'flex';
+
+  await new Promise(r => setTimeout(r, 1200)); // simula processamento
+
+  // ── FILTROS POR INTERESSE ──
+  const typeMap = {
+    natureza:    p => (p.types||[]).some(t=>['park','natural_feature','campground'].includes(t)) || p._specialType==='viewpoint',
+    gastronomia: p => (p.types||[]).some(t=>['restaurant','cafe','bar','bakery','food'].includes(t)) || p._specialType==='gastronomy',
+    chocolate:   p => p._specialType==='chocolate' || (p.name||'').toLowerCase().includes('chocol'),
+    cultura:     p => (p.types||[]).some(t=>['museum','art_gallery','tourist_attraction'].includes(t)) || p._specialType==='culture',
+    aventura:    p => p._specialType==='adventure' || (p.name||'').toLowerCase().match(/trilha|tirolesa|escalada|rafting|teleférico/),
+    compras:     p => (p.types||[]).some(t=>['shopping_mall','store','clothing_store'].includes(t)) || p._specialType==='gastronomy',
+  };
+
+  // ── FILTROS POR PERFIL ──
+  const profileBonus = {
+    familia: p => (p.types||[]).some(t=>['park','amusement_park','tourist_attraction'].includes(t)) || p._specialType==='chocolate',
+    casal:   p => (p.types||[]).some(t=>['restaurant','cafe','tourist_attraction'].includes(t)),
+    amigos:  p => (p.types||[]).some(t=>['bar','restaurant','park'].includes(t)) || p._specialType==='adventure',
+    solo:    p => true,
+  };
+
+  // ── QUANTAS PARADAS ──
+  const qtdMap = {
+    2: {tranquilo:2, equilibrado:2, intenso:3},
+    4: {tranquilo:3, equilibrado:4, intenso:5},
+    8: {tranquilo:4, equilibrado:5, intenso:6},
+  };
+  const tempoKey  = rwState.tempo <= 2 ? 2 : rwState.tempo <= 4 ? 4 : 8;
+  const qtdParadas = qtdMap[tempoKey][rwState.ritmo] || 4;
+
+  // ── CANDIDATOS ──
+  let candidates = [...allPlaces].filter(p => {
+    // Exclui lugares sem foto e sem rating mínimo
+    if(!photoUrl(p)) return false;
+    if((p.rating||0) < 3.5) return false;
+    // Exclui tipos irrelevantes — aluguel, serviços, etc.
+    const badTypes = ['real_estate_agency','insurance_agency','lawyer','doctor',
+      'hospital','pharmacy','gas_station','car_dealer','car_repair','electrician',
+      'plumber','locksmith','moving_company','storage','bank','atm'];
+    if((p.types||[]).some(t => badTypes.includes(t))) return false;
+    return true;
+  });
+
+  // Filtra por interesses escolhidos
+  if(rwState.interesses.length > 0){
+    const interestFiltered = candidates.filter(p =>
+      rwState.interesses.some(interesse => typeMap[interesse] && typeMap[interesse](p))
+    );
+    // Só aplica o filtro se tiver resultados suficientes
+    if(interestFiltered.length >= qtdParadas) candidates = interestFiltered;
+  }
+
+  // Filtra por perfil
+  const profileFilter = profileBonus[rwState.perfil];
+  if(profileFilter){
+    const profileFiltered = candidates.filter(p => profileFilter(p));
+    if(profileFiltered.length >= Math.floor(qtdParadas * 0.6)) {
+      // Mix: 70% do perfil + 30% geral para variedade
+      const complement = candidates.filter(p => !profileFilter(p));
+      candidates = [
+        ...profileFiltered.sort((a,b) => (b.user_ratings_total||0)-(a.user_ratings_total||0)),
+        ...complement.sort((a,b) => (b.user_ratings_total||0)-(a.user_ratings_total||0))
+      ];
+    }
+  }
+
+  // Ordena por quantidade de avaliações (confiabilidade)
+  candidates.sort((a,b) => (b.user_ratings_total||0) - (a.user_ratings_total||0));
+
+  // Pega as melhores por distância do usuário para evitar saltos grandes
+  const byDist = candidates.slice(0, qtdParadas * 4).sort((a,b) =>
+    dist(userLat,userLng,latVal(a),lngVal(a)) - dist(userLat,userLng,latVal(b),lngVal(b))
+  );
+
+  // Seleciona as top N garantindo variedade de categorias
+  const selected = [];
+  const usedCats  = new Set();
+  for(const p of byDist){
+    if(selected.length >= qtdParadas) break;
+    const cat = cfg(p.types, p._specialType).cls;
+    // Evita mais de 2 do mesmo tipo, exceto se não tiver opção
+    const catCount = [...usedCats].filter(c => c === cat).length;
+    if(catCount >= 2 && selected.length < qtdParadas - 1) continue;
+    if(!roteiroPlaces.find(x=>x.place_id===p.place_id)){
+      selected.push(p);
+      usedCats.add(cat);
+    }
+  }
+
+  // Fallback se seleção ficou vazia
+  if(!selected.length){
+    const fallback = [...allPlaces]
+      .filter(p => photoUrl(p) && (p.rating||0) >= 4.0)
+      .sort((a,b) => (b.user_ratings_total||0)-(a.user_ratings_total||0))
+      .slice(0, qtdParadas);
+    selected.push(...fallback);
+  }
+
+  // Adiciona ao roteiro
+  selected.forEach(p => {
+    if(!roteiroPlaces.find(x=>x.place_id===p.place_id)) roteiroPlaces.push(p);
+  });
+
+  // Reseta transits para recalcular
+  roteiroTransits  = [];
+  roteiroOptimized = false;
+
+  renderRoteiro();
+  LS.save();
+
+  // Fecha modal
+  modal.style.display = 'none';
+
+  // Vai para aba roteiro
+  setPlanTab('roteiro');
+
+  // Toast de confirmação
+  const perfis  = {solo:'para você',casal:'para o casal',familia:'para a família',amigos:'para o grupo'};
+  const toast   = document.createElement('div');
+  toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#2D6A4F;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2);text-align:center;max-width:80vw';
+  toast.textContent = '✓ Roteiro de '+selected.length+' lugares '+((perfis[rwState.perfil])||'')+'!';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
 /* ================================================
    INIT GOOGLE MAPS CALLBACK
 ================================================ */
@@ -3602,12 +4070,7 @@ window.initMap=function(){
 
   // roteiro
   document.getElementById('rot-banner').addEventListener('click',()=>showScreen('roteiro'));
-  document.getElementById('criar-rot-btn').addEventListener('click',()=>{
-    const top=[...allPlaces].sort((a,b)=>((b.rating||0)-(a.rating||0))).slice(0,4);
-    top.forEach(p=>{if(!roteiroPlaces.find(x=>x.place_id===p.place_id)) roteiroPlaces.push(p);});
-    renderRoteiro();
-    LS.save();
-  });
+  document.getElementById('criar-rot-btn').addEventListener('click', openRoteiroWizard);
   document.getElementById('coupon-back').addEventListener('click',()=>showScreen(prevScreen));
   document.getElementById('open-painel-btn').addEventListener('click',()=>showScreen('painel'));
   initPainel();
@@ -3682,6 +4145,233 @@ window.initMap=function(){
     document.getElementById('chip-temp').textContent='--°C';
   })();
 };
+</script>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp }          from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+                                   from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js';
+import { getFirestore, doc, setDoc, getDoc, updateDoc, collection,
+         addDoc, getDocs, query, orderBy, serverTimestamp, onSnapshot }
+                                   from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey:            "AIzaSyBy7teFb1kGEoGblG2nFZgX3SLpKM3p8qU",
+  authDomain:        "rotera-app.firebaseapp.com",
+  projectId:         "rotera-app",
+  storageBucket:     "rotera-app.firebasestorage.app",
+  messagingSenderId: "543699954635",
+  appId:             "1:543699954635:web:ebc500945c1573fe8fa44e"
+};
+
+const fbApp  = initializeApp(firebaseConfig);
+const auth   = getAuth(fbApp);
+const db     = getFirestore(fbApp);
+const gProvider = new GoogleAuthProvider();
+
+/* ── Estado do usuário ── */
+let currentUser = null;
+
+/* ── Salva dados do usuário no Firestore ── */
+async function syncToFirestore(){
+  if(!currentUser) return;
+  const uid = currentUser.uid;
+  try {
+    await setDoc(doc(db,'usuarios',uid,'dados','perfil'), {
+      nome:    profile.name,
+      cidade:  profile.city,
+      bio:     profile.bio,
+      email:   currentUser.email,
+      foto:    currentUser.photoURL,
+      updatedAt: serverTimestamp()
+    }, {merge:true});
+    await setDoc(doc(db,'usuarios',uid,'dados','salvos'), {
+      ids: [...savedIds],
+      updatedAt: serverTimestamp()
+    }, {merge:true});
+    await setDoc(doc(db,'usuarios',uid,'dados','checkins'), {
+      dados: checkedInDates,
+      updatedAt: serverTimestamp()
+    }, {merge:true});
+    await setDoc(doc(db,'usuarios',uid,'dados','roteiro'), {
+      ids: roteiroPlaces.map(p=>p.place_id),
+      updatedAt: serverTimestamp()
+    }, {merge:true});
+  } catch(e){ console.log('Sync erro:', e); }
+}
+
+/* ── Carrega dados do Firestore ── */
+async function loadFromFirestore(){
+  if(!currentUser) return;
+  const uid = currentUser.uid;
+  try {
+    const perfDoc = await getDoc(doc(db,'usuarios',uid,'dados','perfil'));
+    if(perfDoc.exists()){
+      const d = perfDoc.data();
+      profile.name = d.nome || 'Visitante';
+      profile.city = d.cidade || '';
+      profile.bio  = d.bio   || '';
+    }
+    const savDoc = await getDoc(doc(db,'usuarios',uid,'dados','salvos'));
+    if(savDoc.exists() && savDoc.data().ids){
+      savedIds = new Set(savDoc.data().ids);
+    }
+    const ckDoc = await getDoc(doc(db,'usuarios',uid,'dados','checkins'));
+    if(ckDoc.exists() && ckDoc.data().dados){
+      checkedInDates = ckDoc.data().dados;
+      checkedInIds   = new Set(Object.keys(checkedInDates));
+    }
+    const rotDoc = await getDoc(doc(db,'usuarios',uid,'dados','roteiro'));
+    if(rotDoc.exists() && rotDoc.data().ids){
+      const ids = rotDoc.data().ids;
+      roteiroPlaces = ids.map(id=>allPlaces.find(p=>p.place_id===id)).filter(Boolean);
+    }
+    // Migra localStorage para Firestore na primeira vez
+    migrateLocalStorage();
+    refreshProfile();
+    document.getElementById('ps-saved').textContent    = savedIds.size;
+    document.getElementById('ps-visited').textContent  = checkedInIds.size;
+  } catch(e){ console.log('Load erro:', e); }
+}
+
+/* ── Migra dados do localStorage para o Firestore ── */
+async function migrateLocalStorage(){
+  const migrated = localStorage.getItem('rotera_migrated');
+  if(migrated) return;
+  // Se tinha dados locais, sobrescreve com eles (mais recentes)
+  const localProfile = localStorage.getItem('cj_profile');
+  const localSaved   = localStorage.getItem('cj_saved');
+  const localCheckin = localStorage.getItem('cj_checkins');
+  if(localProfile || localSaved || localCheckin){
+    if(localProfile){ const p=JSON.parse(localProfile); profile.name=p.name||profile.name; profile.city=p.city||profile.city; }
+    if(localSaved){ savedIds=new Set(JSON.parse(localSaved)); }
+    if(localCheckin){ checkedInDates=JSON.parse(localCheckin); checkedInIds=new Set(Object.keys(checkedInDates)); }
+    await syncToFirestore();
+    localStorage.setItem('rotera_migrated','1');
+  }
+}
+
+/* ── Salvar roteiro da comunidade no Firestore ── */
+async function saveCommunityRoteiro(roteiroData){
+  if(!currentUser) return null;
+  try {
+    const ref = await addDoc(collection(db,'comunidade'), {
+      ...roteiroData,
+      autorId:   currentUser.uid,
+      autorEmail: currentUser.email,
+      createdAt: serverTimestamp()
+    });
+    return ref.id;
+  } catch(e){ return null; }
+}
+
+/* ── Salvar review no Firestore ── */
+async function saveReview(reviewData){
+  if(!currentUser) return;
+  try {
+    await addDoc(collection(db,'reviews'), {
+      ...reviewData,
+      autorId:  currentUser.uid,
+      createdAt: serverTimestamp()
+    });
+  } catch(e){}
+}
+
+/* ── Expõe funções para o app ── */
+window.fbSyncToFirestore    = syncToFirestore;
+window.fbSaveCommunityRoteiro = saveCommunityRoteiro;
+window.fbSaveReview         = saveReview;
+window.fbSignOut = async () => {
+  await signOut(auth);
+  currentUser = null;
+  updateHeaderAvatar(null);
+  // Volta para localStorage
+  document.getElementById('screen-login').style.display = 'flex';
+};
+
+/* ── Atualiza avatar no header ── */
+function updateHeaderAvatar(user){
+  const wrap  = document.getElementById('header-avatar');
+  const inner = document.getElementById('header-avatar-inner');
+  if(!wrap || !inner) return;
+  if(user){
+    wrap.style.display = 'flex';
+    if(user.photoURL){
+      inner.innerHTML = '<img src="'+user.photoURL+'" style="width:100%;height:100%;object-fit:cover">';
+    } else {
+      inner.textContent = (user.displayName||'?').charAt(0).toUpperCase();
+    }
+  } else {
+    wrap.style.display = 'none';
+    inner.textContent = '?';
+  }
+}
+
+/* ── Listeners de login ── */
+document.getElementById('btn-google-login').addEventListener('click', async ()=>{
+  const loginEl   = document.getElementById('screen-login');
+  const loadingEl = document.getElementById('login-loading');
+  const btnEl     = document.getElementById('btn-google-login');
+  btnEl.style.display    = 'none';
+  loadingEl.style.display = 'flex';
+  try {
+    await signInWithPopup(auth, gProvider);
+  } catch(e){
+    btnEl.style.display    = 'flex';
+    loadingEl.style.display = 'none';
+  }
+});
+
+document.getElementById('btn-guest').addEventListener('click', ()=>{
+  document.getElementById('screen-login').style.display = 'none';
+  localStorage.setItem('rotera_guest','1');
+});
+
+/* ── Auth state observer ── */
+onAuthStateChanged(auth, async (user)=>{
+  currentUser = user;
+  const loginEl = document.getElementById('screen-login');
+  const guestMode = localStorage.getItem('rotera_guest');
+
+  if(user){
+    // Usuário logado
+    loginEl.style.display = 'none';
+    updateHeaderAvatar(user);
+    // Atualiza perfil com dados do Google
+    if(profile.name === 'Visitante' && user.displayName){
+      profile.name = user.displayName.split(' ')[0];
+    }
+    // Carrega dados do Firestore
+    await loadFromFirestore();
+    // Sobrescreve LS.save para também sincronizar com Firestore
+    const origSave = LS.save.bind(LS);
+    LS.save = function(){
+      origSave();
+      setTimeout(syncToFirestore, 500); // debounce
+    };
+    // Atualiza logout no perfil
+    const logoutBtn = document.getElementById('painel-logout-btn');
+    if(logoutBtn){
+      const newLogout = logoutBtn.cloneNode(true);
+      newLogout.textContent = 'Sair da conta Rotera';
+      newLogout.addEventListener('click', window.fbSignOut);
+      logoutBtn.parentNode.replaceChild(newLogout, logoutBtn);
+    }
+    // Adiciona info do usuário no perfil
+    refreshProfile();
+    document.getElementById('prof-sub-d').textContent =
+      user.email || profile.city || 'Bem-vindo ao Rotera';
+  } else if(guestMode){
+    loginEl.style.display = 'none';
+  } else {
+    loginEl.style.display = 'flex';
+    const btnEl     = document.getElementById('btn-google-login');
+    const loadingEl = document.getElementById('login-loading');
+    if(btnEl)    btnEl.style.display    = 'flex';
+    if(loadingEl) loadingEl.style.display = 'none';
+  }
+});
 </script>
 
 <!-- Google Maps API -->
