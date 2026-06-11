@@ -660,6 +660,42 @@ html,body{height:100%;background:#e0ddd6;font-family:'DM Sans',sans-serif}
 .det-btn.whatsapp{background:#25D366;color:#fff}
 .det-btn.whatsapp i{font-size:16px}
 
+
+/* ===== ROTEIRO DO DIA ===== */
+.rot-summary-bar{background:var(--green);border-radius:14px;padding:14px 16px;
+  display:flex;gap:0;margin-bottom:16px}
+.rsb-item{flex:1;text-align:center;border-right:.5px solid rgba(255,255,255,.2)}
+.rsb-item:last-child{border-right:none}
+.rsb-val{font-size:16px;font-weight:500;color:#fff}
+.rsb-lbl{font-size:10px;color:rgba(255,255,255,.6);margin-top:2px;text-transform:uppercase;letter-spacing:.4px}
+
+.rot-start-time{display:flex;align-items:center;gap:10px;margin-bottom:14px;
+  background:#f8f6f2;border-radius:12px;padding:10px 14px}
+.rot-start-time label{font-size:12px;color:var(--muted);flex-shrink:0}
+.rot-start-time input{border:none;background:transparent;font-size:14px;font-weight:500;
+  color:var(--text);font-family:'DM Sans',sans-serif;outline:none;cursor:pointer}
+
+.rot-step-full{display:flex;gap:12px;padding-bottom:0}
+.rot-step-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:44px}
+.rot-time-badge{font-size:11px;font-weight:500;color:var(--green);white-space:nowrap;
+  margin-bottom:4px;text-align:center}
+.rot-num{width:36px;height:36px;border-radius:50%;background:var(--green);color:#fff;
+  font-size:13px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rot-line{flex:1;width:2px;background:var(--border-light);margin:4px 0}
+
+/* Trecho de deslocamento entre paradas */
+.rot-transit{display:flex;align-items:center;gap:8px;padding:6px 0 6px 56px;
+  font-size:11px;color:var(--muted)}
+.rot-transit i{font-size:13px;color:var(--mist)}
+.rot-transit-line{flex:1;height:1px;background:var(--border);margin:0 4px;
+  background-image:repeating-linear-gradient(90deg,var(--border-light) 0,var(--border-light) 4px,transparent 4px,transparent 8px)}
+
+.rot-optimize-btn{background:#f0f8f4;color:var(--green);border:.5px solid #b7dfc9;
+  border-radius:12px;padding:11px;text-align:center;cursor:pointer;font-weight:500;
+  font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:10px}
+.rot-optimize-btn.loading{opacity:.6;pointer-events:none}
+.rot-optimize-btn i{font-size:15px}
+
 /* ===== SPINNER ===== */
 .spinner{width:22px;height:22px;border:2.5px solid var(--border-light);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -1877,6 +1913,93 @@ function addToRoteiro(pid){
 /* ================================================
    ROTEIRO
 ================================================ */
+/* ================================================
+   ROTEIRO DO DIA COM HORÁRIOS E DESLOCAMENTO
+================================================ */
+let roteiroStartTime  = '09:00';
+let roteiroTransits   = []; // [{duration_text, distance_text, duration_sec}]
+let roteiroOptimized  = false;
+
+function parseTimeToMin(t){ const [h,m]=t.split(':').map(Number); return h*60+m; }
+function minToTime(m){ return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0'); }
+
+// Tempo de visita em minutos por tipo
+function visitMin(p){
+  const c=cfg(p.types,p._specialType);
+  const map={'ti-trees':150,'ti-tools-kitchen-2':90,'ti-coffee':45,'ti-building-arch':75,
+    'ti-beer':90,'ti-box':60,'ti-sparkles':90,'ti-train':60,'ti-eye':40,'ti-home-2':0};
+  return map[c.icon]||60;
+}
+
+// Calcula horários de cada parada com base nos tempos de visita + deslocamento
+function calcSchedule(places, transits, startTime){
+  let cursor = parseTimeToMin(startTime);
+  return places.map((p,i)=>{
+    const arrival   = minToTime(cursor);
+    const visitMins = visitMin(p);
+    cursor += visitMins;
+    const departure = minToTime(cursor);
+    // Adiciona tempo de deslocamento para a próxima parada
+    if(transits[i]) cursor += Math.round((transits[i].duration_sec||0)/60);
+    else if(i < places.length-1) cursor += 10; // estimativa padrão 10min
+    return {arrival, departure, visitMins, place:p};
+  });
+}
+
+// Otimiza rota via Google Directions API
+async function optimizeRoute(){
+  if(roteiroPlaces.length < 2) return;
+  const btn = document.getElementById('rot-optimize-btn');
+  if(btn){ btn.classList.add('loading'); btn.innerHTML='<i class="ti ti-loader-2 ti-spin"></i>Calculando rota...'; }
+
+  const origin      = `${userLat},${userLng}`;
+  const destination = `${latVal(roteiroPlaces[roteiroPlaces.length-1])},${lngVal(roteiroPlaces[roteiroPlaces.length-1])}`;
+  const waypoints   = roteiroPlaces.slice(0,-1).map(p=>`${latVal(p)},${lngVal(p)}`).join('|');
+
+  try{
+    const svc = new google.maps.DirectionsService();
+    const req = {
+      origin: new google.maps.LatLng(userLat, userLng),
+      destination: new google.maps.LatLng(latVal(roteiroPlaces[roteiroPlaces.length-1]), lngVal(roteiroPlaces[roteiroPlaces.length-1])),
+      waypoints: roteiroPlaces.slice(0,-1).map(p=>({
+        location: new google.maps.LatLng(latVal(p),lngVal(p)),
+        stopover: true
+      })),
+      optimizeWaypoints: true,
+      travelMode: google.maps.TravelMode.DRIVING
+    };
+    svc.route(req, (result, status)=>{
+      if(status === 'OK'){
+        // Reordena places pela ordem otimizada
+        const order = result.routes[0].waypoint_order;
+        const middle = roteiroPlaces.slice(0,-1);
+        const reordered = [...order.map(i=>middle[i]), roteiroPlaces[roteiroPlaces.length-1]];
+        roteiroPlaces = reordered;
+        // Extrai tempos de deslocamento de cada leg
+        const legs = result.routes[0].legs;
+        roteiroTransits = legs.map(leg=>({
+          duration_text: leg.duration.text.replace('hours','h').replace('hour','h').replace('mins','min').replace('min','min'),
+          distance_text: leg.distance.text,
+          duration_sec:  leg.duration.value
+        }));
+        roteiroOptimized = true;
+        LS.save();
+        renderRoteiro();
+      } else {
+        // Fallback sem otimização
+        roteiroTransits = roteiroPlaces.slice(0,-1).map((_,i)=>{
+          const d=dist(latVal(roteiroPlaces[i]),lngVal(roteiroPlaces[i]),latVal(roteiroPlaces[i+1]),lngVal(roteiroPlaces[i+1]));
+          const mins=Math.round(d/0.5);
+          return {duration_text:mins+'min de carro',distance_text:d.toFixed(1)+' km',duration_sec:mins*60};
+        });
+        renderRoteiro();
+      }
+    });
+  }catch(e){
+    if(btn){ btn.classList.remove('loading'); btn.innerHTML='<i class="ti ti-route"></i>Otimizar rota'; }
+  }
+}
+
 function renderRoteiro(){
   const content=document.getElementById('rot-content');
   const steps=document.getElementById('roteiro-steps');
@@ -1886,74 +2009,134 @@ function renderRoteiro(){
     return;
   }
   content.style.display='none';
-  const sorted=[...roteiroPlaces].sort((a,b)=>
-    dist(userLat,userLng,latVal(a),lngVal(a))-
-    dist(userLat,userLng,latVal(b),lngVal(b))
-  );
+
+  // Se não tem transits ainda, estima por distância
+  if(!roteiroTransits.length && roteiroPlaces.length > 1){
+    roteiroTransits = roteiroPlaces.slice(0,-1).map((_,i)=>{
+      const d=dist(latVal(roteiroPlaces[i]),lngVal(roteiroPlaces[i]),latVal(roteiroPlaces[i+1]),lngVal(roteiroPlaces[i+1]));
+      const mins=Math.max(5,Math.round(d/0.5));
+      return {duration_text:mins+'min de carro',distance_text:d.toFixed(1)+' km',duration_sec:mins*60};
+    });
+  }
+
+  const schedule  = calcSchedule(roteiroPlaces, roteiroTransits, roteiroStartTime);
+  const totalVisit= roteiroPlaces.reduce((s,p)=>s+visitMin(p),0);
+  const totalDist = roteiroTransits.reduce((s,t)=>{
+    const d=parseFloat((t.distance_text||'0').replace(',','.'));
+    return s+(isNaN(d)?0:d);
+  },0);
+  const totalTransit=roteiroTransits.reduce((s,t)=>s+(t.duration_sec||0),0);
+  const totalH    = Math.floor((totalVisit+totalTransit/60)/60);
+  const totalM    = Math.round((totalVisit+totalTransit/60)%60);
+  const endTime   = schedule[schedule.length-1]?.departure || '--:--';
+
   steps.innerHTML=`
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-      <div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--text)">${sorted.length} lugar${sorted.length>1?'es':''} no roteiro</div>
+    <!-- Cabeçalho do dia -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--text)">${roteiroPlaces.length} parada${roteiroPlaces.length>1?'s':''}</div>
       <div style="font-size:12px;color:var(--green);cursor:pointer" id="clear-rot">Limpar tudo</div>
     </div>
-    <div class="rot-steps">
-      ${sorted.map((p,i)=>{
+
+    <!-- Resumo do dia -->
+    <div class="rot-summary-bar">
+      <div class="rsb-item"><div class="rsb-val">${totalH}h${totalM>0?totalM+'min':''}</div><div class="rsb-lbl">Duração total</div></div>
+      <div class="rsb-item"><div class="rsb-val">${totalDist.toFixed(1)}km</div><div class="rsb-lbl">Distância</div></div>
+      <div class="rsb-item"><div class="rsb-val">${roteiroStartTime}</div><div class="rsb-lbl">Saída</div></div>
+      <div class="rsb-item"><div class="rsb-val">${endTime}</div><div class="rsb-lbl">Término</div></div>
+    </div>
+
+    <!-- Horário de saída -->
+    <div class="rot-start-time">
+      <label><i class="ti ti-clock" style="font-size:14px;vertical-align:-2px;margin-right:4px"></i>Horário de saída:</label>
+      <input type="time" id="rot-start-input" value="${roteiroStartTime}">
+    </div>
+
+    <!-- Botão otimizar rota -->
+    ${roteiroPlaces.length>1?`<div class="rot-optimize-btn" id="rot-optimize-btn">
+      <i class="ti ti-route"></i>${roteiroOptimized?'✓ Rota otimizada':'Otimizar rota com Google Maps'}
+    </div>`:''}
+
+    <!-- Paradas com horários -->
+    <div class="rot-steps" id="rot-steps-list">
+      ${schedule.map((s,i)=>{
+        const p=s.place;
         const c=cfg(p.types,p._specialType);
         const url=photoUrl(p,300);
         const img=url?`<img src="${url}" alt="${p.name}" onerror="this.style.display='none'">`:`<i class="ti ${c.icon}"></i>`;
-        const d=dist(userLat,userLng,latVal(p),lngVal(p));
-        return `<div class="rot-step">
+        const transit=roteiroTransits[i];
+        return `<div class="rot-step-full">
           <div class="rot-step-left">
+            <div class="rot-time-badge">${s.arrival}</div>
             <div class="rot-num">${i+1}</div>
-            ${i<sorted.length-1?'<div class="rot-line"></div>':''}
+            <div class="rot-line" style="${i>=schedule.length-1?'display:none':''}"></div>
           </div>
-          <div class="rot-card" data-pid="${p.place_id}">
-            <div class="rot-card-img ${c.cls}">${img}</div>
-            <div class="rot-card-body">
-              <div class="rot-card-name">${p.name}</div>
-              <div class="rot-card-meta">
-                <span><i class="ti ti-clock"></i>${c.time}</span>
-                <span><i class="ti ti-map-pin"></i>${d.toFixed(1)} km</span>
-                ${p.rating?`<span><i class="ti ti-star-filled" style="color:#E9A93B"></i>${p.rating.toFixed(1)}</span>`:''}
+          <div style="flex:1;padding-bottom:${transit?'0':'14px'}">
+            <div class="rot-card" data-pid="${p.place_id}" style="margin-bottom:${transit?'0':'0'}">
+              <div class="rot-card-img ${c.cls}">${img}</div>
+              <div class="rot-card-body">
+                <div class="rot-card-name">${p.name}</div>
+                <div class="rot-card-meta">
+                  <span><i class="ti ti-clock"></i>${s.departure} · ${s.visitMins}min</span>
+                  ${p.rating?`<span><i class="ti ti-star-filled" style="color:#E9A93B"></i>${p.rating.toFixed(1)}</span>`:''}
+                </div>
               </div>
             </div>
+            ${transit?`<div class="rot-transit" style="padding-left:0;padding-top:8px;padding-bottom:8px">
+              <i class="ti ti-car"></i>
+              <span style="white-space:nowrap;flex-shrink:0">${transit.duration_text}</span>
+              <div class="rot-transit-line"></div>
+              <span style="white-space:nowrap;flex-shrink:0;color:var(--fog)">${transit.distance_text}</span>
+            </div>`:''}
           </div>
         </div>`;
       }).join('')}
     </div>
-    <div style="background:var(--green);color:#fff;border-radius:12px;padding:13px;text-align:center;cursor:pointer;font-weight:500;font-size:14px;margin-top:16px" id="start-rot-btn">
-      <i class="ti ti-navigation" style="vertical-align:-2px;margin-right:6px"></i>Iniciar navegação
+
+    <!-- Ações -->
+    <div style="background:var(--green);color:#fff;border-radius:12px;padding:13px;text-align:center;cursor:pointer;font-weight:500;font-size:14px;margin-top:16px;display:flex;align-items:center;justify-content:center;gap:8px" id="start-rot-btn">
+      <i class="ti ti-navigation"></i>Iniciar navegação
     </div>
-    <div class="share-rot-btn" id="share-rot-btn">
+    <div class="share-rot-btn" id="share-rot-btn" style="margin-top:10px">
       <i class="ti ti-share"></i>Compartilhar roteiro
     </div>
     <div style="display:flex;gap:8px;margin-top:10px">
       <div style="flex:1;background:#f0f8f4;color:var(--green);border:.5px solid #b7dfc9;border-radius:12px;padding:11px;text-align:center;cursor:pointer;font-weight:500;font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px" id="publish-rot-btn">
-        <i class="ti ti-world-upload" style="font-size:15px"></i>Publicar na comunidade
+        <i class="ti ti-world-upload" style="font-size:15px"></i>Publicar
       </div>
       <div style="flex:1;background:#FFF7E6;color:#92400E;border:.5px solid #FDE68A;border-radius:12px;padding:11px;text-align:center;cursor:pointer;font-weight:500;font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px" id="review-rot-btn">
-        <i class="ti ti-star" style="font-size:15px"></i>Avaliar roteiro
+        <i class="ti ti-star" style="font-size:15px"></i>Avaliar
       </div>
     </div>
     <div style="background:var(--card);border:.5px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:10px;cursor:pointer;display:flex;align-items:center;gap:10px" onclick="setPlanTab('comunidade');showScreen('roteiro')">
       <i class="ti ti-users" style="font-size:18px;color:var(--mist);flex-shrink:0"></i>
       <div>
         <div style="font-size:13px;font-weight:500;color:var(--text)">Ver roteiros da comunidade</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:1px">Inspire-se com roteiros de outros viajantes</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:1px">Inspire-se com outros viajantes</div>
       </div>
       <i class="ti ti-arrow-right" style="font-size:16px;color:#ccc;margin-left:auto"></i>
     </div>
   `;
-  document.getElementById('clear-rot').addEventListener('click',()=>{roteiroPlaces=[];LS.save();renderRoteiro();});
+
+  // Event listeners
+  document.getElementById('clear-rot').addEventListener('click',()=>{
+    roteiroPlaces=[];roteiroTransits=[];roteiroOptimized=false;LS.save();renderRoteiro();
+  });
+  document.getElementById('rot-start-input').addEventListener('change',e=>{
+    roteiroStartTime=e.target.value; renderRoteiro();
+  });
+  if(document.getElementById('rot-optimize-btn')&&!roteiroOptimized){
+    document.getElementById('rot-optimize-btn').addEventListener('click',optimizeRoute);
+  }
   document.getElementById('start-rot-btn').addEventListener('click',()=>{
-    if(sorted.length>0){
-      const p=sorted[0];
+    if(roteiroPlaces.length>0){
+      const p=roteiroPlaces[0];
       openGoogleMaps(p.name,latVal(p),lngVal(p));
     }
   });
   document.getElementById('share-rot-btn').addEventListener('click',shareRoteiro);
   document.getElementById('publish-rot-btn').addEventListener('click',publishRoteiro);
   document.getElementById('review-rot-btn').addEventListener('click',()=>openReviewModal('geral_'+Date.now()));
-  steps.querySelectorAll('.rot-card').forEach(card=>card.addEventListener('click',()=>openDetail(card.dataset.pid)));
+  document.querySelectorAll('.rot-card[data-pid]').forEach(card=>card.addEventListener('click',()=>openDetail(card.dataset.pid)));
 }
 
 /* ================================================
@@ -2081,7 +2264,7 @@ function fetchPlaces(type){
       const res=(status===google.maps.places.PlacesServiceStatus.OK&&results)?results:[];
       // marca o tipo especial nos resultados
       res.forEach(r=>{ r._specialType=type; if(!allPlaces.find(x=>x.place_id===r.place_id)) allPlaces.push(r); });
-      const resSorted=res.sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0)));
+      const resSorted=res.sort((a,b)=>((b.user_ratings_total||0)-(a.user_ratings_total||0)));
       renderFeatured(resSorted.filter(p=>photoUrl(p)));
       renderNear([...res.filter(p=>photoUrl(p)),...res.filter(p=>!photoUrl(p))]);
       addMarkers(mapHome,res,homeMarkers);
@@ -2101,7 +2284,7 @@ function fetchPlaces(type){
       allPlaces=collected.filter((p,i,a)=>a.findIndex(x=>x.place_id===p.place_id)===i);
       if(!allPlaces.find(p=>p.place_id==='DEMO_CHOCOLAND_001')) allPlaces.unshift(DEMO_FEATURED);
       // Destaque: _featured primeiro, depois por rating — SÓ com foto
-      const sorted=[...allPlaces].sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0)));
+      const sorted=[...allPlaces].sort((a,b)=>((b.user_ratings_total||0)-(a.user_ratings_total||0)));
       const comFoto  = sorted.filter(p => photoUrl(p));
       renderFeatured(comFoto);
       // Mais próximos: com foto primeiro, sem foto no final
@@ -2166,11 +2349,22 @@ function dayName(ds,i){
   return d.toLocaleDateString('pt-BR',{weekday:'short'}).replace('.','').replace(/^\w/,c=>c.toUpperCase());
 }
 
-async function fetchWeather(){
+async function fetchWeather(attempt=1){
   const url=`https://api.open-meteo.com/v1/forecast?latitude=${CJ.lat}&longitude=${CJ.lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,precipitation&hourly=temperature_2m,weather_code,precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&timezone=America%2FSao_Paulo&forecast_days=7`;
-  const res=await fetch(url);
-  if(!res.ok)throw new Error('Erro clima');
-  return res.json();
+  try{
+    const controller=new AbortController();
+    const timeout=setTimeout(()=>controller.abort(), 8000); // 8s timeout
+    const res=await fetch(url,{signal:controller.signal});
+    clearTimeout(timeout);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    return res.json();
+  } catch(e) {
+    if(attempt < 3){
+      await new Promise(r=>setTimeout(r, 2000*attempt)); // espera 2s, 4s
+      return fetchWeather(attempt+1);
+    }
+    throw e;
+  }
 }
 
 function updateChip(data){
@@ -2544,7 +2738,7 @@ function renderPlanSuggestions(rain, code) {
   }
 
   // Ordena por rating e pega top 5
-  suggested = suggested.sort((a,b) => ((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0))).slice(0,6);
+  suggested = suggested.sort((a,b) => ((b.rating||0)-(a.rating||0))).slice(0,6);
 
   if(!suggested.length) {
     // Fallback: top rated geral
@@ -3345,7 +3539,7 @@ window.initMap=function(){
     const t=cat.dataset.type;
     const specialCats=['chocolate','adventure','culture','transport'];
     if(t==='all'){
-      const allS=[...allPlaces].sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0)));
+      const allS=[...allPlaces].sort((a,b)=>((b.user_ratings_total||0)-(a.user_ratings_total||0)));
       renderFeatured(allS.filter(p=>photoUrl(p)));
       const allN=[...allPlaces].sort((a,b)=>dist(userLat,userLng,latVal(a),lngVal(a))-dist(userLat,userLng,latVal(b),lngVal(b)));
       renderNear([...allN.filter(p=>photoUrl(p)),...allN.filter(p=>!photoUrl(p))]);
@@ -3353,11 +3547,11 @@ window.initMap=function(){
     } else if(specialCats.includes(t)){
       // categoria especial: filtra por _specialType ou busca se vazio
       const f=allPlaces.filter(p=>p._specialType===t);
-      if(f.length){const fS=[...f].sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0)));renderFeatured(fS.filter(p=>photoUrl(p)));renderNear([...f.filter(p=>photoUrl(p)),...f.filter(p=>!photoUrl(p))]);addMarkers(mapHome,f,homeMarkers);}
+      if(f.length){const fS=[...f].sort((a,b)=>((b.rating||0)-(a.rating||0)));renderFeatured(fS.filter(p=>photoUrl(p)));renderNear([...f.filter(p=>photoUrl(p)),...f.filter(p=>!photoUrl(p))]);addMarkers(mapHome,f,homeMarkers);}
       else fetchPlaces(t);
     } else {
       const f=allPlaces.filter(p=>p.types&&p.types.includes(t));
-      if(f.length){const fS=[...f].sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0)));renderFeatured(fS.filter(p=>photoUrl(p)));renderNear([...f.filter(p=>photoUrl(p)),...f.filter(p=>!photoUrl(p))]);addMarkers(mapHome,f,homeMarkers);}
+      if(f.length){const fS=[...f].sort((a,b)=>((b.rating||0)-(a.rating||0)));renderFeatured(fS.filter(p=>photoUrl(p)));renderNear([...f.filter(p=>photoUrl(p)),...f.filter(p=>!photoUrl(p))]);addMarkers(mapHome,f,homeMarkers);}
       else fetchPlaces(t);
     }
   });
@@ -3365,7 +3559,7 @@ window.initMap=function(){
   // see all buttons — passa categoria ativa do home
   document.getElementById('see-all-featured').addEventListener('click',()=>{
     const activeCat=document.querySelector('#cats .cat.active')?.dataset.type||'all';
-    openListAll('Todos os lugares',[...allPlaces].sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0))), activeCat);
+    openListAll('Todos os lugares',[...allPlaces].sort((a,b)=>((b.rating||0)-(a.rating||0))), activeCat);
   });
   document.getElementById('see-all-near').addEventListener('click',()=>{
     const activeCat=document.querySelector('#cats .cat.active')?.dataset.type||'all';
@@ -3401,7 +3595,7 @@ window.initMap=function(){
   // roteiro
   document.getElementById('rot-banner').addEventListener('click',()=>showScreen('roteiro'));
   document.getElementById('criar-rot-btn').addEventListener('click',()=>{
-    const top=[...allPlaces].sort((a,b)=>((b._featured?1:0)-(a._featured?1:0))||((b.rating||0)-(a.rating||0))).slice(0,4);
+    const top=[...allPlaces].sort((a,b)=>((b.rating||0)-(a.rating||0))).slice(0,4);
     top.forEach(p=>{if(!roteiroPlaces.find(x=>x.place_id===p.place_id)) roteiroPlaces.push(p);});
     renderRoteiro();
     LS.save();
@@ -3464,8 +3658,21 @@ window.initMap=function(){
     el.textContent=el.textContent==='Ativas'?'Desativadas':'Ativas';
   });
 
-  // fetch weather in background
-  fetchWeather().then(data=>{weatherData=data;updateChip(data);}).catch(()=>{});
+  // Carrega clima com retry — mostra animação enquanto tenta
+  document.getElementById('chip-temp').textContent='...';
+  (async()=>{
+    for(let i=0;i<3;i++){
+      try{
+        const data=await fetchWeather();
+        weatherData=data;
+        updateChip(data);
+        return;
+      }catch(e){
+        if(i<2) await new Promise(r=>setTimeout(r,3000));
+      }
+    }
+    document.getElementById('chip-temp').textContent='--°C';
+  })();
 };
 </script>
 
