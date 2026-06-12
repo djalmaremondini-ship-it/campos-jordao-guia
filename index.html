@@ -38,8 +38,8 @@ html,body{
   overflow-x:hidden;
   overscroll-behavior:none;
 }
-/* Regra global — nenhum elemento extrapola a largura */
-*{max-width:100%;}
+/* Regra global — previne overflow horizontal */
+img,svg,video,canvas{max-width:100%;}
 .app{
   width:100%;
   max-width:430px; /* suporta iPhones grandes e Samsung */
@@ -1941,6 +1941,7 @@ let savedIds=new Set();
 let checkedInIds=new Set(); // {place_id: date}
 let checkedInDates={};
 let prevScreen='home';
+let currentScreen='home';
 let searchRadius=5000;
 let listPlaces=[], listSort='rating';
 let listCatFilter='all', listSubFilter=null, listSubfilterPlaces=null;
@@ -2017,6 +2018,7 @@ LS.load();
 function showScreen(name){
   const cur=document.querySelector('.screen.active');
   if(cur&&cur.id!=='screen-'+name) prevScreen=cur.id.replace('screen-','');
+  currentScreen=name;
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.bni').forEach(b=>b.classList.remove('active'));
   document.getElementById('screen-'+name).classList.add('active');
@@ -2045,7 +2047,7 @@ function renderFeatured(places){
         ?'<div class="fc-badge-open open">Aberto</div>'
         :'<div class="fc-badge-open closed">Fechado</div>';
     }}catch(e){}
-    return `<div class="feat-card-new" data-pid="${p.place_id}">
+    return `<div class="feat-card-new" data-pid="${p.place_id}" onclick="openDetail('${p.place_id}')" style="cursor:pointer">
       <div class="fc-img">
         ${imgHtml}
         ${p._featured?'<div class="fc-badge-dest">⭐ DESTAQUE</div>':''}
@@ -2061,7 +2063,7 @@ function renderFeatured(places){
       </div>
     </div>`;
   }).join('');
-  el.querySelectorAll('.feat-card-new').forEach(card=>card.addEventListener('click',()=>openDetail(card.dataset.pid)));
+  // onclick inline no template — não precisa de addEventListener
 }
 
 
@@ -2083,7 +2085,7 @@ function renderNear(places){
         ?'<span class="ni-open open">Aberto</span>'
         :'<span class="ni-open closed">Fechado</span>';
     }}catch(e){}
-    return `<div class="near-item-new" data-pid="${p.place_id}">
+    return `<div class="near-item-new" data-pid="${p.place_id}" onclick="openDetail('${p.place_id}')" style="cursor:pointer">
       <div class="ni-img">${img}</div>
       <div class="ni-info">
         <div class="ni-name">${p.name}</div>
@@ -2096,7 +2098,7 @@ function renderNear(places){
       </div>
     </div>`;
   }).join('');
-  el.querySelectorAll('.near-item-new').forEach(item=>item.addEventListener('click',()=>openDetail(item.dataset.pid)));
+  // onclick inline no template — não precisa de addEventListener
 }
 
 /* ================================================
