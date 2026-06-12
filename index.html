@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#1C4A35">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -31,11 +31,24 @@
   --muted:#888888;
   --sub:#aaaaaa;
 }
-html,body{height:100%;background:#e0ddd6;font-family:'DM Sans',sans-serif}
+html,body{
+  height:100%;
+  background:#e0ddd6;
+  font-family:'DM Sans',sans-serif;
+  overflow-x:hidden;
+  overscroll-behavior:none;
+}
+/* Regra global — nenhum elemento extrapola a largura */
+*{max-width:100%;}
 .app{
-  max-width:390px;margin:0 auto;
-  background:var(--bg);min-height:100vh;
-  position:relative;overflow:hidden;
+  width:100%;
+  max-width:430px; /* suporta iPhones grandes e Samsung */
+  margin:0 auto;
+  background:var(--bg);
+  min-height:100vh;
+  position:relative;
+  overflow-x:hidden; /* previne scroll lateral */
+  overflow-y:hidden;
   box-shadow:0 0 40px rgba(0,0,0,.15);
 }
 
@@ -47,9 +60,11 @@ html,body{height:100%;background:#e0ddd6;font-family:'DM Sans',sans-serif}
 .bnav{
   background:var(--card);border-top:.5px solid var(--border);
   display:flex;justify-content:space-around;
-  padding:10px 0 16px;
-  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
-  width:100%;max-width:390px;z-index:300;
+  padding:10px 0 max(16px, env(safe-area-inset-bottom));
+  position:fixed;bottom:0;
+  left:50%;transform:translateX(-50%);
+  width:100%;max-width:430px;
+  z-index:300;
 }
 .bni{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 14px;-webkit-tap-highlight-color:transparent}
 .bni i{font-size:22px;color:#bbb;transition:color .15s}
@@ -786,6 +801,212 @@ html,body{height:100%;background:#e0ddd6;font-family:'DM Sans',sans-serif}
 .rot-generating .spinner{width:36px;height:36px}
 .rot-generating p{font-size:13px;color:var(--muted);text-align:center;line-height:1.6}
 
+
+/* ===== HOME REDESIGN ===== */
+/* Header limpo */
+.hdr-new{
+  background:var(--card);
+  padding:12px 16px 0;
+  box-shadow:0 1px 0 var(--border);
+  flex-shrink:0;
+  position:sticky;top:0;z-index:200;
+}
+.hdr-top-row{
+  display:flex;align-items:center;
+  justify-content:space-between;
+  margin-bottom:12px;
+}
+.hdr-loc{
+  display:flex;align-items:center;gap:5px;
+  font-size:13px;color:var(--muted);
+  cursor:pointer;
+}
+.hdr-loc i{font-size:14px;color:var(--green)}
+.hdr-loc strong{color:var(--text);font-weight:500}
+.hdr-right{display:flex;align-items:center;gap:8px}
+
+/* Barra de busca grande */
+.search-big{
+  display:flex;align-items:center;gap:10px;
+  background:#f8f6f2;border-radius:14px;
+  padding:11px 14px;margin-bottom:14px;
+  border:.5px solid var(--border);
+}
+.search-big i{font-size:18px;color:var(--muted);flex-shrink:0}
+.search-big input{
+  flex:1;border:none;background:transparent;
+  font-size:15px;color:var(--text);
+  font-family:'DM Sans',sans-serif;outline:none;
+}
+.search-big input::placeholder{color:#bbb}
+
+/* Categorias estilo Airbnb — ícone grande + label */
+.cat-row-new{
+  display:flex;gap:0;overflow-x:auto;
+  scrollbar-width:none;margin:0 -16px;
+  padding:0 16px;
+}
+.cat-row-new::-webkit-scrollbar{display:none}
+.cat-new{
+  display:flex;flex-direction:column;align-items:center;
+  gap:5px;padding:8px 16px 12px;
+  cursor:pointer;flex-shrink:0;
+  border-bottom:2.5px solid transparent;
+  transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.cat-new i{font-size:22px;color:#bbb;transition:color .15s}
+.cat-new span{font-size:11px;color:#bbb;font-weight:500;white-space:nowrap;transition:color .15s}
+.cat-new.active i{color:var(--text)}
+.cat-new.active span{color:var(--text)}
+.cat-new.active{border-bottom-color:var(--text)}
+
+/* Corpo da home */
+.home-body{
+  flex:1;overflow-y:auto;
+  padding:0;
+  background:var(--bg);
+}
+
+/* Banner clima / contexto */
+.home-context-bar{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 16px;
+  background:var(--card);
+  border-bottom:.5px solid var(--border);
+  cursor:pointer;
+}
+.home-context-bar i{font-size:16px;color:var(--green)}
+.home-context-bar span{font-size:13px;color:var(--stone);flex:1}
+.home-context-bar .hcb-temp{
+  font-size:13px;font-weight:500;color:var(--text);
+  background:#f0f8f4;padding:3px 10px;border-radius:20px;
+  border:.5px solid #b7dfc9;
+}
+
+/* Mapa compacto */
+.home-map-wrap{
+  height:160px;position:relative;overflow:hidden;
+  margin:0 16px 0;border-radius:16px;
+  margin-top:14px;
+  border:.5px solid var(--border);
+}
+#map-home{width:100%;height:100%}
+
+/* Seção de destaque */
+.home-section{padding:18px 16px 0}
+.home-sec-hdr{
+  display:flex;align-items:center;
+  justify-content:space-between;margin-bottom:12px;
+}
+.home-sec-ttl{
+  font-family:'Playfair Display',serif;
+  font-size:18px;color:var(--text);
+}
+.home-sec-link{
+  font-size:13px;color:var(--green);
+  font-weight:500;cursor:pointer;
+  display:flex;align-items:center;gap:3px;
+}
+
+/* Cards de destaque — estilo Airbnb */
+.feat-scroll{
+  display:flex;gap:12px;
+  overflow-x:auto;margin:0 -16px;
+  padding:0 16px 16px;
+  scrollbar-width:none;
+}
+.feat-scroll::-webkit-scrollbar{display:none}
+.feat-card-new{
+  flex-shrink:0;width:200px;
+  background:var(--card);border-radius:16px;
+  overflow:hidden;cursor:pointer;
+  border:.5px solid var(--border);
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .1s;
+}
+.feat-card-new:active{transform:scale(.97)}
+.fc-img{
+  height:140px;position:relative;overflow:hidden;
+  background:#e8f4e8;
+}
+.fc-img img{
+  width:100%;height:100%;object-fit:cover;
+  display:block;
+}
+.fc-badge-dest{
+  position:absolute;top:10px;left:10px;
+  background:linear-gradient(135deg,#C4892A,#E8A84C);
+  color:#fff;font-size:9px;font-weight:600;
+  padding:3px 9px;border-radius:20px;letter-spacing:.4px;
+}
+.fc-badge-open{
+  position:absolute;top:10px;right:10px;
+  font-size:10px;font-weight:500;
+  padding:3px 9px;border-radius:20px;
+}
+.fc-badge-open.open{background:rgba(28,74,53,.85);color:#fff}
+.fc-badge-open.closed{background:rgba(180,40,40,.8);color:#fff}
+.fc-body{padding:10px 12px 12px}
+.fc-name{
+  font-size:14px;font-weight:500;color:var(--text);
+  margin-bottom:3px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;
+}
+.fc-cat{font-size:11px;color:var(--muted);margin-bottom:6px}
+.fc-bottom{display:flex;align-items:center;justify-content:space-between}
+.fc-rating{display:flex;align-items:center;gap:3px;font-size:12px;color:var(--stone)}
+.fc-rating i{font-size:11px;color:#E9A93B}
+.fc-dist{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:2px}
+
+/* Lista próximos — estilo Airbnb linha */
+.near-item-new{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 16px;border-bottom:.5px solid var(--border);
+  cursor:pointer;background:var(--card);
+  -webkit-tap-highlight-color:transparent;
+}
+.near-item-new:active{background:#f8f6f2}
+.ni-img{
+  width:72px;height:72px;border-radius:12px;
+  overflow:hidden;flex-shrink:0;
+  position:relative;
+}
+.ni-img img{width:100%;height:100%;object-fit:cover}
+.ni-info{flex:1;min-width:0}
+.ni-name{font-size:14px;font-weight:500;color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+.ni-cat{font-size:11px;color:var(--muted);margin-bottom:4px}
+.ni-bottom{display:flex;align-items:center;gap:8px}
+.ni-rating{display:flex;align-items:center;gap:2px;font-size:11px;color:var(--stone)}
+.ni-rating i{font-size:10px;color:#E9A93B}
+.ni-dist{
+  font-size:11px;color:var(--muted);
+  display:flex;align-items:center;gap:2px;margin-left:auto;
+  white-space:nowrap;
+}
+.ni-open{font-size:10px;font-weight:500;padding:2px 7px;border-radius:10px}
+.ni-open.open{background:#d8efd8;color:#1a5c36}
+.ni-open.closed{background:#fee2e2;color:#c0392b}
+
+/* Banner roteiro */
+.rot-banner-new{
+  margin:0 16px 18px;
+  background:var(--green);border-radius:16px;
+  padding:16px 18px;display:flex;align-items:center;gap:14px;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+.rot-banner-new:active{opacity:.9}
+.rbn-icon{
+  width:44px;height:44px;border-radius:12px;
+  background:rgba(255,255,255,.15);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.rbn-icon i{font-size:22px;color:#74C69D}
+.rbn-text p:first-child{font-size:14px;font-weight:500;color:#fff;margin-bottom:2px}
+.rbn-text p:last-child{font-size:11px;color:rgba(255,255,255,.6)}
+
 /* ===== SPINNER ===== */
 .spinner{width:22px;height:22px;border:2.5px solid var(--border-light);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -797,7 +1018,16 @@ html,body{height:100%;background:#e0ddd6;font-family:'DM Sans',sans-serif}
 
 
   <!-- ===== TELA DE LOGIN ===== -->
-  <div id="screen-login">
+  <div id="screen-auth-loading" style="position:fixed;inset:0;background:#1C4A35;z-index:1001;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+    <svg width="52" height="70" viewBox="0 0 88 118" fill="none">
+      <path d="M44 3C25.8 3 11 17.8 11 36C11 58 44 106 44 106C44 106 77 58 77 36C77 17.8 62.2 3 44 3Z" fill="rgba(255,255,255,0.15)"/>
+      <circle cx="44" cy="36" r="20" fill="rgba(255,255,255,0.9)"/>
+      <path d="M44 20L52 50L44 44L36 50L44 20Z" fill="#1C4A35"/>
+    </svg>
+    <div style="font-family:'Playfair Display',serif;font-size:28px;color:#fff;letter-spacing:-1px">Rotera</div>
+    <div class="spinner" style="border-color:rgba(255,255,255,.2);border-top-color:#fff;width:24px;height:24px"></div>
+  </div>
+  <div id="screen-login" style="display:none">
     <!-- Logo -->
     <div class="login-logo">
       <svg width="72" height="98" viewBox="0 0 88 118" fill="none">
@@ -846,65 +1076,109 @@ html,body{height:100%;background:#e0ddd6;font-family:'DM Sans',sans-serif}
   </div>
 
   <!-- ===== HOME ===== -->
-  <div class="screen active" id="screen-home">
-    <div class="header">
-      <div class="header-top">
+  <div class="screen active" id="screen-home" style="padding-bottom:70px">
+
+    <!-- HEADER STICKY -->
+    <div class="hdr-new">
+      <div class="hdr-top-row">
+        <!-- Logo + localização -->
         <div>
-          <div class="loc-line"><i class="ti ti-map-pin"></i><span id="loc-text">Campos do Jordão, SP</span></div>
-          <!-- LOGO ROTERA -->
-          <div id="rotera-logo-wrap" style="margin-top:2px">
+          <div class="hdr-loc">
+            <i class="ti ti-map-pin"></i>
+            <span id="loc-text">Campos do Jordão, SP</span>
+          </div>
+          <div id="rotera-logo-wrap" style="margin-top:4px">
             <canvas id="logo-measure" style="display:none"></canvas>
             <svg id="rotera-logo-svg" xmlns="http://www.w3.org/2000/svg" style="display:block"></svg>
           </div>
         </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <div class="wchip" id="weather-chip-btn">
-            <i class="ti ti-cloud-snow" id="chip-icon"></i>
-            <span id="chip-temp">--°C</span>
+        <!-- Clima + avatar -->
+        <div class="hdr-right">
+          <div id="weather-chip-btn" style="display:flex;align-items:center;gap:5px;background:#f0f8f4;padding:6px 12px;border-radius:20px;border:.5px solid #b7dfc9;cursor:pointer">
+            <i class="ti ti-cloud-snow" id="chip-icon" style="font-size:15px;color:var(--green)"></i>
+            <span id="chip-temp" style="font-size:13px;font-weight:500;color:var(--text)">...°C</span>
           </div>
           <div class="user-avatar" id="header-avatar" onclick="showScreen('profile')" style="display:none">
             <div class="user-avatar-placeholder" id="header-avatar-inner">?</div>
           </div>
         </div>
       </div>
-      <div class="searchbar"><i class="ti ti-search"></i><input type="text" placeholder="Buscar restaurantes, parques..." id="search-input"/></div>
-      <div class="cats" id="cats">
-        <div class="cat active" data-type="all"><i class="ti ti-layout-grid"></i> Todos</div>
-        <div class="cat" data-type="tourist_attraction"><i class="ti ti-building-arch"></i> Pontos turísticos</div>
-        <div class="cat" data-type="park"><i class="ti ti-trees"></i> Natureza</div>
-        <div class="cat" data-type="chocolate"><i class="ti ti-box"></i> Chocolate</div>
-        <div class="cat" data-type="adventure"><i class="ti ti-parachute"></i> Aventura</div>
-        <div class="cat" data-type="restaurant"><i class="ti ti-tools-kitchen-2"></i> Restaurantes</div>
-        <div class="cat" data-type="cafe"><i class="ti ti-coffee"></i> Cafés</div>
-        <div class="cat" data-type="bar"><i class="ti ti-beer"></i> Bares</div>
-        <div class="cat" data-type="shopping_mall"><i class="ti ti-shopping-bag"></i> Compras</div>
-        <div class="cat" data-type="culture"><i class="ti ti-palette"></i> Arte & Cultura</div>
-        <div class="cat" data-type="transport"><i class="ti ti-train"></i> Passeios</div>
-        <div class="cat" data-type="lodging"><i class="ti ti-home-2"></i> Onde ficar</div>
-        <div class="cat" data-type="experience"><i class="ti ti-sparkles"></i> Experiências</div>
-        <div class="cat" data-type="gastronomy"><i class="ti ti-cheese"></i> Gastronomia</div>
-        <div class="cat" data-type="events"><i class="ti ti-calendar-event"></i> Eventos</div>
-        <div class="cat" data-type="viewpoint"><i class="ti ti-eye"></i> Mirantes</div>
+
+      <!-- BUSCA GRANDE -->
+      <div class="search-big" onclick="document.getElementById('search-input-new').focus()">
+        <i class="ti ti-search"></i>
+        <input type="text" id="search-input-new" placeholder="O que você quer explorar?"/>
+      </div>
+
+      <!-- CATEGORIAS estilo Airbnb -->
+      <div class="cat-row-new" id="cats">
+        <div class="cat-new active" data-type="all"><i class="ti ti-layout-grid"></i><span>Tudo</span></div>
+        <div class="cat-new" data-type="tourist_attraction"><i class="ti ti-building-arch"></i><span>Turístico</span></div>
+        <div class="cat-new" data-type="park"><i class="ti ti-trees"></i><span>Natureza</span></div>
+        <div class="cat-new" data-type="chocolate"><i class="ti ti-box"></i><span>Chocolate</span></div>
+        <div class="cat-new" data-type="adventure"><i class="ti ti-parachute"></i><span>Aventura</span></div>
+        <div class="cat-new" data-type="restaurant"><i class="ti ti-tools-kitchen-2"></i><span>Restaurantes</span></div>
+        <div class="cat-new" data-type="cafe"><i class="ti ti-coffee"></i><span>Cafés</span></div>
+        <div class="cat-new" data-type="bar"><i class="ti ti-beer"></i><span>Bares</span></div>
+        <div class="cat-new" data-type="lodging"><i class="ti ti-home-2"></i><span>Onde ficar</span></div>
+        <div class="cat-new" data-type="experience"><i class="ti ti-sparkles"></i><span>Experiências</span></div>
+        <div class="cat-new" data-type="gastronomy"><i class="ti ti-cheese"></i><span>Gastronomia</span></div>
+        <div class="cat-new" data-type="viewpoint"><i class="ti ti-eye"></i><span>Mirantes</span></div>
+        <div class="cat-new" data-type="events"><i class="ti ti-calendar-event"></i><span>Eventos</span></div>
+        <div class="cat-new" data-type="shopping_mall"><i class="ti ti-shopping-bag"></i><span>Compras</span></div>
+        <div class="cat-new" data-type="culture"><i class="ti ti-palette"></i><span>Cultura</span></div>
       </div>
     </div>
-    <div class="body">
-      <div class="geo-bar"><div class="geo-dot"></div><span id="geo-status">Obtendo geolocalização...</span></div>
-      <div id="map-home-container"><div id="map-home"></div><div class="mlo" id="map-home-loading"><div class="spinner"></div></div></div>
-      <div class="sec-hdr">
-        <div class="sec-ttl">Em destaque</div>
-        <div class="see-all" id="see-all-featured">Ver todos <i class="ti ti-arrow-right" style="font-size:12px"></i></div>
+
+    <!-- CORPO SCROLLÁVEL -->
+    <div class="home-body" id="home-body">
+
+      <!-- Barra de geo status -->
+      <div id="geo-bar-new" style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--card);border-bottom:.5px solid var(--border)">
+        <div class="geo-dot" id="geo-dot-new"></div>
+        <span id="geo-status" style="font-size:12px;color:var(--muted)">Obtendo geolocalização...</span>
       </div>
-      <div class="cards-row" id="featured-cards"><div class="loading-box"><div class="spinner"></div></div></div>
-      <div class="rotbanner" id="rot-banner">
-        <div class="roticon"><i class="ti ti-route"></i></div>
-        <div class="rottext"><p>Montar meu roteiro agora</p><p>IA cria rota otimizada com tempo em cada ponto</p></div>
-        <i class="ti ti-arrow-right" style="margin-left:auto;color:rgba(255,255,255,.5)"></i>
+
+      <!-- Mapa compacto -->
+      <div style="padding:14px 16px 0">
+        <div class="home-map-wrap">
+          <div id="map-home"></div>
+          <div class="mlo" id="map-home-loading"><div class="spinner"></div></div>
+        </div>
       </div>
-      <div class="sec-hdr">
-        <div class="sec-ttl">Mais próximos</div>
-        <div class="see-all" id="see-all-near">Ver todos <i class="ti ti-arrow-right" style="font-size:12px"></i></div>
+
+      <!-- DESTAQUE -->
+      <div class="home-section" id="section-featured">
+        <div class="home-sec-hdr">
+          <div class="home-sec-ttl">Em destaque</div>
+          <div class="home-sec-link" id="see-all-featured">Ver todos <i class="ti ti-arrow-right" style="font-size:11px"></i></div>
+        </div>
+        <div class="feat-scroll" id="featured-cards">
+          <div class="loading-box" style="width:200px;height:200px;border-radius:16px;flex-shrink:0"><div class="spinner"></div></div>
+        </div>
       </div>
-      <div class="nearlist" id="near-list"><div class="loading-box"><div class="spinner"></div></div></div>
+
+      <!-- BANNER ROTEIRO -->
+      <div class="home-section" style="padding-bottom:18px">
+        <div class="rot-banner-new" id="rot-banner">
+          <div class="rbn-icon"><i class="ti ti-route"></i></div>
+          <div class="rbn-text">
+            <p>Montar meu roteiro agora</p>
+            <p>IA cria rota personalizada para você</p>
+          </div>
+          <i class="ti ti-arrow-right" style="margin-left:auto;color:rgba(255,255,255,.5);font-size:18px"></i>
+        </div>
+      </div>
+
+      <!-- MAIS PRÓXIMOS -->
+      <div class="home-section" style="padding:0 0 14px">
+        <div class="home-sec-hdr" style="padding:0 16px">
+          <div class="home-sec-ttl">Mais próximos</div>
+          <div class="home-sec-link" id="see-all-near">Ver todos <i class="ti ti-arrow-right" style="font-size:11px"></i></div>
+        </div>
+        <div id="near-list"><div class="loading-box" style="height:120px"><div class="spinner"></div></div></div>
+      </div>
+
     </div>
   </div>
 
@@ -1112,6 +1386,12 @@ html,body{height:100%;background:#e0ddd6;font-family:'DM Sans',sans-serif}
         <div class="prof-sec-ttl">Sobre</div>
         <div class="prof-menu-item"><i class="ti ti-info-circle lead"></i><span class="pm-label">Sobre o app</span><i class="ti ti-chevron-right trail"></i></div>
         <div class="prof-menu-item"><i class="ti ti-help lead"></i><span class="pm-label">Ajuda & Suporte</span><i class="ti ti-chevron-right trail"></i></div>
+      </div>
+      <!-- Botão sair — só aparece quando logado -->
+      <div style="padding:0 4px 20px" id="prof-signout-wrap" style="display:none">
+        <button id="prof-signout-btn" style="width:100%;padding:12px;border-radius:12px;border:1px solid #fee2e2;background:#fff;color:#c0392b;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;display:none;align-items:center;justify-content:center;gap:6px">
+          <i class="ti ti-logout" style="font-size:15px"></i>Sair da conta
+        </button>
       </div>
     </div>
   </div>
@@ -1751,49 +2031,72 @@ function showScreen(name){
 ================================================ */
 function renderFeatured(places){
   const el=document.getElementById('featured-cards');
-  // Garante que só entra no destaque lugares com foto — sem exceção
   const comFoto = places.filter(p => photoUrl(p));
-  if(!comFoto.length){el.innerHTML='<p style="padding:10px;font-size:13px;color:var(--muted)">Nenhum lugar encontrado.</p>';return;}
+  if(!comFoto.length){el.innerHTML='<p style="padding:16px;font-size:13px;color:var(--muted)">Nenhum lugar encontrado.</p>';return;}
   el.innerHTML=comFoto.slice(0,12).map(p=>{
     const c=cfg(p.types,p._specialType);
     const d=dist(userLat,userLng,latVal(p),lngVal(p));
-    const url=photoUrl(p);
-    const ob=p.opening_hours?(p.opening_hours.isOpen()?'<span class="cbadge open">Aberto</span>':'<span class="cbadge closed">Fechado</span>'):'';
-    const featBadge=p._featured?`<div class="featured-badge"><i class="ti ti-star-filled"></i>DESTAQUE</div>`:'';
-    const imgHtml=imgOrFallback(url,c.cls,c.icon);
-    return `<div class="pcard" data-pid="${p.place_id}">
-      <div class="cimg-wrap ${c.cls}" style="position:relative;overflow:hidden">${imgHtml}${ob}${featBadge}</div>
-      <div class="cbody">
-        <div class="cname">${p.name}</div>
-        <div class="cmeta"><span class="ccat">${c.label}${getPriceLabel(p)?'<span class="price-badge">'+getPriceLabel(p)+'</span>':''}</span><span class="cdist"><i class="ti ti-walk"></i>${d.toFixed(1)}km</span></div>
-        <div class="crating"><div class="stars">${starsH(p.rating)}</div><span>${p.rating?p.rating.toFixed(1):'–'} (${fmtN(p.user_ratings_total)})</span></div>
-        <div class="ctime"><i class="ti ti-clock"></i>${c.time}</div>
+    const url=photoUrl(p,400);
+    const imgHtml=imgOrFallback(url,c.cls,c.icon,'width:100%;height:100%;object-fit:cover;display:block');
+    const pl=getPriceLabel(p);
+    let openBadge='';
+    try{ if(p.opening_hours&&typeof p.opening_hours.isOpen==='function'){
+      openBadge=p.opening_hours.isOpen()
+        ?'<div class="fc-badge-open open">Aberto</div>'
+        :'<div class="fc-badge-open closed">Fechado</div>';
+    }}catch(e){}
+    return `<div class="feat-card-new" data-pid="${p.place_id}">
+      <div class="fc-img">
+        ${imgHtml}
+        ${p._featured?'<div class="fc-badge-dest">⭐ DESTAQUE</div>':''}
+        ${openBadge}
+      </div>
+      <div class="fc-body">
+        <div class="fc-name">${p.name}</div>
+        <div class="fc-cat">${c.label}${pl?' · '+pl.label:''}</div>
+        <div class="fc-bottom">
+          <div class="fc-rating"><i class="ti ti-star-filled"></i>${p.rating?p.rating.toFixed(1):'–'} <span style="color:var(--muted)">(${fmtN(p.user_ratings_total)})</span></div>
+          <div class="fc-dist"><i class="ti ti-walk" style="font-size:10px"></i>${d.toFixed(1)} km</div>
+        </div>
       </div>
     </div>`;
   }).join('');
-  el.querySelectorAll('.pcard').forEach(card=>card.addEventListener('click',()=>openDetail(card.dataset.pid)));
+  el.querySelectorAll('.feat-card-new').forEach(card=>card.addEventListener('click',()=>openDetail(card.dataset.pid)));
 }
+
 
 function renderNear(places){
   const el=document.getElementById('near-list');
-  if(!places.length){el.innerHTML='<p style="padding:10px;font-size:13px;color:var(--muted)">Nenhum lugar próximo.</p>';return;}
-  // Ordena por distância mas sempre empurra sem foto pro final
+  if(!places.length){el.innerHTML='<p style="padding:16px;font-size:13px;color:var(--muted)">Nenhum lugar próximo.</p>';return;}
   const byDist=(a,b)=>dist(userLat,userLng,latVal(a),lngVal(a))-dist(userLat,userLng,latVal(b),lngVal(b));
-  const comFoto = [...places].filter(p=>photoUrl(p)).sort(byDist);
-  const semFoto = [...places].filter(p=>!photoUrl(p)).sort(byDist);
-  const sorted  = [...comFoto, ...semFoto];
-  el.innerHTML=sorted.slice(0,8).map(p=>{
+  const comFoto=[...places].filter(p=>photoUrl(p)).sort(byDist);
+  const semFoto=[...places].filter(p=>!photoUrl(p)).sort(byDist);
+  const sorted=[...comFoto,...semFoto];
+  el.innerHTML=sorted.slice(0,12).map(p=>{
     const c=cfg(p.types,p._specialType);
     const d=dist(userLat,userLng,latVal(p),lngVal(p));
     const url=photoUrl(p,150);
     const img=imgOrFallback(url,c.nc,c.icon,'width:100%;height:100%;object-fit:cover');
-    return `<div class="nitem" data-pid="${p.place_id}">
-      <div class="nthumb ${c.nc}" style="overflow:hidden">${img}</div>
-      <div class="ninfo"><div class="nname">${p.name}</div><div class="nsub"><i class="ti ti-map-pin"></i>${d.toFixed(1)} km · ${c.label}</div></div>
-      <div class="nright"><div class="dbadge">${wt(d)}</div><div class="nrat"><i class="ti ti-star-filled"></i>${p.rating?p.rating.toFixed(1):'–'}<span>(${fmtN(p.user_ratings_total)})</span></div></div>
+    let openBadge='';
+    try{ if(p.opening_hours&&typeof p.opening_hours.isOpen==='function'){
+      openBadge=p.opening_hours.isOpen()
+        ?'<span class="ni-open open">Aberto</span>'
+        :'<span class="ni-open closed">Fechado</span>';
+    }}catch(e){}
+    return `<div class="near-item-new" data-pid="${p.place_id}">
+      <div class="ni-img">${img}</div>
+      <div class="ni-info">
+        <div class="ni-name">${p.name}</div>
+        <div class="ni-cat">${c.label}</div>
+        <div class="ni-bottom">
+          <div class="ni-rating"><i class="ti ti-star-filled"></i>${p.rating?p.rating.toFixed(1):'–'} <span style="color:var(--muted)">(${fmtN(p.user_ratings_total)})</span></div>
+          ${openBadge}
+          <div class="ni-dist"><i class="ti ti-map-pin" style="font-size:10px"></i>${d.toFixed(1)} km · ${wt(d)}</div>
+        </div>
+      </div>
     </div>`;
   }).join('');
-  el.querySelectorAll('.nitem').forEach(item=>item.addEventListener('click',()=>openDetail(item.dataset.pid)));
+  el.querySelectorAll('.near-item-new').forEach(item=>item.addEventListener('click',()=>openDetail(item.dataset.pid)));
 }
 
 /* ================================================
@@ -2211,7 +2514,6 @@ function renderDetailBody(p){
     <div class="det-desc">Localizado em Campos do Jordão, ${p.name} é um dos destinos mais procurados da região. ${p.rating&&p.rating>=4.5?'Altamente recomendado pelos visitantes com nota excelente no Google.':p.rating&&p.rating>=4.0?'Muito bem avaliado pelos turistas que visitaram.':'Um destino interessante para incluir no roteiro.'}</div>
     ${revsHtml}
   `;
-  showScreen('detail');
 }
 
 function removeFromRoteiro(pid, event){
@@ -2578,6 +2880,14 @@ function refreshProfile(){
   document.getElementById('prof-sub-d').textContent=profile.city?`${profile.city} · Bem-vindo!`:'Bem-vindo a Campos do Jordão';
   document.getElementById('ps-saved').textContent=savedIds.size;
   document.getElementById('ps-visited').textContent=checkedInIds.size;
+
+  // Contador de avaliações — lê do localStorage (e Firestore quando logado)
+  try {
+    const allRevs = JSON.parse(localStorage.getItem(LS_REVIEWS_KEY)||'[]');
+    document.getElementById('ps-reviews').textContent = allRevs.length;
+  } catch(e){
+    document.getElementById('ps-reviews').textContent = 0;
+  }
 
   // Salvos
   const sg=document.getElementById('prof-saved-grid');
@@ -3767,6 +4077,10 @@ function initReviewModal() {
       const all = JSON.parse(localStorage.getItem(LS_REVIEWS_KEY)||'[]');
       all.push(review);
       localStorage.setItem(LS_REVIEWS_KEY, JSON.stringify(all));
+      // Atualiza contador no perfil imediatamente
+      try { document.getElementById('ps-reviews').textContent = all.length; } catch(e){}
+      // Salva no Firestore se logado
+      if(window.fbSaveReview) window.fbSaveReview(review);
     } catch(e){}
     document.getElementById('modal-review').style.display = 'none';
     const toast = document.createElement('div');
@@ -4067,27 +4381,58 @@ async function gerarRoteiroInteligente(){
   // Ordena por quantidade de avaliações (confiabilidade)
   candidates.sort((a,b) => (b.user_ratings_total||0) - (a.user_ratings_total||0));
 
-  // Pega as melhores por distância do usuário para evitar saltos grandes
-  const byDist = candidates.slice(0, qtdParadas * 4).sort((a,b) =>
+  // Pool de candidatos próximos — pega até 6x o necessário para ter opções
+  const pool = candidates.slice(0, qtdParadas * 6).sort((a,b) =>
     dist(userLat,userLng,latVal(a),lngVal(a)) - dist(userLat,userLng,latVal(b),lngVal(b))
   );
 
-  // Seleciona as top N garantindo variedade de categorias
-  const selected = [];
-  const usedCats  = new Set();
-  for(const p of byDist){
-    if(selected.length >= qtdParadas) break;
-    const cat = cfg(p.types, p._specialType).cls;
-    // Evita mais de 2 do mesmo tipo, exceto se não tiver opção
-    const catCount = [...usedCats].filter(c => c === cat).length;
-    if(catCount >= 2 && selected.length < qtdParadas - 1) continue;
-    if(!roteiroPlaces.find(x=>x.place_id===p.place_id)){
-      selected.push(p);
-      usedCats.add(cat);
+  const selected   = [];
+  const usedCats   = {};
+  const jaNoRoteiro = pid => roteiroPlaces.find(x=>x.place_id===pid);
+
+  // PASSO 1: Pega o MELHOR de cada interesse selecionado (garante representação)
+  if(rwState.interesses.length > 0){
+    for(const interesse of rwState.interesses){
+      if(selected.length >= qtdParadas) break;
+      const fn = typeMap[interesse];
+      if(!fn) continue;
+      // Melhor candidato desse interesse que ainda não foi selecionado
+      const best = pool.find(p =>
+        fn(p) &&
+        !selected.find(s=>s.place_id===p.place_id) &&
+        !jaNoRoteiro(p.place_id)
+      );
+      if(best){
+        selected.push(best);
+        const cat = cfg(best.types, best._specialType).cls;
+        usedCats[cat] = (usedCats[cat]||0) + 1;
+      }
     }
   }
 
-  // Fallback se seleção ficou vazia
+  // PASSO 2: Completa as vagas restantes com os melhores do pool
+  // respeitando variedade — máximo 2 do mesmo tipo
+  for(const p of pool){
+    if(selected.length >= qtdParadas) break;
+    if(selected.find(s=>s.place_id===p.place_id)) continue;
+    if(jaNoRoteiro(p.place_id)) continue;
+    const cat = cfg(p.types, p._specialType).cls;
+    if((usedCats[cat]||0) >= 2) continue; // já tem 2 desse tipo
+    selected.push(p);
+    usedCats[cat] = (usedCats[cat]||0) + 1;
+  }
+
+  // PASSO 3: Fallback se ainda não completou (sem filtro de tipo)
+  if(selected.length < qtdParadas){
+    for(const p of pool){
+      if(selected.length >= qtdParadas) break;
+      if(selected.find(s=>s.place_id===p.place_id)) continue;
+      if(jaNoRoteiro(p.place_id)) continue;
+      selected.push(p);
+    }
+  }
+
+  // Fallback geral se pool vazio
   if(!selected.length){
     const fallback = [...allPlaces]
       .filter(p => photoUrl(p) && (p.rating||0) >= 4.0)
@@ -4396,6 +4741,12 @@ async function syncToFirestore(){
       ids: roteiroPlaces.map(p=>p.place_id),
       updatedAt: serverTimestamp()
     }, {merge:true});
+    // Salva contagem de reviews (os dados completos ficam na coleção /reviews)
+    const allRevs = JSON.parse(localStorage.getItem(LS_REVIEWS_KEY)||'[]');
+    await setDoc(doc(db,'usuarios',uid,'dados','stats'), {
+      totalReviews: allRevs.length,
+      updatedAt: serverTimestamp()
+    }, {merge:true});
   } catch(e){ console.log('Sync erro:', e); }
 }
 
@@ -4424,6 +4775,11 @@ async function loadFromFirestore(){
     if(rotDoc.exists() && rotDoc.data().ids){
       const ids = rotDoc.data().ids;
       roteiroPlaces = ids.map(id=>allPlaces.find(p=>p.place_id===id)).filter(Boolean);
+    }
+    // Carrega stats (reviews)
+    const statsDoc = await getDoc(doc(db,'usuarios',uid,'dados','stats'));
+    if(statsDoc.exists() && statsDoc.data().totalReviews !== undefined){
+      try { document.getElementById('ps-reviews').textContent = statsDoc.data().totalReviews; } catch(e){}
     }
     // Migra localStorage para Firestore na primeira vez
     migrateLocalStorage();
@@ -4483,9 +4839,19 @@ window.fbSaveReview         = saveReview;
 window.fbSignOut = async () => {
   await signOut(auth);
   currentUser = null;
+  _lsSavePatched = false;
+  localStorage.removeItem('rotera_guest');
+  localStorage.removeItem('rotera_migrated');
   updateHeaderAvatar(null);
-  // Volta para localStorage
+  // Esconde botão de logout no perfil
+  const profSignOut = document.getElementById('prof-signout-btn');
+  if(profSignOut) profSignOut.style.display = 'none';
+  // Mostra tela de login
   document.getElementById('screen-login').style.display = 'flex';
+  const btnEl     = document.getElementById('btn-google-login');
+  const loadingEl = document.getElementById('login-loading');
+  if(btnEl)    btnEl.style.display    = 'flex';
+  if(loadingEl) loadingEl.style.display = 'none';
 };
 
 /* ── Atualiza avatar no header ── */
@@ -4527,39 +4893,53 @@ document.getElementById('btn-guest').addEventListener('click', ()=>{
 });
 
 /* ── Auth state observer ── */
+let _lsSavePatched = false;
+
 onAuthStateChanged(auth, async (user)=>{
   currentUser = user;
-  const loginEl = document.getElementById('screen-login');
+  const loginEl   = document.getElementById('screen-login');
+  const splashEl  = document.getElementById('screen-auth-loading');
   const guestMode = localStorage.getItem('rotera_guest');
 
+  // Esconde splash de verificação em qualquer caso
+  if(splashEl) splashEl.style.display = 'none';
+
   if(user){
-    // Usuário logado
+    // Usuário logado — esconde login, mostra app
     loginEl.style.display = 'none';
     updateHeaderAvatar(user);
+    // Mostra botão de logout no perfil
+    const profSignOut = document.getElementById('prof-signout-btn');
+    if(profSignOut){
+      profSignOut.style.display = 'flex';
+      profSignOut.onclick = window.fbSignOut;
+    }
     // Atualiza perfil com dados do Google
     if(profile.name === 'Visitante' && user.displayName){
       profile.name = user.displayName.split(' ')[0];
     }
     // Carrega dados do Firestore
     await loadFromFirestore();
-    // Sobrescreve LS.save para também sincronizar com Firestore
-    const origSave = LS.save.bind(LS);
-    LS.save = function(){
-      origSave();
-      setTimeout(syncToFirestore, 500); // debounce
-    };
-    // Atualiza logout no perfil
-    const logoutBtn = document.getElementById('painel-logout-btn');
-    if(logoutBtn){
-      const newLogout = logoutBtn.cloneNode(true);
-      newLogout.textContent = 'Sair da conta Rotera';
-      newLogout.addEventListener('click', window.fbSignOut);
-      logoutBtn.parentNode.replaceChild(newLogout, logoutBtn);
+    // Sobrescreve LS.save UMA SÓ VEZ para sincronizar com Firestore
+    if(!_lsSavePatched){
+      _lsSavePatched = true;
+      const origSave = LS.save.bind(LS);
+      LS.save = function(){
+        origSave();
+        setTimeout(syncToFirestore, 500);
+      };
     }
-    // Adiciona info do usuário no perfil
+    // Atualiza logout no painel parceiro também
+    const logoutBtn = document.getElementById('painel-logout-btn');
+    if(logoutBtn && !logoutBtn.dataset.patched){
+      logoutBtn.dataset.patched = '1';
+      logoutBtn.textContent = 'Sair da conta';
+      logoutBtn.addEventListener('click', window.fbSignOut);
+    }
+    // Info do usuário no perfil
     refreshProfile();
-    document.getElementById('prof-sub-d').textContent =
-      user.email || profile.city || 'Bem-vindo ao Rotera';
+    const subEl = document.getElementById('prof-sub-d');
+    if(subEl) subEl.textContent = user.email || profile.city || 'Bem-vindo ao Rotera';
   } else if(guestMode){
     loginEl.style.display = 'none';
   } else {
