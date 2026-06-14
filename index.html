@@ -2406,6 +2406,8 @@ function openDetail(pid){
 }
 
 function renderDetailBody(p){
+  const pid = p.place_id;
+  const c   = cfg(p.types, p._specialType);
   const addr=p.vicinity||'Campos do Jordão, SP';
   const d=dist(userLat,userLng,latVal(p),lngVal(p));
   // Horário — trata todos os casos com segurança
