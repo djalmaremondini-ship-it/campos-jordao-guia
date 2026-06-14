@@ -3352,7 +3352,20 @@ const WMO={
   95:{desc:'Tempestade',icon:'ti-storm',night:'ti-storm'},
   99:{desc:'Tempestade forte',icon:'ti-storm',night:'ti-storm'}
 };
-patchWMO();
+// Preenche códigos WMO intermediários que o Open-Meteo às vezes retorna sem mapeamento
+(function patchWMO(){
+  const patches = {
+    1:{desc:'Céu limpo',icon:'ti-sun',night:'ti-moon'},
+    2:{desc:'Parcialmente nublado',icon:'ti-cloud-sun',night:'ti-cloud-moon'},
+    3:{desc:'Nublado',icon:'ti-cloud',night:'ti-cloud'},
+    10:{desc:'Névoa',icon:'ti-cloud-fog',night:'ti-cloud-fog'},
+    11:{desc:'Neblina',icon:'ti-cloud-fog',night:'ti-cloud-fog'},
+    12:{desc:'Fumaça',icon:'ti-cloud-fog',night:'ti-cloud-fog'},
+    20:{desc:'Chuva passageira',icon:'ti-cloud-rain',night:'ti-cloud-rain'},
+    21:{desc:'Chuva',icon:'ti-cloud-rain',night:'ti-cloud-rain'},
+  };
+  Object.entries(patches).forEach(([k,v])=>{ if(!WMO[k]) WMO[k]=v; });
+})();
 function getWMO(code){
   if(code==null||code===undefined) return {desc:'Variável',icon:'ti-cloud',night:'ti-cloud-moon'};
   return WMO[code] || WMO[Math.floor(code/10)*10] || {desc:'Variável',icon:'ti-cloud',night:'ti-cloud'};
