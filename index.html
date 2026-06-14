@@ -790,14 +790,19 @@ img,svg,video,canvas{max-width:100%;}
   border:.5px solid var(--border-light);border-radius:12px;cursor:pointer;
   background:var(--card);transition:all .15s}
 .rot-single-opt.selected{border-color:var(--green);background:#f0f8f4}
-.rot-single-opt i{font-size:20px;color:var(--mist);flex-shrink:0}
-.rot-single-opt.selected i{color:var(--green)}
-.rot-single-opt div{flex:1}
+.rot-single-opt > i{font-size:20px;color:var(--mist);flex-shrink:0;width:24px}
+.rot-single-opt.selected > i{color:var(--green)}
+.rot-single-opt > div.rot-opt-text{flex:1;min-width:0}
 .rot-single-opt .opt-name{font-size:13px;font-weight:500;color:var(--text)}
 .rot-single-opt .opt-desc{font-size:11px;color:var(--muted);margin-top:1px}
-.rot-single-opt .opt-radio{width:18px;height:18px;border-radius:50%;
-  border:1.5px solid var(--border-light);flex-shrink:0;transition:all .15s}
+.rot-single-opt .opt-radio{
+  width:20px;height:20px;min-width:20px;min-height:20px;
+  border-radius:50%;border:1.5px solid var(--border-light);
+  flex-shrink:0;transition:all .15s;
+  display:flex;align-items:center;justify-content:center;
+}
 .rot-single-opt.selected .opt-radio{border-color:var(--green);background:var(--green)}
+.rot-single-opt.selected .opt-radio::after{content:'';width:8px;height:8px;border-radius:50%;background:#fff;display:block}
 .rot-generating{display:none;flex-direction:column;align-items:center;gap:14px;padding:20px 0}
 .rot-generating .spinner{width:36px;height:36px}
 .rot-generating p{font-size:13px;color:var(--muted);text-align:center;line-height:1.6}
@@ -1088,10 +1093,21 @@ img,svg,video,canvas{max-width:100%;}
             <i class="ti ti-map-pin"></i>
             <span id="loc-text">Campos do Jordão, SP</span>
           </div>
-          <div id="rotera-logo-wrap" style="margin-top:4px">
-            <canvas id="logo-measure" style="display:none"></canvas>
-            <svg id="rotera-logo-svg" xmlns="http://www.w3.org/2000/svg" style="display:block"></svg>
-          </div>
+        <!-- LOGO ROTERA — SVG estático -->
+        <div id="rotera-logo-wrap" style="margin-top:4px">
+          <svg width="130" height="28" viewBox="0 0 330 72" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;overflow:visible">
+            <text x="2" y="52" font-family="'DM Serif Display',Georgia,serif" font-size="58" fill="#fff" letter-spacing="-2">Rotera</text>
+            <!-- eco rota -->
+            <path d="M2 64 C50 64 80 55 130 55 C180 55 205 70 255 70 C278 70 292 65 305 64" stroke="rgba(255,255,255,0.18)" stroke-width="5" stroke-linecap="round" fill="none"/>
+            <!-- rota principal -->
+            <path d="M2 64 C50 64 80 55 130 55 C180 55 205 70 255 70 C278 70 292 65 305 64" stroke="rgba(255,255,255,0.55)" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <!-- ponto de partida -->
+            <circle cx="2" cy="64" r="3" fill="rgba(255,255,255,0.3)"/>
+            <!-- pin âmbar -->
+            <path d="M305 50C299 50 294 55 294 61C294 69 305 80 305 80C305 80 316 69 316 61C316 55 311 50 305 50Z" fill="#E8A84C"/>
+            <circle cx="305" cy="61" r="5" fill="rgba(255,255,255,0.88)"/>
+          </svg>
+        </div>
         </div>
         <!-- Clima + avatar -->
         <div class="hdr-right">
@@ -1742,17 +1758,17 @@ img,svg,video,canvas{max-width:100%;}
         <div class="rot-single-opts">
           <div class="rot-single-opt" data-val="2" onclick="rwSelect(this,'tempo')">
             <i class="ti ti-clock"></i>
-            <div><div class="opt-name">Algumas horas</div><div class="opt-desc">2–3 horas · 2 a 3 lugares</div></div>
+            <div class="rot-opt-text"><div class="opt-name">Algumas horas</div><div class="opt-desc">2–3 horas · 2 a 3 lugares</div></div>
             <div class="opt-radio"></div>
           </div>
           <div class="rot-single-opt" data-val="4" onclick="rwSelect(this,'tempo')">
             <i class="ti ti-sun"></i>
-            <div><div class="opt-name">Meio período</div><div class="opt-desc">4–5 horas · 3 a 4 lugares</div></div>
+            <div class="rot-opt-text"><div class="opt-name">Meio período</div><div class="opt-desc">4–5 horas · 3 a 4 lugares</div></div>
             <div class="opt-radio"></div>
           </div>
           <div class="rot-single-opt selected" data-val="8" onclick="rwSelect(this,'tempo')">
             <i class="ti ti-calendar"></i>
-            <div><div class="opt-name">Dia completo</div><div class="opt-desc">6–8 horas · 5 a 6 lugares</div></div>
+            <div class="rot-opt-text"><div class="opt-name">Dia completo</div><div class="opt-desc">6–8 horas · 5 a 6 lugares</div></div>
             <div class="opt-radio"></div>
           </div>
         </div>
@@ -1769,17 +1785,17 @@ img,svg,video,canvas{max-width:100%;}
         <div class="rot-single-opts">
           <div class="rot-single-opt" data-val="tranquilo" onclick="rwSelect(this,'ritmo')">
             <i class="ti ti-coffee"></i>
-            <div><div class="opt-name">Tranquilo</div><div class="opt-desc">Menos lugares, mais tempo em cada</div></div>
+            <div class="rot-opt-text"><div class="opt-name">Tranquilo</div><div class="opt-desc">Menos lugares, mais tempo em cada</div></div>
             <div class="opt-radio"></div>
           </div>
           <div class="rot-single-opt selected" data-val="equilibrado" onclick="rwSelect(this,'ritmo')">
             <i class="ti ti-route"></i>
-            <div><div class="opt-name">Equilibrado</div><div class="opt-desc">Bom balanço entre lugares e descanso</div></div>
+            <div class="rot-opt-text"><div class="opt-name">Equilibrado</div><div class="opt-desc">Bom balanço entre lugares e descanso</div></div>
             <div class="opt-radio"></div>
           </div>
           <div class="rot-single-opt" data-val="intenso" onclick="rwSelect(this,'ritmo')">
             <i class="ti ti-bolt"></i>
-            <div><div class="opt-name">Intenso</div><div class="opt-desc">Máximo de lugares no menor tempo</div></div>
+            <div class="rot-opt-text"><div class="opt-name">Intenso</div><div class="opt-desc">Máximo de lugares no menor tempo</div></div>
             <div class="opt-radio"></div>
           </div>
         </div>
@@ -2528,13 +2544,11 @@ function getIsOpen(p){
   try{
     const oh = p.opening_hours;
     if(!oh) return null;
-    // 1. open_now — campo mais simples do nearbySearch
-    if(typeof oh.open_now === 'boolean') return oh.open_now;
-    // 2. isOpen() da API
+    // 1. isOpen() da API — mais preciso
     if(typeof oh.isOpen === 'function'){
       try{ const r = oh.isOpen(); if(r !== null && r !== undefined) return r; }catch(e){}
     }
-    // 3. weekday_text — fallback manual
+    // 2. weekday_text — fallback manual (não usa open_now que está deprecated)
     if(oh.weekday_text && oh.weekday_text.length) return calcIsOpenFromText(oh.weekday_text);
   }catch(e){}
   return null;
@@ -2711,56 +2725,115 @@ function calcSchedule(places, transits, startTime){
 }
 
 // Otimiza rota via Google Directions API
+// Define a janela de horário ideal de cada lugar (0=manhã, 1=almoço, 2=tarde, 3=noite)
+function getTimeWindow(p){
+  const types  = p.types || [];
+  const name   = (p.name||'').toLowerCase();
+  const special = p._specialType;
+  // Noite: bar, cervejaria, jantar
+  if(types.includes('bar') || name.match(/bar|cervejaria|pub|noite/))
+    return 3;
+  // Almoço: restaurante (nunca antes das 11h30)
+  if(types.includes('restaurant') || name.match(/cantina|restaurante|churrascaria/))
+    return 1;
+  // Tarde: chocolate, café, compras, cultura
+  if(special==='chocolate'||special==='gastronomy'||special==='culture'||
+     types.includes('cafe')||types.includes('shopping_mall')||types.includes('store'))
+    return 2;
+  // Manhã: parques, pontos turísticos, mirantes, aventura
+  return 0;
+}
+
 async function optimizeRoute(){
   if(roteiroPlaces.length < 2) return;
   const btn = document.getElementById('rot-optimize-btn');
   if(btn){ btn.classList.add('loading'); btn.innerHTML='<i class="ti ti-loader-2 ti-spin"></i>Calculando rota...'; }
 
-  const origin      = `${userLat},${userLng}`;
-  const destination = `${latVal(roteiroPlaces[roteiroPlaces.length-1])},${lngVal(roteiroPlaces[roteiroPlaces.length-1])}`;
-  const waypoints   = roteiroPlaces.slice(0,-1).map(p=>`${latVal(p)},${lngVal(p)}`).join('|');
-
   try{
+    // ── PASSO 1: Agrupa por janela de horário ──────────────────────────────
+    // Separa em blocos: manhã → almoço → tarde → noite
+    const blocos = [0,1,2,3].map(w => roteiroPlaces.filter(p => getTimeWindow(p) === w));
+
+    // ── PASSO 2: Otimiza rota dentro de cada bloco com Google Maps ─────────
     const svc = new google.maps.DirectionsService();
-    const req = {
-      origin: new google.maps.LatLng(userLat, userLng),
-      destination: new google.maps.LatLng(latVal(roteiroPlaces[roteiroPlaces.length-1]), lngVal(roteiroPlaces[roteiroPlaces.length-1])),
-      waypoints: roteiroPlaces.slice(0,-1).map(p=>({
-        location: new google.maps.LatLng(latVal(p),lngVal(p)),
-        stopover: true
-      })),
-      optimizeWaypoints: true,
-      travelMode: google.maps.TravelMode.DRIVING
-    };
-    svc.route(req, (result, status)=>{
-      if(status === 'OK'){
-        // Reordena places pela ordem otimizada
-        const order = result.routes[0].waypoint_order;
-        const middle = roteiroPlaces.slice(0,-1);
-        const reordered = [...order.map(i=>middle[i]), roteiroPlaces[roteiroPlaces.length-1]];
-        roteiroPlaces = reordered;
-        // Extrai tempos de deslocamento de cada leg
-        const legs = result.routes[0].legs;
-        roteiroTransits = legs.map(leg=>({
-          duration_text: leg.duration.text.replace('hours','h').replace('hour','h').replace('mins','min').replace('min','min'),
-          distance_text: leg.distance.text,
-          duration_sec:  leg.duration.value
-        }));
-        roteiroOptimized = true;
-        LS.save();
-        renderRoteiro();
-      } else {
-        // Fallback sem otimização
-        roteiroTransits = roteiroPlaces.slice(0,-1).map((_,i)=>{
-          const d=dist(latVal(roteiroPlaces[i]),lngVal(roteiroPlaces[i]),latVal(roteiroPlaces[i+1]),lngVal(roteiroPlaces[i+1]));
-          const mins=Math.round(d/0.5);
-          return {duration_text:mins+'min de carro',distance_text:d.toFixed(1)+' km',duration_sec:mins*60};
+
+    async function optimizarBloco(places){
+      if(places.length <= 1) return {places, legs:[]};
+      return new Promise(resolve=>{
+        svc.route({
+          origin:      new google.maps.LatLng(latVal(places[0]),  lngVal(places[0])),
+          destination: new google.maps.LatLng(latVal(places[places.length-1]), lngVal(places[places.length-1])),
+          waypoints:   places.slice(1,-1).map(p=>({location:new google.maps.LatLng(latVal(p),lngVal(p)),stopover:true})),
+          optimizeWaypoints: true,
+          travelMode:  google.maps.TravelMode.DRIVING
+        }, (result, status)=>{
+          if(status==='OK'){
+            const order    = result.routes[0].waypoint_order;
+            const middle   = places.slice(1,-1);
+            const reordered= [places[0], ...order.map(i=>middle[i]), places[places.length-1]];
+            resolve({places: reordered, legs: result.routes[0].legs});
+          } else {
+            // Fallback: mantém ordem original
+            resolve({places, legs:[]});
+          }
         });
-        renderRoteiro();
-      }
-    });
+      });
+    }
+
+    // Otimiza cada bloco em paralelo
+    const results = await Promise.all(blocos.map(b => b.length>0 ? optimizarBloco(b) : Promise.resolve({places:[],legs:[]})));
+
+    // ── PASSO 3: Junta blocos na ordem manhã→almoço→tarde→noite ───────────
+    const reordered = results.flatMap(r => r.places);
+
+    // ── PASSO 4: Calcula deslocamentos reais entre as paradas ──────────────
+    // Busca tempos reais de toda a rota final ordenada
+    if(reordered.length > 1){
+      await new Promise(resolve=>{
+        svc.route({
+          origin:      new google.maps.LatLng(userLat, userLng),
+          destination: new google.maps.LatLng(latVal(reordered[reordered.length-1]), lngVal(reordered[reordered.length-1])),
+          waypoints:   reordered.slice(0,-1).map(p=>({location:new google.maps.LatLng(latVal(p),lngVal(p)),stopover:true})),
+          optimizeWaypoints: false, // já está ordenado
+          travelMode:  google.maps.TravelMode.DRIVING
+        }, (result, status)=>{
+          if(status==='OK'){
+            const legs = result.routes[0].legs;
+            roteiroTransits = legs.map(leg=>({
+              duration_text: leg.duration.text
+                .replace('hours','h').replace('hour','h')
+                .replace(' mins',' min').replace(' min',' min'),
+              distance_text: leg.distance.text,
+              duration_sec:  leg.duration.value
+            }));
+          } else {
+            // Estimativa por distância
+            roteiroTransits = reordered.slice(0,-1).map((_,i)=>{
+              const d=dist(latVal(reordered[i]),lngVal(reordered[i]),latVal(reordered[i+1]),lngVal(reordered[i+1]));
+              const mins=Math.max(5,Math.round(d/0.5));
+              return {duration_text:mins+'min de carro',distance_text:d.toFixed(1)+' km',duration_sec:mins*60};
+            });
+          }
+          resolve();
+        });
+      });
+    }
+
+    roteiroPlaces   = reordered;
+    roteiroOptimized = true;
+    LS.save();
+    renderRoteiro();
+
+    // Toast explicando a lógica
+    const toast = document.createElement('div');
+    toast.style.cssText='position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#2D6A4F;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2);text-align:center;max-width:85vw';
+    toast.textContent='✓ Rota otimizada · Manhã → Almoço → Tarde → Noite';
+    document.body.appendChild(toast);
+    setTimeout(()=>toast.remove(), 3500);
+
   }catch(e){
     if(btn){ btn.classList.remove('loading'); btn.innerHTML='<i class="ti ti-route"></i>Otimizar rota'; }
+    console.error('Erro otimização:', e);
   }
 }
 
@@ -4546,50 +4619,6 @@ window.initMap=function(){
 
 
   // ── LOGO ROTERA no header ──
-  (function renderLogo(){
-    const cv=document.getElementById('logo-measure');
-    if(!cv) return;
-    const ctx=cv.getContext('2d');
-    const FS=26; // tamanho da fonte no header
-    const fontStr=`${FS}px 'DM Serif Display', Georgia, serif`;
-    // Aguarda fonte carregar
-    document.fonts.ready.then(()=>{
-      ctx.font=fontStr;
-      const tw=ctx.measureText('Rotera').width;
-      const PAD=2;
-      const baseline=FS*0.82;
-      const routeY=baseline+FS*0.28;
-      const pinH=FS*0.62;
-      const pinW=pinH*0.65;
-      const pr=pinW*0.5;
-      const pinCX=PAD+tw;
-      const py=routeY-pinH*0.42;
-      const pinBotY=routeY+pinH*0.38;
-      const amp=FS*0.09;
-      const svgW=pinCX+pr+6;
-      const svgH=pinBotY+4;
-      // Bezier path
-      const mx1=PAD+tw*0.25, my1=routeY-amp;
-      const mx2=PAD+tw*0.5,  my2=routeY+amp;
-      const mx3=PAD+tw*0.75, my3=routeY-amp;
-      const rp=`M${PAD},${routeY} C${mx1},${my1} ${mx1+10},${my1} ${mx2},${my2} C${mx2+10},${my2} ${mx3},${my3} ${pinCX},${routeY}`;
-      // Pin teardrop
-      const tp=`M${pinCX},${pinBotY} C${pinCX-pr*0.4},${pinBotY-pr*0.7} ${pinCX-pr},${py+pr*0.5} ${pinCX-pr},${py} A${pr},${pr} 0 1,1 ${pinCX+pr},${py} C${pinCX+pr},${py+pr*0.5} ${pinCX+pr*0.4},${pinBotY-pr*0.7} ${pinCX},${pinBotY} Z`;
-      const svg=document.getElementById('rotera-logo-svg');
-      svg.setAttribute('width',svgW);
-      svg.setAttribute('height',svgH);
-      svg.setAttribute('viewBox',`0 0 ${svgW} ${svgH}`);
-      svg.innerHTML=`
-        <text x="${PAD}" y="${baseline}" font-family="'DM Serif Display',Georgia,serif" font-size="${FS}" fill="#fff" style="letter-spacing:-0.5px">Rotera</text>
-        <path d="${rp}" stroke="rgba(255,255,255,0.18)" stroke-width="${FS*0.07}" stroke-linecap="round" fill="none"/>
-        <path d="${rp}" stroke="rgba(255,255,255,0.55)" stroke-width="${FS*0.038}" stroke-linecap="round" fill="none"/>
-        <circle cx="${PAD}" cy="${routeY}" r="${FS*0.05}" fill="rgba(255,255,255,0.3)"/>
-        <path d="${tp}" fill="#E8A84C"/>
-        <circle cx="${pinCX}" cy="${py}" r="${FS*0.19}" fill="rgba(255,255,255,0.88)"/>
-      `;
-    });
-  })();
-
   fetchPlaces('all');
 
   // category filter
