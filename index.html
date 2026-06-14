@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+<meta name="app-version" content="2.1.0">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#1C4A35">
@@ -2458,19 +2459,19 @@ function renderDetailBody(p){
       '</div>' : '';
 
   // Horários da semana expansível
-  const weekHoursHtml = weekHours ? `
-    <div class="det-hours-bar" style="margin-bottom:16px">
-      <div class="det-hours-title" style="cursor:pointer" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
-        <i class="ti ti-clock"></i>Horários de funcionamento
-        <i class="ti ti-chevron-down" style="margin-left:auto;font-size:12px"></i>
-      </div>
-      <div style="display:none;margin-top:8px">
-        ${weekHours.map((line,i)=>{
-          const isToday = i === (new Date().getDay()+6)%7; // ajuste pt-BR
-          return '<div style="font-size:12px;color:'+(isToday?'var(--green)':'var(--stone)')+';font-weight:'+(isToday?'500':'400')+';padding:2px 0">'+line+'</div>';
-        }).join('')}
-      </div>
-    </div>` : '';
+  const weekHoursHtml = weekHours ? (
+    '<div class="det-hours-bar" style="margin-bottom:16px">'+
+    '<div class="det-hours-title" style="cursor:pointer" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">'+
+    '<i class="ti ti-clock"></i>Horários de funcionamento'+
+    '<i class="ti ti-chevron-down" style="margin-left:auto;font-size:12px"></i></div>'+
+    '<div style="display:none;margin-top:8px">'+
+    weekHours.map(function(line,i){
+      var today=(new Date().getDay()+6)%7;
+      var isToday=i===today;
+      return '<div style="font-size:12px;color:'+(isToday?'var(--green)':'var(--stone)')+';font-weight:'+(isToday?'500':'400')+';padding:2px 0">'+line+'</div>';
+    }).join('')+
+    '</div></div>'
+  ) : '';
 
   const hoursHtml =
     '<div class="det-hours-bar">'+
@@ -2484,7 +2485,7 @@ function renderDetailBody(p){
   document.getElementById('det-body').innerHTML=`
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
       <div class="det-tag ${c.cls}"><i class="ti ${c.icon}" style="font-size:12px"></i>${c.label}</div>
-      ${priceLabel ? '<span class="price-badge">'+priceLabel+'</span>' : ''}
+      ${priceLabel ? '<span class="price-badge">'+priceLabel.label+'</span>' : ''}
     </div>
     <div class="det-name">${p.name}</div>
     <div class="det-rating-row">
@@ -4554,8 +4555,8 @@ window.initMap=function(){
 
   // category filter
   document.getElementById('cats').addEventListener('click',e=>{
-    const cat=e.target.closest('.cat');if(!cat)return;
-    document.querySelectorAll('.cat').forEach(c=>c.classList.remove('active'));
+    const cat=e.target.closest('.cat-new');if(!cat)return;
+    document.querySelectorAll('.cat-new').forEach(c=>c.classList.remove('active'));
     cat.classList.add('active');
     const t=cat.dataset.type;
     const specialCats=['chocolate','adventure','culture','transport'];

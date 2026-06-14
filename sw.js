@@ -5,7 +5,7 @@
    - Base para Push Notifications futuras
    ============================================================ */
 
-const CACHE_NAME   = 'rotera-v2';
+const CACHE_NAME   = 'rotera-v4';
 const CACHE_STATIC = [
   '/campos-jordao-guia/',
   '/campos-jordao-guia/index.html',
