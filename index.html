@@ -1096,16 +1096,16 @@ img,svg,video,canvas{max-width:100%;}
         <!-- LOGO ROTERA — SVG estático -->
         <div id="rotera-logo-wrap" style="margin-top:4px">
           <svg width="130" height="28" viewBox="0 0 330 72" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;overflow:visible">
-            <text x="2" y="52" font-family="'DM Serif Display',Georgia,serif" font-size="58" fill="#fff" letter-spacing="-2">Rotera</text>
+            <text x="2" y="52" font-family="'DM Serif Display',Georgia,serif" font-size="58" fill="#1C4A35" letter-spacing="-2">Rotera</text>
             <!-- eco rota -->
-            <path d="M2 64 C50 64 80 55 130 55 C180 55 205 70 255 70 C278 70 292 65 305 64" stroke="rgba(255,255,255,0.18)" stroke-width="5" stroke-linecap="round" fill="none"/>
+            <path d="M2 64 C50 64 80 55 130 55 C180 55 205 70 255 70 C278 70 292 65 305 64" stroke="rgba(28,74,53,0.18)" stroke-width="5" stroke-linecap="round" fill="none"/>
             <!-- rota principal -->
-            <path d="M2 64 C50 64 80 55 130 55 C180 55 205 70 255 70 C278 70 292 65 305 64" stroke="rgba(255,255,255,0.55)" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <path d="M2 64 C50 64 80 55 130 55 C180 55 205 70 255 70 C278 70 292 65 305 64" stroke="rgba(28,74,53,0.5)" stroke-width="3" stroke-linecap="round" fill="none"/>
             <!-- ponto de partida -->
-            <circle cx="2" cy="64" r="3" fill="rgba(255,255,255,0.3)"/>
+            <circle cx="2" cy="64" r="3" fill="rgba(28,74,53,0.3)"/>
             <!-- pin âmbar -->
-            <path d="M305 50C299 50 294 55 294 61C294 69 305 80 305 80C305 80 316 69 316 61C316 55 311 50 305 50Z" fill="#E8A84C"/>
-            <circle cx="305" cy="61" r="5" fill="rgba(255,255,255,0.88)"/>
+            <path d="M305 50C299 50 294 55 294 61C294 69 305 80 305 80C305 80 316 69 316 61C316 55 311 50 305 50Z" fill="#C4892A"/>
+            <circle cx="305" cy="61" r="5" fill="rgba(255,255,255,0.9)"/>
           </svg>
         </div>
         </div>
@@ -3352,8 +3352,9 @@ const WMO={
   95:{desc:'Tempestade',icon:'ti-storm',night:'ti-storm'},
   99:{desc:'Tempestade forte',icon:'ti-storm',night:'ti-storm'}
 };
+patchWMO();
 function getWMO(code){
-  if(code==null) return {desc:'Variável',icon:'ti-cloud',night:'ti-cloud'};
+  if(code==null||code===undefined) return {desc:'Variável',icon:'ti-cloud',night:'ti-cloud-moon'};
   return WMO[code] || WMO[Math.floor(code/10)*10] || {desc:'Variável',icon:'ti-cloud',night:'ti-cloud'};
 }
 function isNight(h){return h<6||h>=19;}
@@ -3416,8 +3417,9 @@ function renderWeatherPopup(data){
   const dailyHtml=daily.time.map((date,i)=>{
     // Para hoje (i=0), usa weather_code atual que é mais preciso que o diário
     const rawCode = i===0 ? cur.weather_code : daily.weather_code[i];
-    const dw = rawCode != null ? getWMO(rawCode) : {desc:'Variável',icon:'ti-cloud',night:'ti-cloud'};
-    // Para ícone de hoje usa hora atual (dia/noite)
+    // getWMO já lida com null — sempre retorna um ícone válido
+    const dw = getWMO(rawCode);
+    // Para ícone de hoje usa hora atual (dia/noite), demais dias sempre ícone diurno
     const dayIcon = i===0 ? (isNight(h)?dw.night:dw.icon) : dw.icon;
     const dmax = daily.temperature_2m_max[i] != null ? Math.round(daily.temperature_2m_max[i]) : '--';
     const dmin = daily.temperature_2m_min[i] != null ? Math.round(daily.temperature_2m_min[i]) : '--';
