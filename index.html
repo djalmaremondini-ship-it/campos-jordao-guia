@@ -2043,11 +2043,15 @@ function renderFeatured(places){
     const imgHtml=imgOrFallback(url,c.cls,c.icon,'width:100%;height:100%;object-fit:cover;display:block');
     const pl=getPriceLabel(p);
     let openBadge='';
-    try{ if(p.opening_hours&&typeof p.opening_hours.isOpen==='function'){
-      openBadge=p.opening_hours.isOpen()
-        ?'<div class="fc-badge-open open">Aberto</div>'
-        :'<div class="fc-badge-open closed">Fechado</div>';
-    }}catch(e){}
+    try{
+      if(p.opening_hours){
+        let isOpenNow=null;
+        try{ if(typeof p.opening_hours.isOpen==='function') isOpenNow=p.opening_hours.isOpen(); }catch(e){}
+        if(isOpenNow===null&&p.opening_hours.weekday_text) isOpenNow=calcIsOpenFromText(p.opening_hours.weekday_text);
+        if(isOpenNow===true)  openBadge='<div class="fc-badge-open open">Aberto</div>';
+        else if(isOpenNow===false) openBadge='<div class="fc-badge-open closed">Fechado</div>';
+      }
+    }catch(e){}
     return `<div class="feat-card-new" data-pid="${p.place_id}" onclick="openDetail('${p.place_id}')" style="cursor:pointer">
       <div class="fc-img">
         ${imgHtml}
@@ -2081,11 +2085,15 @@ function renderNear(places){
     const url=photoUrl(p,150);
     const img=imgOrFallback(url,c.nc,c.icon,'width:100%;height:100%;object-fit:cover');
     let openBadge='';
-    try{ if(p.opening_hours&&typeof p.opening_hours.isOpen==='function'){
-      openBadge=p.opening_hours.isOpen()
-        ?'<span class="ni-open open">Aberto</span>'
-        :'<span class="ni-open closed">Fechado</span>';
-    }}catch(e){}
+    try{
+      if(p.opening_hours){
+        let isOpenNow=null;
+        try{ if(typeof p.opening_hours.isOpen==='function') isOpenNow=p.opening_hours.isOpen(); }catch(e){}
+        if(isOpenNow===null&&p.opening_hours.weekday_text) isOpenNow=calcIsOpenFromText(p.opening_hours.weekday_text);
+        if(isOpenNow===true)  openBadge='<span class="ni-open open">Aberto</span>';
+        else if(isOpenNow===false) openBadge='<span class="ni-open closed">Fechado</span>';
+      }
+    }catch(e){}
     return `<div class="near-item-new" data-pid="${p.place_id}" onclick="openDetail('${p.place_id}')" style="cursor:pointer">
       <div class="ni-img">${img}</div>
       <div class="ni-info">
@@ -2418,17 +2426,23 @@ function renderDetailBody(p){
       openStr = '<span style="color:#c0392b;font-weight:500">Temporariamente fechado</span>';
     } else if(p.opening_hours){
       const oh = p.opening_hours;
-      // isOpen() pode lançar erro se não tiver dados suficientes
-      const isOpen = typeof oh.isOpen === 'function' ? oh.isOpen() : null;
+      let isOpen = null;
+      // Tenta isOpen() da API
+      try { if(typeof oh.isOpen==='function') isOpen=oh.isOpen(); } catch(e){}
+      // Fallback: calcula manualmente pelo weekday_text
+      if(isOpen===null && oh.weekday_text && oh.weekday_text.length){
+        isOpen = calcIsOpenFromText(oh.weekday_text);
+      }
       if(isOpen === true){
-        // Mostra horário de fechamento de hoje se disponível
         const todayPeriod = getTodayClosingTime(oh);
         openStr = '<span style="color:#2D6A4F;font-weight:500">Aberto agora</span>'
           + (todayPeriod ? ' · <span style="color:#5C6960;font-size:11px">Fecha '+todayPeriod+'</span>' : '');
       } else if(isOpen === false){
         const nextOpen = getNextOpenTime(oh);
-        openStr = '<span style="color:#c0392b;font-weight:500">Fechado</span>'
+        openStr = '<span style="color:#c0392b;font-weight:500">Fechado agora</span>'
           + (nextOpen ? ' · <span style="color:#5C6960;font-size:11px">Abre '+nextOpen+'</span>' : '');
+      } else if(oh.weekday_text){
+        openStr = '<span style="color:#888">Veja horários abaixo</span>';
       }
     }
   } catch(e){ openStr = '<span style="color:#888">Consulte o local</span>'; }
@@ -2528,6 +2542,33 @@ function removeFromRoteiro(pid, event){
   roteiroOptimized = false;
   renderRoteiro();
   LS.save();
+}
+
+// Calcula se está aberto agora com base no weekday_text do Google
+// Formato: ["segunda-feira: 09:00 – 18:00", "terça-feira: 09:00 – 18:00", ...]
+function calcIsOpenFromText(weekdayText){
+  try {
+    const now     = new Date();
+    const nowMin  = now.getHours()*60 + now.getMinutes();
+    // Google retorna de segunda(0) a domingo(6) no pt-BR
+    const dayIdx  = (now.getDay()+6)%7; // 0=seg, 6=dom
+    const todayText = weekdayText[dayIdx];
+    if(!todayText) return null;
+    // Ex: "segunda-feira: 09:00 – 18:00" ou "domingo: Fechado"
+    if(/fechado|closed/i.test(todayText)) return false;
+    if(/aberto.*24/i.test(todayText)) return true;
+    // Extrai horários — suporta "09:00 – 18:00" e "9:00 AM – 6:00 PM"
+    const match = todayText.match(/(\d{1,2}):(\d{2})\s*[–\-]\s*(\d{1,2}):(\d{2})/);
+    if(!match) return null;
+    const openMin  = parseInt(match[1])*60 + parseInt(match[2]);
+    const closeMin = parseInt(match[3])*60 + parseInt(match[4]);
+    // Trata meia-noite (00:00 = 0, que significa fechamento no dia seguinte)
+    if(closeMin === 0 || closeMin < openMin){
+      // Passa da meia-noite
+      return nowMin >= openMin || nowMin < (closeMin === 0 ? 1440 : closeMin);
+    }
+    return nowMin >= openMin && nowMin < closeMin;
+  } catch(e){ return null; }
 }
 
 // Retorna horário de fechamento de hoje
