@@ -1698,6 +1698,7 @@ img,svg,video,canvas{max-width:100%;}
         <div class="rwp-dot" id="rwp-2"></div>
         <div class="rwp-dot" id="rwp-3"></div>
         <div class="rwp-dot" id="rwp-4"></div>
+        <div class="rwp-dot" id="rwp-5"></div>
       </div>
 
       <!-- STEP 1: Perfil do viajante -->
@@ -1752,7 +1753,40 @@ img,svg,video,canvas{max-width:100%;}
       </div>
 
       <!-- STEP 3: Tempo disponível -->
+      <!-- STEP 3: Horário de saída (NOVO) -->
       <div class="rot-wizard-step" id="rws-3">
+        <div class="rot-wizard-title">Que horas você sai?</div>
+        <div class="rot-wizard-sub">Vamos respeitar os horários certos — restaurante no almoço, café na tarde, bar no fim do dia.</div>
+        <div class="rot-single-opts">
+          <div class="rot-single-opt" data-val="08:00" onclick="rwSelect(this,'horario')">
+            <i class="ti ti-sunrise"></i>
+            <div class="rot-opt-text"><div class="opt-name">Manhã cedo — 8h</div><div class="opt-desc">Aproveita o dia inteiro</div></div>
+            <div class="opt-radio"></div>
+          </div>
+          <div class="rot-single-opt selected" data-val="09:00" onclick="rwSelect(this,'horario')">
+            <i class="ti ti-sun"></i>
+            <div class="rot-opt-text"><div class="opt-name">Manhã — 9h</div><div class="opt-desc">Dia completo, horário clássico</div></div>
+            <div class="opt-radio"></div>
+          </div>
+          <div class="rot-single-opt" data-val="13:00" onclick="rwSelect(this,'horario')">
+            <i class="ti ti-sun-high"></i>
+            <div class="rot-opt-text"><div class="opt-name">Depois do almoço — 13h</div><div class="opt-desc">Tarde e fim de dia</div></div>
+            <div class="opt-radio"></div>
+          </div>
+          <div class="rot-single-opt" data-val="16:00" onclick="rwSelect(this,'horario')">
+            <i class="ti ti-sunset"></i>
+            <div class="rot-opt-text"><div class="opt-name">Final de tarde — 16h</div><div class="opt-desc">Chocolate, café e jantar</div></div>
+            <div class="opt-radio"></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <button class="modal-btn cancel" style="flex:1;padding:12px;border-radius:12px" onclick="rwNext(2)">← Voltar</button>
+          <button class="modal-btn save" style="flex:2;padding:12px;border-radius:12px" onclick="rwNext(4)">Próximo →</button>
+        </div>
+      </div>
+
+      <!-- STEP 4: Quanto tempo -->
+      <div class="rot-wizard-step" id="rws-4">
         <div class="rot-wizard-title">Quanto tempo você tem?</div>
         <div class="rot-wizard-sub">Vamos montar um roteiro que caiba no seu dia.</div>
         <div class="rot-single-opts">
@@ -1773,13 +1807,13 @@ img,svg,video,canvas{max-width:100%;}
           </div>
         </div>
         <div style="display:flex;gap:8px;margin-top:4px">
-          <button class="modal-btn cancel" style="flex:1;padding:12px;border-radius:12px" onclick="rwNext(2)">← Voltar</button>
-          <button class="modal-btn save" style="flex:2;padding:12px;border-radius:12px" onclick="rwNext(4)">Próximo →</button>
+          <button class="modal-btn cancel" style="flex:1;padding:12px;border-radius:12px" onclick="rwNext(3)">← Voltar</button>
+          <button class="modal-btn save" style="flex:2;padding:12px;border-radius:12px" onclick="rwNext(5)">Próximo →</button>
         </div>
       </div>
 
-      <!-- STEP 4: Ritmo -->
-      <div class="rot-wizard-step" id="rws-4">
+      <!-- STEP 5: Ritmo -->
+      <div class="rot-wizard-step" id="rws-5">
         <div class="rot-wizard-title">Qual o ritmo da viagem?</div>
         <div class="rot-wizard-sub">Prefere aproveitar com calma ou ver o máximo possível?</div>
         <div class="rot-single-opts">
@@ -1800,10 +1834,11 @@ img,svg,video,canvas{max-width:100%;}
           </div>
         </div>
         <div style="display:flex;gap:8px;margin-top:4px">
-          <button class="modal-btn cancel" style="flex:1;padding:12px;border-radius:12px" onclick="rwNext(3)">← Voltar</button>
+          <button class="modal-btn cancel" style="flex:1;padding:12px;border-radius:12px" onclick="rwNext(4)">← Voltar</button>
           <button class="modal-btn save" style="flex:2;padding:12px;border-radius:12px" id="rw-gerar-btn" onclick="gerarRoteiroInteligente()">Gerar meu roteiro ✨</button>
         </div>
       </div>
+
 
       <!-- Gerando... -->
       <div class="rot-generating" id="rot-generating">
@@ -2710,37 +2745,130 @@ function visitMin(p){
 }
 
 // Calcula horários de cada parada com base nos tempos de visita + deslocamento
+
+// Verifica se um lugar estará aberto num horário específico (em minutos desde meia-noite)
+// Retorna: true=aberto, false=fechado, null=sem dados
+function willBeOpen(p, arrivalMin){
+  try{
+    const oh = p.opening_hours;
+    if(!oh) return null;
+
+    // Se tem periods (dados detalhados do getDetails)
+    if(oh.periods && oh.periods.length){
+      const wday = Math.floor(arrivalMin / (24*60)) % 7; // dia da semana (relativo)
+      const timeMin = arrivalMin % (24*60); // minuto do dia
+      const today   = new Date().getDay(); // 0=dom
+      const targetDay = (today + Math.floor(arrivalMin/(24*60))) % 7;
+
+      for(const period of oh.periods){
+        if(period.open && period.open.day === targetDay){
+          const openMin  = period.open.hours*60 + period.open.minutes;
+          const closeMin = period.close ? period.close.hours*60 + period.close.minutes : 24*60;
+          if(timeMin >= openMin && timeMin < (closeMin || 24*60)) return true;
+        }
+      }
+      return false;
+    }
+
+    // Fallback: weekday_text
+    if(oh.weekday_text && oh.weekday_text.length){
+      const timeMin = arrivalMin % (24*60);
+      const targetDay = (new Date().getDay() + Math.floor(arrivalMin/(24*60))) % 7;
+      const dayIdx  = (targetDay + 6) % 7; // Google: 0=seg
+      const line    = oh.weekday_text[dayIdx] || '';
+      if(/fechado|closed/i.test(line)) return false;
+      if(/24 horas|24h/i.test(line)) return true;
+      const match = line.match(/(\d{1,2}):(\d{2})\s*[–\-]\s*(\d{1,2}):(\d{2})/);
+      if(match){
+        const openMin  = parseInt(match[1])*60 + parseInt(match[2]);
+        const closeMin = parseInt(match[3])*60 + parseInt(match[4]);
+        return timeMin >= openMin && timeMin < closeMin;
+      }
+    }
+  }catch(e){}
+  return null; // sem dados suficientes
+}
+
+// Retorna horário de fechamento de um lugar num dia específico (em minutos)
+function getCloseMin(p, arrivalMin){
+  try{
+    const oh = p.opening_hours;
+    if(!oh) return null;
+    const timeMin   = arrivalMin % (24*60);
+    const targetDay = (new Date().getDay() + Math.floor(arrivalMin/(24*60))) % 7;
+
+    if(oh.periods && oh.periods.length){
+      for(const period of oh.periods){
+        if(period.open && period.open.day === targetDay){
+          const openMin = period.open.hours*60 + period.open.minutes;
+          if(timeMin >= openMin && period.close){
+            return period.close.hours*60 + period.close.minutes;
+          }
+        }
+      }
+    }
+    if(oh.weekday_text){
+      const dayIdx = (targetDay+6)%7;
+      const line   = oh.weekday_text[dayIdx]||'';
+      const match  = line.match(/(\d{1,2}):(\d{2})\s*[–\-]\s*(\d{1,2}):(\d{2})/);
+      if(match) return parseInt(match[3])*60+parseInt(match[4]);
+    }
+  }catch(e){}
+  return null;
+}
+
 function calcSchedule(places, transits, startTime){
   let cursor = parseTimeToMin(startTime);
   return places.map((p,i)=>{
-    const arrival   = minToTime(cursor);
-    const visitMins = visitMin(p);
+    const arrival    = minToTime(cursor);
+    const visitMins  = visitMin(p);
+    // Verifica se estará aberto na chegada
+    const openStatus = willBeOpen(p, cursor);
+    const closeMin   = getCloseMin(p, cursor);
+    // Alerta se fechar antes do fim da visita
+    const endVisit   = cursor + visitMins;
+    const closesEarly = closeMin && endVisit > closeMin;
     cursor += visitMins;
-    const departure = minToTime(cursor);
-    // Adiciona tempo de deslocamento para a próxima parada
+    const departure  = minToTime(cursor);
     if(transits[i]) cursor += Math.round((transits[i].duration_sec||0)/60);
-    else if(i < places.length-1) cursor += 10; // estimativa padrão 10min
-    return {arrival, departure, visitMins, place:p};
+    else if(i < places.length-1) cursor += 10;
+    return {arrival, departure, visitMins, place:p,
+      openStatus,   // true=aberto, false=fechado, null=sem dados
+      closesEarly,  // vai fechar durante a visita
+      closeMin      // horário de fechamento em minutos
+    };
   });
 }
 
 // Otimiza rota via Google Directions API
-// Define a janela de horário ideal de cada lugar (0=manhã, 1=almoço, 2=tarde, 3=noite)
-function getTimeWindow(p){
+// Define a janela de horário ideal de cada lugar baseada na hora real do dia
+// startMin = minutos desde meia-noite do horário de saída
+function getTimeWindow(p, startMin){
   const types  = p.types || [];
   const name   = (p.name||'').toLowerCase();
   const special = p._specialType;
-  // Noite: bar, cervejaria, jantar
-  if(types.includes('bar') || name.match(/bar|cervejaria|pub|noite/))
+
+  // Noite: bar, cervejaria — sempre último
+  if(types.includes('bar') || name.match(/bar\b|cervejaria|pub/))
     return 3;
-  // Almoço: restaurante (nunca antes das 11h30)
-  if(types.includes('restaurant') || name.match(/cantina|restaurante|churrascaria/))
-    return 1;
-  // Tarde: chocolate, café, compras, cultura
+
+  // Restaurante: almoço se horário < 15h, senão jantar (noite)
+  if(types.includes('restaurant') || name.match(/cantina|restaurante|churrascaria|bistrô/)){
+    // Se saída for depois das 15h, restaurante vira jantar (noite)
+    return (startMin >= 15*60) ? 3 : 1;
+  }
+
+  // Café: manhã se antes das 12h, tarde se depois
+  if(types.includes('cafe') || name.match(/café|cafeteria|bakery/))
+    return (startMin < 12*60) ? 0 : 2;
+
+  // Tarde: chocolate, compras, cultura
   if(special==='chocolate'||special==='gastronomy'||special==='culture'||
-     types.includes('cafe')||types.includes('shopping_mall')||types.includes('store'))
+     types.includes('shopping_mall')||types.includes('store')||
+     types.includes('museum')||types.includes('art_gallery'))
     return 2;
-  // Manhã: parques, pontos turísticos, mirantes, aventura
+
+  // Manhã: parques, mirantes, pontos turísticos, aventura — padrão
   return 0;
 }
 
@@ -2751,8 +2879,9 @@ async function optimizeRoute(){
 
   try{
     // ── PASSO 1: Agrupa por janela de horário ──────────────────────────────
-    // Separa em blocos: manhã → almoço → tarde → noite
-    const blocos = [0,1,2,3].map(w => roteiroPlaces.filter(p => getTimeWindow(p) === w));
+    // Usa horário de saída real para definir janelas corretas
+    const startMin = parseTimeToMin(roteiroStartTime);
+    const blocos = [0,1,2,3].map(w => roteiroPlaces.filter(p => getTimeWindow(p, startMin) === w));
 
     // ── PASSO 2: Otimiza rota dentro de cada bloco com Google Maps ─────────
     const svc = new google.maps.DirectionsService();
@@ -2923,6 +3052,8 @@ function renderRoteiro(){
                     <i class="ti ti-x"></i>
                   </button>
                 </div>
+                ${s.openStatus===false ? `<div style="display:flex;align-items:center;gap:4px;background:#fee2e2;color:#c0392b;font-size:11px;font-weight:500;padding:4px 8px;border-radius:8px;margin-bottom:4px"><i class="ti ti-alert-triangle" style="font-size:12px"></i>Fechado no horário de chegada (${s.arrival})</div>` : ''}
+                ${s.closesEarly ? `<div style="display:flex;align-items:center;gap:4px;background:#FFF7E6;color:#92400E;font-size:11px;font-weight:500;padding:4px 8px;border-radius:8px;margin-bottom:4px"><i class="ti ti-clock-exclamation" style="font-size:12px"></i>Fecha às ${minToTime(s.closeMin)} · visita pode ficar curta</div>` : ''}
                 <div class="rot-card-meta">
                   <span><i class="ti ti-clock"></i>${s.departure} · ${s.visitMins}min</span>
                   ${p.rating?`<span><i class="ti ti-star-filled" style="color:#E9A93B"></i>${p.rating.toFixed(1)}</span>`:''}
@@ -3770,9 +3901,30 @@ let reviewState = {
 const STAR_LABELS = ['','Péssimo','Ruim','Regular','Bom','Excelente!'];
 
 /* ── ROTEIROS DEMO DA COMUNIDADE ── */
+// Cache dos roteiros do Firestore
+let _communityCache = null;
+let _communityLoaded = false;
+
+async function loadCommunityFromFirestore(){
+  if(!window.fbGetCommunityRoteiros) return [];
+  try {
+    const roteiros = await window.fbGetCommunityRoteiros();
+    _communityCache = roteiros;
+    _communityLoaded = true;
+    return roteiros;
+  } catch(e){ return []; }
+}
+
 function getCommunityRoteiros() {
+  // Retorna cache do Firestore + localStorage + demos
   let saved = [];
   try { saved = JSON.parse(localStorage.getItem(LS_ROTEIROS_KEY)||'[]'); } catch(e){}
+  // Mescla com cache do Firestore (sem duplicar por id)
+  if(_communityCache && _communityCache.length){
+    const localIds = new Set(saved.map(r=>r.id));
+    const firebaseOnly = _communityCache.filter(r=>!localIds.has(r.id));
+    saved = [...firebaseOnly, ...saved];
+  }
 
   const demos = [
     {
@@ -3879,7 +4031,12 @@ function getCommunitySlotPhoto(name, keyword, cls) {
 /* ── RENDERIZAR LISTA ── */
 function renderCommunityList(filter) {
   const el  = document.getElementById('community-list');
-  let roteiros = getCommunityRoteiros();
+  // Mostra loading enquanto busca do Firestore
+  el.innerHTML = '<div class="loading-box" style="height:120px"><div class="spinner"></div></div>';
+
+  // Carrega do Firestore se ainda não carregou
+  const render = () => {
+    let roteiros = getCommunityRoteiros();
 
   if(filter === 'melhores') roteiros.sort((a,b) => (b.uses||0)-(a.uses||0));
   else if(filter === 'meus')  roteiros = roteiros.filter(r => r._mine);
@@ -3930,6 +4087,14 @@ function renderCommunityList(filter) {
       </div>
     </div>`;
   }).join('');
+  }; // fim render()
+
+  // Carrega do Firestore e re-renderiza
+  if(!_communityLoaded){
+    loadCommunityFromFirestore().then(() => render());
+  } else {
+    render();
+  }
 }
 
 let currentComTab = 'recentes';
@@ -4085,11 +4250,32 @@ function publishRoteiro() {
     destaques: ''
   };
 
-  try {
-    const saved = JSON.parse(localStorage.getItem(LS_ROTEIROS_KEY)||'[]');
-    saved.push(newRoteiro);
-    localStorage.setItem(LS_ROTEIROS_KEY, JSON.stringify(saved));
-  } catch(e){}
+  // Salva no Firestore (compartilhado entre todos os usuários)
+  if(window.fbSaveCommunityRoteiro){
+    window.fbSaveCommunityRoteiro(newRoteiro).then(firestoreId => {
+      if(firestoreId) newRoteiro.id = firestoreId; // usa o ID do Firestore
+      // Também salva localmente para aparecer imediatamente
+      try {
+        const saved = JSON.parse(localStorage.getItem(LS_ROTEIROS_KEY)||'[]');
+        saved.push(newRoteiro);
+        localStorage.setItem(LS_ROTEIROS_KEY, JSON.stringify(saved));
+      } catch(e){}
+    }).catch(()=>{
+      // Fallback: só local se Firebase falhar
+      try {
+        const saved = JSON.parse(localStorage.getItem(LS_ROTEIROS_KEY)||'[]');
+        saved.push(newRoteiro);
+        localStorage.setItem(LS_ROTEIROS_KEY, JSON.stringify(saved));
+      } catch(e){}
+    });
+  } else {
+    // Sem Firebase — salva só local
+    try {
+      const saved = JSON.parse(localStorage.getItem(LS_ROTEIROS_KEY)||'[]');
+      saved.push(newRoteiro);
+      localStorage.setItem(LS_ROTEIROS_KEY, JSON.stringify(saved));
+    } catch(e){}
+  }
 
   // Abre modal de review logo em seguida
   setTimeout(() => openReviewModal(newRoteiro.id), 400);
@@ -4308,10 +4494,11 @@ function getDistanceInfo(d){
    ROTEIRO INTELIGENTE — WIZARD
 ================================================ */
 const rwState = {
-  perfil:     null,   // solo | casal | familia | amigos
-  interesses: [],     // natureza | gastronomia | chocolate | cultura | aventura | compras
-  tempo:      8,      // horas disponíveis
-  ritmo:      'equilibrado' // tranquilo | equilibrado | intenso
+  perfil:     null,
+  interesses: [],
+  horario:    '09:00', // horário de saída
+  tempo:      8,
+  ritmo:      'equilibrado'
 };
 
 function rwSelect(el, key){
@@ -4320,9 +4507,10 @@ function rwSelect(el, key){
     .querySelectorAll('[data-val]').forEach(o => o.classList.remove('selected'));
   el.classList.add('selected');
   rwState[key] = el.dataset.val;
-  if(key==='tempo')  rwState.tempo  = parseInt(el.dataset.val);
-  if(key==='ritmo')  rwState.ritmo  = el.dataset.val;
-  if(key==='perfil') rwState.perfil = el.dataset.val;
+  if(key==='tempo')   rwState.tempo   = parseInt(el.dataset.val);
+  if(key==='ritmo')   rwState.ritmo   = el.dataset.val;
+  if(key==='perfil')  rwState.perfil  = el.dataset.val;
+  if(key==='horario') rwState.horario = el.dataset.val;
 }
 
 function rwToggle(el, key){
@@ -4347,7 +4535,7 @@ function rwNext(step){
   // Esconde todos os steps
   document.querySelectorAll('.rot-wizard-step').forEach(s => s.classList.remove('active'));
   // Atualiza progresso
-  [1,2,3,4].forEach(i => {
+  [1,2,3,4,5].forEach(i => {
     const dot = document.getElementById('rwp-'+i);
     if(dot) dot.classList.toggle('done', i <= step);
   });
@@ -4359,6 +4547,7 @@ function openRoteiroWizard(){
   // Reseta estado
   rwState.perfil     = null;
   rwState.interesses = [];
+  rwState.horario    = '09:00';
   rwState.tempo      = 8;
   rwState.ritmo      = 'equilibrado';
   // Reseta UI
@@ -4370,8 +4559,9 @@ function openRoteiroWizard(){
     if(dot) dot.classList.toggle('done', i===1);
   });
   // Marca defaults
-  document.querySelector('#rws-3 [data-val="8"]')?.classList.add('selected');
-  document.querySelector('#rws-4 [data-val="equilibrado"]')?.classList.add('selected');
+    document.querySelector('#rws-3 [data-val="09:00"]')?.classList.add('selected');
+    document.querySelector('#rws-4 [data-val="8"]')?.classList.add('selected');
+    document.querySelector('#rws-5 [data-val="equilibrado"]')?.classList.add('selected');
   document.getElementById('rot-generating').style.display = 'none';
   document.getElementById('modal-roteiro-wizard').style.display = 'flex';
 }
@@ -4382,6 +4572,8 @@ async function gerarRoteiroInteligente(){
   document.querySelectorAll('.rot-wizard-step').forEach(s => s.classList.remove('active'));
   document.getElementById('rot-generating').style.display = 'flex';
 
+  // Aplica horário de saída escolhido no wizard
+  roteiroStartTime = rwState.horario || '09:00';
   await new Promise(r => setTimeout(r, 1200)); // simula processamento
 
   // ── FILTROS POR INTERESSE ──
@@ -4501,6 +4693,10 @@ async function gerarRoteiroInteligente(){
     dist(userLat,userLng,latVal(a),lngVal(a)) - dist(userLat,userLng,latVal(b),lngVal(b))
   );
 
+  // Estima horário de chegada em cada candidato para verificar se estará aberto
+  const startMin = parseTimeToMin(rwState.horario || '09:00');
+  function estimatedArrival(idx){ return startMin + idx * 90; } // ~90min por parada como estimativa
+
   const selected   = [];
   const usedCats   = {};
   const jaNoRoteiro = pid => roteiroPlaces.find(x=>x.place_id===pid);
@@ -4511,11 +4707,12 @@ async function gerarRoteiroInteligente(){
       if(selected.length >= qtdParadas) break;
       const fn = typeMap[interesse];
       if(!fn) continue;
-      // Melhor candidato desse interesse que ainda não foi selecionado
+      // Melhor candidato desse interesse que ainda não foi selecionado e estará aberto
       const best = pool.find(p =>
         fn(p) &&
         !selected.find(s=>s.place_id===p.place_id) &&
-        !jaNoRoteiro(p.place_id)
+        !jaNoRoteiro(p.place_id) &&
+        willBeOpen(p, estimatedArrival(selected.length)) !== false
       );
       if(best){
         selected.push(best);
@@ -4533,6 +4730,11 @@ async function gerarRoteiroInteligente(){
     if(jaNoRoteiro(p.place_id)) continue;
     const cat = cfg(p.types, p._specialType).cls;
     if((usedCats[cat]||0) >= 2) continue; // já tem 2 desse tipo
+    // Verifica se estará aberto no horário estimado de chegada
+    const estArr = estimatedArrival(selected.length);
+    if(willBeOpen(p, estArr) === false) continue; // pula se fechado
+    selected.push(p);
+    usedCats[cat] = (usedCats[cat]||0) + 1;
     selected.push(p);
     usedCats[cat] = (usedCats[cat]||0) + 1;
   }
@@ -4929,6 +5131,26 @@ async function saveReview(reviewData){
 
 /* ── Expõe funções para o app ── */
 window.fbSyncToFirestore    = syncToFirestore;
+/* ── Busca roteiros da comunidade do Firestore ── */
+async function getCommunityRoteirosFB(){
+  try {
+    const q = query(
+      collection(db,'comunidade'),
+      orderBy('createdAt','desc')
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      // Marca como do Firestore para não duplicar
+      _fromFirestore: true,
+      // Marca como meu se o uid bater
+      _mine: doc.data().autorId === (currentUser?.uid)
+    }));
+  } catch(e){ return []; }
+}
+
+window.fbGetCommunityRoteiros = getCommunityRoteirosFB;
 window.fbSaveCommunityRoteiro = saveCommunityRoteiro;
 window.fbSaveReview         = saveReview;
 window.fbSignOut = async () => {
