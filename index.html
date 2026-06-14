@@ -2734,7 +2734,7 @@ let roteiroTransits   = []; // [{duration_text, distance_text, duration_sec}]
 let roteiroOptimized  = false;
 
 function parseTimeToMin(t){ const [h,m]=t.split(':').map(Number); return h*60+m; }
-function minToTime(m){ return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0'); }
+function minToTime(m){ const t=m%(24*60); return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0'); }
 
 // Tempo de visita em minutos por tipo
 function visitMin(p){
@@ -2820,22 +2820,26 @@ function getCloseMin(p, arrivalMin){
 function calcSchedule(places, transits, startTime){
   let cursor = parseTimeToMin(startTime);
   return places.map((p,i)=>{
-    const arrival    = minToTime(cursor);
-    const visitMins  = visitMin(p);
-    // Verifica se estará aberto na chegada
-    const openStatus = willBeOpen(p, cursor);
-    const closeMin   = getCloseMin(p, cursor);
+    const arrivalReal = cursor % (24*60); // hora do dia real (0-1439)
+    const arrival     = minToTime(cursor);
+    const visitMins   = visitMin(p);
+    // Marca como noite seguinte se passou de 23:59
+    const passedMidnight = cursor >= 24*60;
+    // Verifica se estará aberto na chegada (usa hora real do dia)
+    const openStatus  = passedMidnight ? false : willBeOpen(p, arrivalReal);
+    const closeMin    = passedMidnight ? null  : getCloseMin(p, arrivalReal);
     // Alerta se fechar antes do fim da visita
-    const endVisit   = cursor + visitMins;
-    const closesEarly = closeMin && endVisit > closeMin;
+    const endVisit    = arrivalReal + visitMins;
+    const closesEarly = !passedMidnight && closeMin && endVisit > closeMin;
     cursor += visitMins;
-    const departure  = minToTime(cursor);
+    const departure = minToTime(cursor);
     if(transits[i]) cursor += Math.round((transits[i].duration_sec||0)/60);
     else if(i < places.length-1) cursor += 10;
     return {arrival, departure, visitMins, place:p,
-      openStatus,   // true=aberto, false=fechado, null=sem dados
-      closesEarly,  // vai fechar durante a visita
-      closeMin      // horário de fechamento em minutos
+      openStatus,    // true=aberto, false=fechado, null=sem dados
+      closesEarly,   // vai fechar durante a visita
+      closeMin,      // horário de fechamento em minutos
+      passedMidnight // passou de meia-noite
     };
   });
 }
@@ -3052,8 +3056,8 @@ function renderRoteiro(){
                     <i class="ti ti-x"></i>
                   </button>
                 </div>
-                ${s.openStatus===false ? `<div style="display:flex;align-items:center;gap:4px;background:#fee2e2;color:#c0392b;font-size:11px;font-weight:500;padding:4px 8px;border-radius:8px;margin-bottom:4px"><i class="ti ti-alert-triangle" style="font-size:12px"></i>Fechado no horário de chegada (${s.arrival})</div>` : ''}
-                ${s.closesEarly ? `<div style="display:flex;align-items:center;gap:4px;background:#FFF7E6;color:#92400E;font-size:11px;font-weight:500;padding:4px 8px;border-radius:8px;margin-bottom:4px"><i class="ti ti-clock-exclamation" style="font-size:12px"></i>Fecha às ${minToTime(s.closeMin)} · visita pode ficar curta</div>` : ''}
+                ${s.passedMidnight ? `<div style="display:flex;align-items:center;gap:4px;background:#fee2e2;color:#c0392b;font-size:11px;font-weight:500;padding:4px 8px;border-radius:8px;margin-bottom:4px"><i class="ti ti-moon" style="font-size:12px"></i>Passaria da meia-noite — remova ou ajuste o horário</div>` : s.openStatus===false ? `<div style="display:flex;align-items:center;gap:4px;background:#fee2e2;color:#c0392b;font-size:11px;font-weight:500;padding:4px 8px;border-radius:8px;margin-bottom:4px"><i class="ti ti-alert-triangle" style="font-size:12px"></i>Fechado no horário de chegada (${s.arrival})</div>` : ''}
+                ${!s.passedMidnight && s.closesEarly ? `<div style="display:flex;align-items:center;gap:4px;background:#FFF7E6;color:#92400E;font-size:11px;font-weight:500;padding:4px 8px;border-radius:8px;margin-bottom:4px"><i class="ti ti-clock-exclamation" style="font-size:12px"></i>Fecha às ${minToTime(s.closeMin)} · visita pode ficar curta</div>` : ''}
                 <div class="rot-card-meta">
                   <span><i class="ti ti-clock"></i>${s.departure} · ${s.visitMins}min</span>
                   ${p.rating?`<span><i class="ti ti-star-filled" style="color:#E9A93B"></i>${p.rating.toFixed(1)}</span>`:''}
@@ -3101,7 +3105,31 @@ function renderRoteiro(){
     roteiroPlaces=[];roteiroTransits=[];roteiroOptimized=false;LS.save();renderRoteiro();
   });
   document.getElementById('rot-start-input').addEventListener('change',e=>{
-    roteiroStartTime=e.target.value; renderRoteiro();
+    roteiroStartTime = e.target.value;
+    const startMin   = parseTimeToMin(roteiroStartTime);
+    // Remove lugares que estarão definitivamente fechados nesse novo horário
+    // Só remove se tiver dados de horário suficientes (não remove por falta de dados)
+    let removidos = 0;
+    let cursor = startMin;
+    roteiroPlaces = roteiroPlaces.filter(p => {
+      const open = willBeOpen(p, cursor % (24*60));
+      cursor += visitMin(p) + 15; // estimativa de deslocamento
+      if(open === false){
+        removidos++;
+        return false;
+      }
+      return true;
+    });
+    if(removidos > 0){
+      roteiroTransits  = [];
+      roteiroOptimized = false;
+      const toast = document.createElement('div');
+      toast.style.cssText='position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#c0392b;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2);text-align:center';
+      toast.textContent = removidos+' lugar'+(removidos>1?'es removidos':'removido')+' — fechado neste horário';
+      document.body.appendChild(toast);
+      setTimeout(()=>toast.remove(), 3500);
+    }
+    renderRoteiro();
   });
   if(document.getElementById('rot-optimize-btn')&&!roteiroOptimized){
     document.getElementById('rot-optimize-btn').addEventListener('click',optimizeRoute);
@@ -4129,7 +4157,7 @@ function setComTab(tab) {
 }
 
 /* ── DETALHE DO ROTEIRO ── */
-function openCommunityDetail(rid) {
+async function openCommunityDetail(rid) {
   const roteiros = getCommunityRoteiros();
   const r = roteiros.find(x => x.id === rid);
   if(!r) return;
@@ -4142,13 +4170,23 @@ function openCommunityDetail(rid) {
     <span><i class="ti ti-users"></i>${r.uses||0} pessoas usaram</span>
   `;
 
-  // Busca places reais que batem com os nomes
   const matchedPlaces = (r.places||[]).map(name =>
     allPlaces.find(p => p.name.toLowerCase().includes(name.toLowerCase().split(' ')[0])) || {name, _mock:true, place_id:'mock_'+name}
   );
 
-  const reviews = getReviewsForRoteiro(rid);
-  const starsAvg = reviews.length ? (reviews.reduce((s,rv)=>s+rv.nota,0)/reviews.length).toFixed(1) : (r.nota_media||r.rating||0).toFixed(1);
+  // Busca reviews: Firestore primeiro, fallback localStorage
+  let reviews = getReviewsForRoteiro(rid);
+  if(!reviews.length && window.fbGetReviewsFirestore){
+    try {
+      const fbRevs = await window.fbGetReviewsFirestore(rid);
+      if(fbRevs.length) reviews = fbRevs;
+    } catch(e){}
+  }
+
+  // Usa nota_media do Firestore se não tiver reviews locais
+  const starsAvg = reviews.length
+    ? (reviews.reduce((s,rv)=>s+rv.nota,0)/reviews.length).toFixed(1)
+    : (r.nota_media||r.rating||0).toFixed(1);
   const totalRevs = reviews.length || r.reviews || 0;
 
   document.getElementById('com-detail-body').innerHTML = `
@@ -5222,13 +5260,23 @@ async function getCommunityRoteirosFB(){
 /* ── Atualiza nota_media do roteiro no Firestore ── */
 async function updateRoteiroNota(roteiroId, dados){
   try {
-    const { doc: fsDoc, updateDoc } = await import('https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js');
-    await updateDoc(fsDoc(db,'comunidade',roteiroId), dados);
-    console.log('[Rotera] Nota atualizada:', roteiroId, dados);
+    await updateDoc(doc(db,'comunidade',roteiroId), dados);
+    console.log('[Rotera] Nota atualizada:', roteiroId, dados.nota_media);
   } catch(e){ console.warn('[Rotera] Erro ao atualizar nota:', e.message); }
 }
 
+/* ── Busca reviews de um roteiro no Firestore ── */
+async function getReviewsFromFirestore(roteiroId){
+  try {
+    const snap = await getDocs(collection(db,'reviews'));
+    return snap.docs
+      .map(d=>d.data())
+      .filter(r=>r.roteiroId===roteiroId);
+  } catch(e){ return []; }
+}
+
 window.fbUpdateRoteiroNota    = updateRoteiroNota;
+window.fbGetReviewsFirestore  = getReviewsFromFirestore;
 window.fbGetCommunityRoteiros = getCommunityRoteirosFB;
 window.fbSaveCommunityRoteiro = saveCommunityRoteiro;
 window.fbSaveReview         = saveReview;
