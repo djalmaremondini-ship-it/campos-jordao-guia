@@ -3905,6 +3905,16 @@ const STAR_LABELS = ['','Péssimo','Ruim','Regular','Bom','Excelente!'];
 let _communityCache = null;
 let _communityLoaded = false;
 
+// Expõe para o módulo Firebase poder invalidar
+Object.defineProperty(window, '_communityCache', {
+  get(){ return _communityCache; },
+  set(v){ _communityCache = v; }
+});
+Object.defineProperty(window, '_communityLoaded', {
+  get(){ return _communityLoaded; },
+  set(v){ _communityLoaded = v; }
+});
+
 async function loadCommunityFromFirestore(){
   if(!window.fbGetCommunityRoteiros) return [];
   try {
@@ -5105,16 +5115,29 @@ async function migrateLocalStorage(){
 
 /* ── Salvar roteiro da comunidade no Firestore ── */
 async function saveCommunityRoteiro(roteiroData){
-  if(!currentUser) return null;
+  if(!currentUser){
+    console.warn('[Rotera] Tentou publicar sem estar logado');
+    return null;
+  }
   try {
-    const ref = await addDoc(collection(db,'comunidade'), {
+    // Remove campos que o Firestore não aceita (undefined, funções)
+    const dados = JSON.parse(JSON.stringify({
       ...roteiroData,
-      autorId:   currentUser.uid,
+      autorId:    currentUser.uid,
       autorEmail: currentUser.email,
-      createdAt: serverTimestamp()
-    });
+      autorNome:  currentUser.displayName || roteiroData.author || 'Visitante',
+      createdAt:  new Date().toISOString() // usa ISO string em vez de serverTimestamp para evitar problemas
+    }));
+    const ref = await addDoc(collection(db,'comunidade'), dados);
+    console.log('[Rotera] Roteiro publicado no Firestore:', ref.id);
+    // Invalida cache para recarregar na próxima abertura
+    window._communityCache = null;
+    window._communityLoaded = false;
     return ref.id;
-  } catch(e){ return null; }
+  } catch(e){
+    console.error('[Rotera] Erro ao publicar roteiro:', e.message);
+    return null;
+  }
 }
 
 /* ── Salvar review no Firestore ── */
@@ -5134,20 +5157,26 @@ window.fbSyncToFirestore    = syncToFirestore;
 /* ── Busca roteiros da comunidade do Firestore ── */
 async function getCommunityRoteirosFB(){
   try {
-    const q = query(
-      collection(db,'comunidade'),
-      orderBy('createdAt','desc')
-    );
-    const snap = await getDocs(q);
-    return snap.docs.map(doc => ({
+    // Query simples sem orderBy para evitar necessidade de índice
+    const snap = await getDocs(collection(db,'comunidade'));
+    const docs = snap.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
-      // Marca como do Firestore para não duplicar
       _fromFirestore: true,
-      // Marca como meu se o uid bater
       _mine: doc.data().autorId === (currentUser?.uid)
     }));
-  } catch(e){ return []; }
+    // Ordena localmente por data decrescente
+    docs.sort((a,b) => {
+      const ta = a.createdAt?.seconds || 0;
+      const tb = b.createdAt?.seconds || 0;
+      return tb - ta;
+    });
+    console.log('[Rotera] Comunidade do Firestore:', docs.length, 'roteiros');
+    return docs;
+  } catch(e){
+    console.error('[Rotera] Erro ao buscar comunidade:', e.message);
+    return [];
+  }
 }
 
 window.fbGetCommunityRoteiros = getCommunityRoteirosFB;
