@@ -3601,7 +3601,12 @@ function setPlanTab(tab) {
     document.getElementById('tab-'+t).classList.toggle('active', t===tab);
     document.getElementById('plan-body-'+t).style.display = t===tab?'block':'none';
   });
-  if(tab==='comunidade') renderCommunityList(currentComTab);
+  if(tab==='comunidade'){
+    // Sempre recarrega do Firestore ao abrir a aba
+    window._communityLoaded = false;
+    window._communityCache  = null;
+    renderCommunityList(currentComTab);
+  }
 }
 
 function onDatesChange() {
@@ -3926,15 +3931,14 @@ async function loadCommunityFromFirestore(){
 }
 
 function getCommunityRoteiros() {
-  // Retorna cache do Firestore + localStorage + demos
+  // Firestore é a fonte principal — local só como fallback offline
+  if(_communityCache && _communityCache.length){
+    // Usa só Firestore quando disponível (evita duplicatas)
+    return _communityCache;
+  }
+  // Fallback: localStorage (offline ou antes de carregar Firestore)
   let saved = [];
   try { saved = JSON.parse(localStorage.getItem(LS_ROTEIROS_KEY)||'[]'); } catch(e){}
-  // Mescla com cache do Firestore (sem duplicar por id)
-  if(_communityCache && _communityCache.length){
-    const localIds = new Set(saved.map(r=>r.id));
-    const firebaseOnly = _communityCache.filter(r=>!localIds.has(r.id));
-    saved = [...firebaseOnly, ...saved];
-  }
 
   const demos = [
     {
@@ -4084,8 +4088,13 @@ function renderCommunityList(filter) {
         <div class="cc-tags">${tagHtml}${posTop}</div>
         <div class="cc-footer">
           <div class="cc-author">
-            <div class="cc-avatar">${(r.avatar||r.author||'?').slice(0,2).toUpperCase()}</div>
-            <span class="cc-author-name">${r.author||'Anônimo'}</span>
+            <div class="cc-avatar" style="overflow:hidden;display:flex;align-items:center;justify-content:center">
+              ${r.autorFoto
+                ? `<img src="${r.autorFoto}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`
+                : (r.avatar||r.author||'?').slice(0,2).toUpperCase()
+              }
+            </div>
+            <span class="cc-author-name">${r.author||r.autorNome||'Anônimo'}</span>
           </div>
           <div class="cc-stats">
             <span class="cc-stat"><i class="ti ti-route"></i>${r.uses||0} usaram</span>
@@ -4113,6 +4122,9 @@ function setComTab(tab) {
   ['recentes','melhores','meus'].forEach(t => {
     document.getElementById('com-tab-'+t).classList.toggle('active', t===tab);
   });
+  // Sempre busca dados frescos do Firestore
+  window._communityLoaded = false;
+  window._communityCache  = null;
   renderCommunityList(tab);
 }
 
@@ -4260,18 +4272,23 @@ function publishRoteiro() {
     destaques: ''
   };
 
-  // Salva no Firestore (compartilhado entre todos os usuários)
+  // Salva no Firestore — fonte única da verdade
   if(window.fbSaveCommunityRoteiro){
     window.fbSaveCommunityRoteiro(newRoteiro).then(firestoreId => {
-      if(firestoreId) newRoteiro.id = firestoreId; // usa o ID do Firestore
-      // Também salva localmente para aparecer imediatamente
-      try {
-        const saved = JSON.parse(localStorage.getItem(LS_ROTEIROS_KEY)||'[]');
-        saved.push(newRoteiro);
-        localStorage.setItem(LS_ROTEIROS_KEY, JSON.stringify(saved));
-      } catch(e){}
+      if(firestoreId){
+        newRoteiro.id = firestoreId;
+        // Remove qualquer versão local com ID diferente do mesmo autor
+        try {
+          const saved = JSON.parse(localStorage.getItem(LS_ROTEIROS_KEY)||'[]');
+          const filtered = saved.filter(r => r.id === firestoreId);
+          localStorage.setItem(LS_ROTEIROS_KEY, JSON.stringify(filtered));
+        } catch(e){}
+      }
+      // Invalida cache para recarregar
+      window._communityCache = null;
+      window._communityLoaded = false;
     }).catch(()=>{
-      // Fallback: só local se Firebase falhar
+      // Fallback offline — salva só local
       try {
         const saved = JSON.parse(localStorage.getItem(LS_ROTEIROS_KEY)||'[]');
         saved.push(newRoteiro);
@@ -4279,7 +4296,6 @@ function publishRoteiro() {
       } catch(e){}
     });
   } else {
-    // Sem Firebase — salva só local
     try {
       const saved = JSON.parse(localStorage.getItem(LS_ROTEIROS_KEY)||'[]');
       saved.push(newRoteiro);
@@ -4372,7 +4388,7 @@ function initReviewModal() {
   });
 
   // Publicar
-  document.getElementById('review-submit').addEventListener('click', () => {
+  document.getElementById('review-submit').addEventListener('click', async () => {
     if(!reviewState.nota) { alert('Selecione uma nota antes de publicar'); return; }
     const review = {
       roteiroId:  reviewState.roteiroId || 'geral',
@@ -4381,19 +4397,40 @@ function initReviewModal() {
       negativos:  reviewState.negativos,
       perfil:     reviewState.perfil,
       texto:      document.getElementById('review-texto').value,
-      autor:      document.getElementById('review-nome').value || 'Visitante',
+      autor:      document.getElementById('review-nome').value || profile.name || 'Visitante',
       data:       new Date().toLocaleDateString('pt-BR')
     };
     try {
       const all = JSON.parse(localStorage.getItem(LS_REVIEWS_KEY)||'[]');
       all.push(review);
       localStorage.setItem(LS_REVIEWS_KEY, JSON.stringify(all));
-      // Atualiza contador no perfil imediatamente
       try { document.getElementById('ps-reviews').textContent = all.length; } catch(e){}
-      // Salva no Firestore se logado
+      // Salva review no Firestore
       if(window.fbSaveReview) window.fbSaveReview(review);
+      // Atualiza nota_media no documento do roteiro no Firestore
+      if(window.fbUpdateRoteiroNota && reviewState.roteiroId){
+        const todasReviews = all.filter(r => r.roteiroId === reviewState.roteiroId);
+        const media = todasReviews.reduce((s,r)=>s+r.nota,0) / todasReviews.length;
+        // Conta positivos e negativos mais frequentes
+        const posCount = {}, negCount = {};
+        todasReviews.forEach(r=>{
+          (r.positivos||[]).forEach(p=>posCount[p]=(posCount[p]||0)+1);
+          (r.negativos||[]).forEach(n=>negCount[n]=(negCount[n]||0)+1);
+        });
+        const posTop = Object.entries(posCount).sort((a,b)=>b[1]-a[1]).slice(0,3).map(e=>e[0]);
+        const negTop = Object.entries(negCount).sort((a,b)=>b[1]-a[1]).slice(0,2).map(e=>e[0]);
+        window.fbUpdateRoteiroNota(reviewState.roteiroId, {
+          nota_media:    parseFloat(media.toFixed(1)),
+          reviews:       todasReviews.length,
+          positivos_top: posTop,
+          negativos_top: negTop,
+        });
+      }
     } catch(e){}
     document.getElementById('modal-review').style.display = 'none';
+    // Invalida cache para mostrar nova nota
+    window._communityCache  = null;
+    window._communityLoaded = false;
     const toast = document.createElement('div');
     toast.style.cssText='position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#2D6A4F;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2)';
     toast.textContent = '✓ Review publicado! Obrigado por ajudar outros viajantes.';
@@ -5125,8 +5162,11 @@ async function saveCommunityRoteiro(roteiroData){
       ...roteiroData,
       autorId:    currentUser.uid,
       autorEmail: currentUser.email,
-      autorNome:  currentUser.displayName || roteiroData.author || 'Visitante',
-      createdAt:  new Date().toISOString() // usa ISO string em vez de serverTimestamp para evitar problemas
+      autorFoto:  currentUser.photoURL || null,
+      // Garante que author e avatar refletem o usuário logado
+      author:     currentUser.displayName || roteiroData.author || 'Visitante',
+      avatar:     (currentUser.displayName || roteiroData.author || '??').slice(0,2).toUpperCase(),
+      createdAt:  new Date().toISOString()
     }));
     const ref = await addDoc(collection(db,'comunidade'), dados);
     console.log('[Rotera] Roteiro publicado no Firestore:', ref.id);
@@ -5179,6 +5219,16 @@ async function getCommunityRoteirosFB(){
   }
 }
 
+/* ── Atualiza nota_media do roteiro no Firestore ── */
+async function updateRoteiroNota(roteiroId, dados){
+  try {
+    const { doc: fsDoc, updateDoc } = await import('https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js');
+    await updateDoc(fsDoc(db,'comunidade',roteiroId), dados);
+    console.log('[Rotera] Nota atualizada:', roteiroId, dados);
+  } catch(e){ console.warn('[Rotera] Erro ao atualizar nota:', e.message); }
+}
+
+window.fbUpdateRoteiroNota    = updateRoteiroNota;
 window.fbGetCommunityRoteiros = getCommunityRoteirosFB;
 window.fbSaveCommunityRoteiro = saveCommunityRoteiro;
 window.fbSaveReview         = saveReview;
