@@ -1,106 +1,96 @@
 /* ============================================================
-   ROTERA — Service Worker
-   Versão: 1.0
-   - Cache offline dos assets principais
-   - Base para Push Notifications futuras
+   ROTERA — Service Worker v7
+   Estratégia: Network First para HTML, Cache First para assets
+   O index.html NUNCA é cacheado — sempre vem da rede
    ============================================================ */
 
-const CACHE_NAME   = 'rotera-v6';
-const CACHE_STATIC = [
-  '/campos-jordao-guia/',
-  '/campos-jordao-guia/index.html',
-];
+const CACHE_NAME   = 'rotera-v7';
+const CACHE_STATIC = []; // não pré-cacheia nada no install
 
-// ── INSTALL — pré-cache dos assets estáticos ──────────────────
+// ── INSTALL ──────────────────────────────────────────────────
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(CACHE_STATIC).catch(() => {
-        // Falha silenciosa — continua mesmo sem cache completo
-      });
-    })
-  );
-  self.skipWaiting();
+  self.skipWaiting(); // ativa imediatamente sem esperar
 });
 
-// ── ACTIVATE — limpa caches antigos ───────────────────────────
+// ── ACTIVATE — limpa caches antigos ─────────────────────────
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(
-        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
-      )
+      Promise.all(keys.map(k => caches.delete(k))) // limpa TUDO
     )
   );
-  self.clients.claim();
+  self.clients.claim(); // assume controle imediatamente
 });
 
-// ── FETCH — estratégia Network First com fallback cache ───────
+// ── FETCH — Network First para HTML, ignora o resto ─────────
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // APIs externas (Google Maps, Open-Meteo) — sempre network, sem cache
-  if (
+  // APIs externas — nunca intercepta
+  if(
     url.hostname.includes('googleapis.com') ||
     url.hostname.includes('google.com') ||
     url.hostname.includes('open-meteo.com') ||
-    url.hostname.includes('script.google.com')
-  ) {
-    return; // deixa o browser resolver normalmente
+    url.hostname.includes('script.google.com') ||
+    url.hostname.includes('gstatic.com') ||
+    url.hostname.includes('firebaseapp.com') ||
+    url.hostname.includes('firebasestorage')
+  ) return;
+
+  // HTML principal — SEMPRE busca da rede, nunca do cache
+  if(
+    event.request.mode === 'navigate' ||
+    url.pathname.endsWith('.html') ||
+    url.pathname === '/campos-jordao-guia/' ||
+    url.pathname === '/campos-jordao-guia'
+  ){
+    event.respondWith(
+      fetch(event.request).catch(() =>
+        // Só usa cache se estiver completamente offline
+        caches.match(event.request)
+      )
+    );
+    return;
   }
 
-  // Assets do app — Network First, fallback para cache
+  // Outros assets (CSS inline, fontes, ícones) — Network First
   event.respondWith(
     fetch(event.request)
       .then(response => {
-        // Atualiza cache com versão mais recente
-        if (response.ok && event.request.method === 'GET') {
+        if(response.ok && event.request.method === 'GET'){
           const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+          caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
         }
         return response;
       })
-      .catch(() => {
-        // Offline — tenta servir do cache
-        return caches.match(event.request).then(cached => {
-          if (cached) return cached;
-          // Fallback para index.html (SPA)
-          return caches.match('/campos-jordao-guia/index.html');
-        });
-      })
+      .catch(() => caches.match(event.request))
   );
 });
 
-// ── PUSH NOTIFICATIONS (preparado para uso futuro) ────────────
+// ── PUSH NOTIFICATIONS ───────────────────────────────────────
 self.addEventListener('push', event => {
-  if (!event.data) return;
+  if(!event.data) return;
   let data = {};
-  try { data = event.data.json(); } catch(e) { data = { title: 'Rotera', body: event.data.text() }; }
-
-  const options = {
-    body:    data.body || 'Nova notificação do Rotera',
-    icon:    '/campos-jordao-guia/icon-192.png',
-    badge:   '/campos-jordao-guia/icon-192.png',
-    vibrate: [200, 100, 200],
-    data:    { url: data.url || '/campos-jordao-guia/' },
-    actions: data.actions || []
-  };
-
+  try { data = event.data.json(); } catch(e){ data = {title:'Rotera', body: event.data.text()}; }
   event.waitUntil(
-    self.registration.showNotification(data.title || 'Rotera', options)
+    self.registration.showNotification(data.title||'Rotera', {
+      body:    data.body||'Nova notificação',
+      icon:    '/campos-jordao-guia/icon-192.png',
+      badge:   '/campos-jordao-guia/icon-192.png',
+      vibrate: [200,100,200],
+      data:    {url: data.url||'/campos-jordao-guia/'}
+    })
   );
 });
 
-// Clique na notificação — abre o app
 self.addEventListener('notificationclick', event => {
   event.notification.close();
   const url = event.notification.data?.url || '/campos-jordao-guia/';
   event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
-      for (const client of list) {
-        if (client.url.includes('campos-jordao-guia') && 'focus' in client) {
+    clients.matchAll({type:'window', includeUncontrolled:true}).then(list => {
+      for(const client of list){
+        if(client.url.includes('campos-jordao-guia') && 'focus' in client)
           return client.focus();
-        }
       }
       return clients.openWindow(url);
     })
