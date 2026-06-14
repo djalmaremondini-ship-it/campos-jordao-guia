@@ -4598,32 +4598,56 @@ window.initMap=function(){
     document.querySelectorAll('.cat-new').forEach(c=>c.classList.remove('active'));
     cat.classList.add('active');
     const t=cat.dataset.type;
-    const specialCats=['chocolate','adventure','culture','transport'];
+    // Mapa de filtro por categoria — usa mesma lógica do wizard inteligente
+    const catFilterMap = {
+      chocolate: p => p._specialType==='chocolate' || (p.name||'').toLowerCase().includes('chocol') || (p.name||'').toLowerCase().includes('cacau'),
+      adventure: p => p._specialType==='adventure' || (p.name||'').toLowerCase().match(/teleférico|tirolesa|escalada|rafting|trilha|aventura|arvorismo|canion|pedra do baú/),
+      culture:   p => p._specialType==='culture' || (p.types||[]).includes('museum') || (p.types||[]).includes('art_gallery'),
+      transport: p => p._specialType==='transport' || (p.name||'').toLowerCase().match(/trem|bonde|teleférico/),
+      lodging:   p => p._specialType==='lodging' || (p.types||[]).includes('lodging'),
+      experience:p => p._specialType==='experience',
+      gastronomy:p => p._specialType==='gastronomy',
+      events:    p => p._specialType==='events',
+      viewpoint: p => p._specialType==='viewpoint' || (p.name||'').toLowerCase().match(/mirante|vista|belvedere/),
+    };
+
     if(t==='all'){
       const allS=[...allPlaces].sort((a,b)=>((b.user_ratings_total||0)-(a.user_ratings_total||0)));
       renderFeatured(allS.filter(p=>photoUrl(p)));
       const allN=[...allPlaces].sort((a,b)=>dist(userLat,userLng,latVal(a),lngVal(a))-dist(userLat,userLng,latVal(b),lngVal(b)));
       renderNear([...allN.filter(p=>photoUrl(p)),...allN.filter(p=>!photoUrl(p))]);
       addMarkers(mapHome,allPlaces,homeMarkers);
-    } else if(specialCats.includes(t)){
-      // categoria especial: filtra por _specialType ou busca se vazio
-      const f=allPlaces.filter(p=>p._specialType===t);
-      if(f.length){const fS=[...f].sort((a,b)=>((b.rating||0)-(a.rating||0)));renderFeatured(fS.filter(p=>photoUrl(p)));renderNear([...f.filter(p=>photoUrl(p)),...f.filter(p=>!photoUrl(p))]);addMarkers(mapHome,f,homeMarkers);}
-      else fetchPlaces(t);
+    } else if(catFilterMap[t]){
+      // Categoria com filtro inteligente
+      const f = allPlaces.filter(catFilterMap[t]);
+      if(f.length >= 3){
+        const fS=[...f].sort((a,b)=>((b.user_ratings_total||0)-(a.user_ratings_total||0)));
+        renderFeatured(fS.filter(p=>photoUrl(p)));
+        renderNear([...f.filter(p=>photoUrl(p)),...f.filter(p=>!photoUrl(p))]);
+        addMarkers(mapHome,f,homeMarkers);
+      } else {
+        // Poucos resultados — busca mais
+        fetchPlaces(t);
+      }
     } else {
+      // Categorias do Google Places (restaurant, cafe, park, etc.)
       const f=allPlaces.filter(p=>p.types&&p.types.includes(t));
-      if(f.length){const fS=[...f].sort((a,b)=>((b.rating||0)-(a.rating||0)));renderFeatured(fS.filter(p=>photoUrl(p)));renderNear([...f.filter(p=>photoUrl(p)),...f.filter(p=>!photoUrl(p))]);addMarkers(mapHome,f,homeMarkers);}
-      else fetchPlaces(t);
+      if(f.length >= 2){
+        const fS=[...f].sort((a,b)=>((b.user_ratings_total||0)-(a.user_ratings_total||0)));
+        renderFeatured(fS.filter(p=>photoUrl(p)));
+        renderNear([...f.filter(p=>photoUrl(p)),...f.filter(p=>!photoUrl(p))]);
+        addMarkers(mapHome,f,homeMarkers);
+      } else fetchPlaces(t);
     }
   });
 
   // see all buttons — passa categoria ativa do home
   document.getElementById('see-all-featured').addEventListener('click',()=>{
-    const activeCat=document.querySelector('#cats .cat.active')?.dataset.type||'all';
-    openListAll('Todos os lugares',[...allPlaces].sort((a,b)=>((b.rating||0)-(a.rating||0))), activeCat);
+    const activeCat=document.querySelector('#cats .cat-new.active')?.dataset.type||'all';
+    openListAll('Todos os lugares',[...allPlaces].sort((a,b)=>((b.user_ratings_total||0)-(a.user_ratings_total||0))), activeCat);
   });
   document.getElementById('see-all-near').addEventListener('click',()=>{
-    const activeCat=document.querySelector('#cats .cat.active')?.dataset.type||'all';
+    const activeCat=document.querySelector('#cats .cat-new.active')?.dataset.type||'all';
     openListAll('Mais próximos',[...allPlaces].sort((a,b)=>dist(userLat,userLng,latVal(a),lngVal(a))-dist(userLat,userLng,latVal(b),lngVal(b))), activeCat);
   });
 
