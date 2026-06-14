@@ -2042,16 +2042,8 @@ function renderFeatured(places){
     const url=photoUrl(p,400);
     const imgHtml=imgOrFallback(url,c.cls,c.icon,'width:100%;height:100%;object-fit:cover;display:block');
     const pl=getPriceLabel(p);
-    let openBadge='';
-    try{
-      if(p.opening_hours){
-        let isOpenNow=null;
-        try{ if(typeof p.opening_hours.isOpen==='function') isOpenNow=p.opening_hours.isOpen(); }catch(e){}
-        if(isOpenNow===null&&p.opening_hours.weekday_text) isOpenNow=calcIsOpenFromText(p.opening_hours.weekday_text);
-        if(isOpenNow===true)  openBadge='<div class="fc-badge-open open">Aberto</div>';
-        else if(isOpenNow===false) openBadge='<div class="fc-badge-open closed">Fechado</div>';
-      }
-    }catch(e){}
+    const _fo=getIsOpen(p);
+    const openBadge=_fo===true?'<div class="fc-badge-open open">Aberto</div>':_fo===false?'<div class="fc-badge-open closed">Fechado</div>':''
     return `<div class="feat-card-new" data-pid="${p.place_id}" onclick="openDetail('${p.place_id}')" style="cursor:pointer">
       <div class="fc-img">
         ${imgHtml}
@@ -2084,16 +2076,8 @@ function renderNear(places){
     const d=dist(userLat,userLng,latVal(p),lngVal(p));
     const url=photoUrl(p,150);
     const img=imgOrFallback(url,c.nc,c.icon,'width:100%;height:100%;object-fit:cover');
-    let openBadge='';
-    try{
-      if(p.opening_hours){
-        let isOpenNow=null;
-        try{ if(typeof p.opening_hours.isOpen==='function') isOpenNow=p.opening_hours.isOpen(); }catch(e){}
-        if(isOpenNow===null&&p.opening_hours.weekday_text) isOpenNow=calcIsOpenFromText(p.opening_hours.weekday_text);
-        if(isOpenNow===true)  openBadge='<span class="ni-open open">Aberto</span>';
-        else if(isOpenNow===false) openBadge='<span class="ni-open closed">Fechado</span>';
-      }
-    }catch(e){}
+    const _no=getIsOpen(p);
+    const openBadge=_no===true?'<span class="ni-open open">Aberto</span>':_no===false?'<span class="ni-open closed">Fechado</span>':''
     return `<div class="near-item-new" data-pid="${p.place_id}" onclick="openDetail('${p.place_id}')" style="cursor:pointer">
       <div class="ni-img">${img}</div>
       <div class="ni-info">
@@ -2426,13 +2410,7 @@ function renderDetailBody(p){
       openStr = '<span style="color:#c0392b;font-weight:500">Temporariamente fechado</span>';
     } else if(p.opening_hours){
       const oh = p.opening_hours;
-      let isOpen = null;
-      // Tenta isOpen() da API
-      try { if(typeof oh.isOpen==='function') isOpen=oh.isOpen(); } catch(e){}
-      // Fallback: calcula manualmente pelo weekday_text
-      if(isOpen===null && oh.weekday_text && oh.weekday_text.length){
-        isOpen = calcIsOpenFromText(oh.weekday_text);
-      }
+      let isOpen = getIsOpen(p);
       if(isOpen === true){
         const todayPeriod = getTodayClosingTime(oh);
         openStr = '<span style="color:#2D6A4F;font-weight:500">Aberto agora</span>'
@@ -2542,6 +2520,24 @@ function removeFromRoteiro(pid, event){
   roteiroOptimized = false;
   renderRoteiro();
   LS.save();
+}
+
+// Helper centralizado — usa qualquer dado disponível para determinar se está aberto
+function getIsOpen(p){
+  if(!p) return null;
+  try{
+    const oh = p.opening_hours;
+    if(!oh) return null;
+    // 1. open_now — campo mais simples do nearbySearch
+    if(typeof oh.open_now === 'boolean') return oh.open_now;
+    // 2. isOpen() da API
+    if(typeof oh.isOpen === 'function'){
+      try{ const r = oh.isOpen(); if(r !== null && r !== undefined) return r; }catch(e){}
+    }
+    // 3. weekday_text — fallback manual
+    if(oh.weekday_text && oh.weekday_text.length) return calcIsOpenFromText(oh.weekday_text);
+  }catch(e){}
+  return null;
 }
 
 // Calcula se está aberto agora com base no weekday_text do Google
