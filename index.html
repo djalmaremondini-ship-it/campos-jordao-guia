@@ -1167,7 +1167,10 @@ img,svg,video,canvas{max-width:100%;}
       <!-- DESTAQUE -->
       <div class="home-section" id="section-featured">
         <div class="home-sec-hdr">
-          <div class="home-sec-ttl">Em destaque</div>
+          <div style="display:flex;flex-direction:column;gap:2px">
+            <div class="home-sec-ttl">Mais procurados</div>
+            <div style="font-size:11px;color:var(--muted)">Por número de avaliações no Google</div>
+          </div>
           <div class="home-sec-link" id="see-all-featured">Ver todos <i class="ti ti-arrow-right" style="font-size:11px"></i></div>
         </div>
         <div class="feat-scroll" id="featured-cards">
@@ -2219,6 +2222,8 @@ function renderFeatured(places){
           <div class="fc-rating"><i class="ti ti-star-filled"></i>${p.rating?p.rating.toFixed(1):'–'} <span style="color:var(--muted)">(${fmtN(p.user_ratings_total)})</span></div>
           <div class="fc-dist"><i class="ti ti-walk" style="font-size:10px"></i>${d.toFixed(1)} km</div>
         </div>
+        ${(p.user_ratings_total||0)>=10000?'<div style="font-size:10px;color:var(--green);font-weight:500;margin-top:4px;display:flex;align-items:center;gap:3px"><i class="ti ti-trending-up" style="font-size:10px"></i>Muito popular</div>':
+          (p.user_ratings_total||0)>=1000?'<div style="font-size:10px;color:var(--mist);font-weight:500;margin-top:4px;display:flex;align-items:center;gap:3px"><i class="ti ti-users" style="font-size:10px"></i>Popular</div>':''}
       </div>
     </div>`;
   }).join('');
