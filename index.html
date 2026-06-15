@@ -1903,7 +1903,118 @@ img,svg,video,canvas{max-width:100%;}
    CONFIGURAÇÃO
 ================================================ */
 const GOOGLE_API_KEY = 'AIzaSyDfQIYqC6B8Q1AR-osYKDAkI9dkYJZd0rk'; // substituir pela chave nova
-const CJ = {lat:-22.7389, lng:-45.5908};
+/* ================================================
+   CONFIGURAÇÃO DE CIDADE — parametrizável
+   Para adicionar nova cidade: copiar CIDADE_CONFIG,
+   trocar nome/coords/raio/categorias
+================================================ */
+const CIDADE_CONFIG = {
+  id:        'campos-jordao',
+  nome:      'Campos do Jordão',
+  estado:    'SP',
+  lat:       -22.7389,
+  lng:       -45.5908,
+  raio:      15000, // raio de busca em metros
+
+  // Categorias descobertas automaticamente para esta cidade
+  // Cada entrada define: label, ícone, query de busca, tipo Google Places
+  // Ordem = ordem de exibição no menu
+  categorias: [
+    { id:'tourist_attraction', label:'Turístico',    icon:'ti-building-arch', tipo:'nearbySearch', placeType:'tourist_attraction' },
+    { id:'park',               label:'Natureza',     icon:'ti-trees',         tipo:'nearbySearch', placeType:'park' },
+    { id:'chocolate',          label:'Chocolate',    icon:'ti-box',           tipo:'textSearch',   query:'fabrica chocolate {cidade}',         placeType:'store' },
+    { id:'adventure',          label:'Aventura',     icon:'ti-parachute',     tipo:'textSearch',   query:'aventura tirolesa arvorismo {cidade}', placeType:'tourist_attraction' },
+    { id:'restaurant',         label:'Restaurantes', icon:'ti-tools-kitchen-2', tipo:'nearbySearch', placeType:'restaurant' },
+    { id:'cafe',               label:'Cafés',        icon:'ti-coffee',        tipo:'nearbySearch', placeType:'cafe' },
+    { id:'bar',                label:'Bares',        icon:'ti-beer',          tipo:'nearbySearch', placeType:'bar' },
+    { id:'lodging',            label:'Onde ficar',   icon:'ti-home-2',        tipo:'textSearch',   query:'pousada hotel chalé {cidade}',       placeType:'lodging' },
+    { id:'experience',         label:'Experiências', icon:'ti-sparkles',      tipo:'textSearch',   query:'degustacao atelie experiencia {cidade}', placeType:'tourist_attraction' },
+    { id:'gastronomy',         label:'Gastronomia',  icon:'ti-cheese',        tipo:'textSearch',   query:'queijo vinho frios coloniais {cidade}',  placeType:'store' },
+    { id:'viewpoint',          label:'Mirantes',     icon:'ti-eye',           tipo:'textSearch',   query:'mirante vista panoramica {cidade}',  placeType:'tourist_attraction' },
+    { id:'events',             label:'Eventos',      icon:'ti-calendar-event', tipo:'textSearch',  query:'festival evento show {cidade}',      placeType:'tourist_attraction' },
+    { id:'shopping_mall',      label:'Compras',      icon:'ti-shopping-bag',  tipo:'nearbySearch', placeType:'shopping_mall' },
+    { id:'culture',            label:'Cultura',      icon:'ti-palette',       tipo:'textSearch',   query:'museu arte cultura {cidade}',        placeType:'museum' },
+    { id:'transport',          label:'Passeios',     icon:'ti-train',         tipo:'textSearch',   query:'bonde trem teleferico passeio {cidade}', placeType:'tourist_attraction' },
+  ],
+
+  // Categorias a descobrir automaticamente ao carregar (verifica se tem resultados)
+  descoberta: ['chocolate','adventure','viewpoint','experience','gastronomy','events','transport'],
+};
+
+// Cidade ativa (futuramente substituída dinamicamente)
+let CIDADE_ATUAL = CIDADE_CONFIG;
+
+// Atalho de coordenadas (compatibilidade com código existente)
+const CJ = {lat: CIDADE_ATUAL.lat, lng: CIDADE_ATUAL.lng};
+
+// Constrói SPECIAL_CATS dinamicamente a partir da configuração da cidade
+function buildSpecialCats(cidade){
+  const sc = {};
+  cidade.categorias
+    .filter(c => c.tipo === 'textSearch')
+    .forEach(c => {
+      sc[c.id] = {
+        query:     c.query.replace('{cidade}', cidade.nome),
+        placeType: c.placeType,
+        label:     c.label,
+        icon:      c.icon
+      };
+    });
+  return sc;
+}
+
+let SPECIAL_CATS = buildSpecialCats(CIDADE_ATUAL);
+
+// Constrói o menu de categorias dinamicamente
+function buildCatMenu(cidade){
+  const container = document.getElementById('cats');
+  if(!container) return;
+  container.innerHTML = `<div class="cat-new active" data-type="all"><i class="ti ti-layout-grid"></i><span>Tudo</span></div>` +
+    cidade.categorias.map(c =>
+      `<div class="cat-new" data-type="${c.id}"><i class="ti ${c.icon}"></i><span>${c.label}</span></div>`
+    ).join('');
+}
+
+// Descobre automaticamente quais categorias têm resultados suficientes
+// Oculta categorias com menos de MIN_RESULTS resultados
+async function descobrirCategorias(cidade){
+  const MIN_RESULTS = 2;
+  const service     = new google.maps.places.PlacesService(mapHome);
+  const center      = new google.maps.LatLng(cidade.lat, cidade.lng);
+
+  const checks = cidade.descoberta.map(catId => new Promise(resolve => {
+    const cat = cidade.categorias.find(c => c.id === catId);
+    if(!cat || cat.tipo !== 'textSearch'){ resolve({catId, ok:true}); return; }
+    service.textSearch(
+      {query: cat.query.replace('{cidade}', cidade.nome), location: center, radius: cidade.raio},
+      (results, status) => {
+        const count = (status === google.maps.places.PlacesServiceStatus.OK && results) ? results.length : 0;
+        resolve({catId, ok: count >= MIN_RESULTS, count});
+      }
+    );
+  }));
+
+  const results = await Promise.all(checks);
+  results.forEach(({catId, ok, count}) => {
+    if(!ok){
+      // Oculta categoria sem resultados suficientes
+      const el = document.querySelector(`#cats [data-type="${catId}"]`);
+      if(el) el.style.display = 'none';
+      console.log(`[Rotera] Categoria "${catId}" ocultada (${count||0} resultados)`);
+    } else {
+      console.log(`[Rotera] Categoria "${catId}" ativa (${count} resultados)`);
+    }
+  });
+}
+
+// Atualiza textos de cidade na UI
+function atualizarTextoCidade(cidade){
+  const els = document.querySelectorAll('[data-city-name]');
+  els.forEach(el => el.textContent = `${cidade.nome}, ${cidade.estado}`);
+  document.getElementById('loc-text').textContent = `${cidade.nome}, ${cidade.estado}`;
+  // Atualiza título da página
+  document.title = `Rotera — Guia Turístico de ${cidade.nome}`;
+}
 
 /* ================================================
    TYPE CONFIG
@@ -3254,17 +3365,7 @@ function initMapFull(){
    FETCH PLACES
 ================================================ */
 // Categorias especiais que usam textSearch em vez de nearbySearch
-const SPECIAL_CATS = {
-  chocolate:  {query:'fabrica chocolate Campos do Jordao', placeType:'store'},
-  lodging:    {query:'pousada chalé hotel Campos do Jordao', placeType:'lodging'},
-  experience: {query:'degustacao atelie experiencia Campos do Jordao', placeType:'tourist_attraction'},
-  gastronomy: {query:'queijo vinho frios coloniais Campos do Jordao', placeType:'store'},
-  events:     {query:'festival evento show Campos do Jordao', placeType:'tourist_attraction'},
-  viewpoint:  {query:'mirante vista panoramica Campos do Jordao', placeType:'tourist_attraction'},
-  adventure:  {query:'aventura tirolesa arvorismo Campos do Jordao', placeType:'tourist_attraction'},
-  culture:    {query:'museu arte cultura Campos do Jordao', placeType:'museum'},
-  transport:  {query:'bonde trem teleferico passeio Campos do Jordao', placeType:'tourist_attraction'},
-};
+// SPECIAL_CATS agora é gerado por buildSpecialCats() acima
 
 function fetchPlaces(type){
   const service=new google.maps.places.PlacesService(mapHome);
@@ -4923,24 +5024,33 @@ window.initMap=function(){
   // ── LOGO ROTERA no header ──
   fetchPlaces('all');
 
+  // ── Inicializa cidade — monta menu, textos e descobre categorias ──
+  buildCatMenu(CIDADE_ATUAL);
+  atualizarTextoCidade(CIDADE_ATUAL);
+  setTimeout(() => descobrirCategorias(CIDADE_ATUAL), 2000);
+
+
   // category filter
   document.getElementById('cats').addEventListener('click',e=>{
     const cat=e.target.closest('.cat-new');if(!cat)return;
     document.querySelectorAll('.cat-new').forEach(c=>c.classList.remove('active'));
     cat.classList.add('active');
     const t=cat.dataset.type;
-    // Mapa de filtro por categoria — usa mesma lógica do wizard inteligente
+    // Filtro dinâmico por categoria — textSearch usa _specialType, nearbySearch usa types Google
     const catFilterMap = {
-      chocolate: p => p._specialType==='chocolate' || (p.name||'').toLowerCase().includes('chocol') || (p.name||'').toLowerCase().includes('cacau'),
+      chocolate: p => p._specialType==='chocolate' || (p.name||'').toLowerCase().match(/chocol|cacau|trufa/),
       adventure: p => p._specialType==='adventure' || (p.name||'').toLowerCase().match(/teleférico|tirolesa|escalada|rafting|trilha|aventura|arvorismo|canion|pedra do baú/),
-      culture:   p => p._specialType==='culture' || (p.types||[]).includes('museum') || (p.types||[]).includes('art_gallery'),
-      transport: p => p._specialType==='transport' || (p.name||'').toLowerCase().match(/trem|bonde|teleférico/),
-      lodging:   p => p._specialType==='lodging' || (p.types||[]).includes('lodging'),
+      culture:   p => p._specialType==='culture'   || (p.types||[]).includes('museum') || (p.types||[]).includes('art_gallery'),
+      transport: p => p._specialType==='transport'  || (p.name||'').toLowerCase().match(/trem|bonde|teleférico/),
+      lodging:   p => p._specialType==='lodging'    || (p.types||[]).includes('lodging'),
       experience:p => p._specialType==='experience',
       gastronomy:p => p._specialType==='gastronomy',
       events:    p => p._specialType==='events',
-      viewpoint: p => p._specialType==='viewpoint' || (p.name||'').toLowerCase().match(/mirante|vista|belvedere/),
+      viewpoint: p => p._specialType==='viewpoint'  || (p.name||'').toLowerCase().match(/mirante|vista|belvedere/),
+      // Categorias adicionais de outras cidades podem ser adicionadas aqui dinamicamente
+      ...(CIDADE_ATUAL.catFiltros || {}),
     };
+
 
     if(t==='all'){
       const allS=[...allPlaces].sort((a,b)=>((b.user_ratings_total||0)-(a.user_ratings_total||0)));
