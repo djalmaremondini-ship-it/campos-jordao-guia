@@ -3629,14 +3629,18 @@ function fetchPlaces(type){
   const service=new google.maps.places.PlacesService(mapHome);
   document.getElementById('featured-cards').innerHTML='<div class="loading-box"><div class="spinner"></div></div>';
   document.getElementById('near-list').innerHTML='<div class="loading-box"><div class="spinner"></div></div>';
-  const center=new google.maps.LatLng(userLat,userLng);
+
+  // SEMPRE usa coordenadas da cidade selecionada — nunca do usuário
+  const cidadeLat = CIDADE_ATUAL?.lat || CJ.lat;
+  const cidadeLng = CIDADE_ATUAL?.lng || CJ.lng;
+  const cidadeRaio= CIDADE_ATUAL?.raio || 15000;
+  const center = new google.maps.LatLng(cidadeLat, cidadeLng);
 
   // Categoria especial — usa textSearch
   if(SPECIAL_CATS[type]){
     const sc=SPECIAL_CATS[type];
-    service.textSearch({query:sc.query,location:center,radius:searchRadius},(results,status)=>{
+    service.textSearch({query:sc.query,location:center,radius:cidadeRaio},(results,status)=>{
       const res=(status===google.maps.places.PlacesServiceStatus.OK&&results)?results:[];
-      // marca o tipo especial nos resultados
       res.forEach(r=>{ r._specialType=type; if(!allPlaces.find(x=>x.place_id===r.place_id)) allPlaces.push(r); });
       const resSorted=res.sort((a,b)=>((b.user_ratings_total||0)-(a.user_ratings_total||0)));
       renderFeatured(resSorted.filter(p=>photoUrl(p)));
@@ -3657,12 +3661,13 @@ function fetchPlaces(type){
     if(pending===0){
       allPlaces=collected.filter((p,i,a)=>a.findIndex(x=>x.place_id===p.place_id)===i);
       if(!allPlaces.find(p=>p.place_id==='DEMO_CHOCOLAND_001')) allPlaces.unshift(DEMO_FEATURED);
-      // Destaque: _featured primeiro, depois por rating — SÓ com foto
+      // Destaque: ordena por quantidade de avaliações
       const sorted=[...allPlaces].sort((a,b)=>((b.user_ratings_total||0)-(a.user_ratings_total||0)));
-      const comFoto  = sorted.filter(p => photoUrl(p));
-      renderFeatured(comFoto);
-      // Mais próximos: com foto primeiro, sem foto no final
-      const nearAll  = [...allPlaces].sort((a,b)=>dist(userLat,userLng,latVal(a),lngVal(a))-dist(userLat,userLng,latVal(b),lngVal(b)));
+      renderFeatured(sorted.filter(p=>photoUrl(p)));
+      // Mais próximos: ordena por distância DO CENTRO DA CIDADE (não do usuário)
+      const nearAll=[...allPlaces].sort((a,b)=>
+        dist(cidadeLat,cidadeLng,latVal(a),lngVal(a))-dist(cidadeLat,cidadeLng,latVal(b),lngVal(b))
+      );
       renderNear([...nearAll.filter(p=>photoUrl(p)), ...nearAll.filter(p=>!photoUrl(p))]);
       addMarkers(mapHome,allPlaces,homeMarkers);
       if(fullInited) addMarkers(mapFull,allPlaces,fullMarkers);
@@ -3671,14 +3676,14 @@ function fetchPlaces(type){
   }
 
   baseTypes.forEach(t=>{
-    service.nearbySearch({location:center,radius:searchRadius,type:t,keyword:CIDADE_ATUAL?.nome||'Campos do Jordão'},(results,status)=>{
+    service.nearbySearch({location:center,radius:cidadeRaio,type:t,keyword:CIDADE_ATUAL?.nome||'Campos do Jordão'},(results,status)=>{
       done(status===google.maps.places.PlacesServiceStatus.OK?results:[]);
     });
   });
 
   if(type==='all'){
     Object.entries(SPECIAL_CATS).forEach(([key,sc])=>{
-      service.textSearch({query:sc.query,location:center,radius:searchRadius},(results,status)=>{
+      service.textSearch({query:sc.query,location:center,radius:cidadeRaio},(results,status)=>{
         if(status===google.maps.places.PlacesServiceStatus.OK&&results) results.forEach(r=>r._specialType=key);
         done(status===google.maps.places.PlacesServiceStatus.OK?results:[]);
       });
