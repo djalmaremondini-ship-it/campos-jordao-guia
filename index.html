@@ -1064,6 +1064,56 @@ img,svg,video,canvas{max-width:100%;}
 }
 .hbd.active{background:var(--green);width:14px;border-radius:3px}
 
+
+/* ===== SELETOR DE CIDADE ===== */
+.hdr-loc{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.hdr-loc:active{opacity:.7}
+.hdr-loc i.ti-chevron-down{font-size:11px;color:var(--muted);margin-left:2px}
+
+.modal-cidade{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);
+  z-index:1000;display:none;align-items:flex-end;
+}
+.modal-cidade.open{display:flex}
+.modal-cidade-sheet{
+  background:var(--card);width:100%;border-radius:20px 20px 0 0;
+  padding:20px 20px 40px;max-height:85vh;overflow-y:auto;
+}
+.cidade-search{
+  display:flex;align-items:center;gap:10px;
+  background:#f8f6f2;border-radius:12px;padding:10px 14px;
+  margin-bottom:16px;border:.5px solid var(--border);
+}
+.cidade-search i{font-size:16px;color:var(--muted)}
+.cidade-search input{
+  flex:1;border:none;background:transparent;font-size:14px;
+  color:var(--text);font-family:'DM Sans',sans-serif;outline:none;
+}
+.cidade-item{
+  display:flex;align-items:center;gap:12px;padding:12px 4px;
+  border-bottom:.5px solid var(--border-light);cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.cidade-item:last-child{border-bottom:none}
+.cidade-item:active{background:#f8f6f2;border-radius:10px}
+.cidade-item-icon{
+  width:40px;height:40px;border-radius:10px;
+  background:#f0f8f4;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.cidade-item-icon i{font-size:18px;color:var(--green)}
+.cidade-item-info{flex:1}
+.cidade-item-nome{font-size:14px;font-weight:500;color:var(--text)}
+.cidade-item-estado{font-size:11px;color:var(--muted)}
+.cidade-item-badge{
+  font-size:10px;font-weight:500;padding:2px 8px;border-radius:10px;
+  background:#f0f8f4;color:var(--green);
+}
+.cidade-buscar-qualquer{
+  margin-top:14px;padding:12px;border-radius:12px;
+  background:#f8f6f2;border:.5px solid var(--border);
+  display:flex;align-items:center;gap:10px;cursor:pointer;
+}
+
 /* ===== SPINNER ===== */
 .spinner{width:22px;height:22px;border:2.5px solid var(--border-light);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -1140,9 +1190,10 @@ img,svg,video,canvas{max-width:100%;}
       <div class="hdr-top-row">
         <!-- Logo + localização -->
         <div>
-          <div class="hdr-loc">
+          <div class="hdr-loc" onclick="abrirModalCidade()" title="Trocar cidade">
             <i class="ti ti-map-pin"></i>
             <span id="loc-text">Carregando...</span>
+            <i class="ti ti-chevron-down"></i>
           </div>
         <!-- LOGO ROTERA — SVG estático -->
         <div id="rotera-logo-wrap" style="margin-top:4px">
@@ -1951,6 +2002,35 @@ img,svg,video,canvas{max-width:100%;}
     </div>
   </div>
 
+
+  <!-- ===== MODAL: SELETOR DE CIDADE ===== -->
+  <div class="modal-cidade" id="modal-cidade" onclick="if(event.target===this)fecharModalCidade()">
+    <div class="modal-cidade-sheet">
+      <div class="modal-handle" style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px"></div>
+      <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--text);margin-bottom:4px">Escolha uma cidade</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:16px">Categorias e lugares são descobertos automaticamente</div>
+
+      <!-- Busca de cidade -->
+      <div class="cidade-search">
+        <i class="ti ti-search"></i>
+        <input type="text" id="cidade-search-input" placeholder="Buscar cidade..." oninput="filtrarCidades(this.value)">
+      </div>
+
+      <!-- Lista de cidades -->
+      <div id="cidade-lista"></div>
+
+      <!-- Buscar qualquer cidade -->
+      <div class="cidade-buscar-qualquer" onclick="buscarCidadeCustom()">
+        <i class="ti ti-map-search" style="font-size:20px;color:var(--mist)"></i>
+        <div>
+          <div style="font-size:13px;font-weight:500;color:var(--text)">Buscar outra cidade</div>
+          <div style="font-size:11px;color:var(--muted)">Digite o nome de qualquer cidade do Brasil</div>
+        </div>
+        <i class="ti ti-arrow-right" style="font-size:16px;color:#ccc;margin-left:auto"></i>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== BOTTOM NAV ===== -->
   <div class="bnav">
     <div class="bni active" data-screen="home"><i class="ti ti-home"></i><span>Início</span></div>
@@ -2090,19 +2170,19 @@ const CATALOGO_CATEGORIAS = [
   { id:'lodging',            label:'Onde ficar',   icon:'ti-home-2',        tipo:'nearbySearch', placeType:'lodging',             prioridade:8 },
 
   // Descobertas por textSearch — só aparecem se tiver resultados na cidade
-  { id:'praia',      label:'Praias',        icon:'ti-beach',          tipo:'textSearch', query:'praia {cidade}',                    placeType:'tourist_attraction', min:3, prioridade:2 },
-  { id:'chocolate',  label:'Chocolate',     icon:'ti-box',            tipo:'textSearch', query:'fábrica chocolate {cidade}',         placeType:'store',              min:2, prioridade:4 },
-  { id:'adventure',  label:'Aventura',      icon:'ti-parachute',      tipo:'textSearch', query:'aventura tirolesa arvorismo {cidade}', placeType:'tourist_attraction', min:2, prioridade:5 },
-  { id:'viewpoint',  label:'Mirantes',      icon:'ti-eye',            tipo:'textSearch', query:'mirante vista panoramica {cidade}',   placeType:'tourist_attraction', min:2, prioridade:5 },
+  { id:'praia',      label:'Praias',        icon:'ti-beach',          tipo:'textSearch', query:'praia litoral {cidade}',             placeType:'tourist_attraction', min:5, relevancia:/praia|beach|litoral|mar|costa|balnear/i, prioridade:2 },
+  { id:'chocolate',  label:'Chocolate',     icon:'ti-box',            tipo:'textSearch', query:'fábrica chocolate {cidade}',         placeType:'store',              min:2, relevancia:/chocol|cacau|trufa|doce/i, prioridade:4 },
+  { id:'adventure',  label:'Aventura',      icon:'ti-parachute',      tipo:'textSearch', query:'aventura tirolesa arvorismo {cidade}', placeType:'tourist_attraction', min:2, relevancia:/aventura|tirolesa|arvorismo|rafting|escalada|trilha/i, prioridade:5 },
+  { id:'viewpoint',  label:'Mirantes',      icon:'ti-eye',            tipo:'textSearch', query:'mirante vista panoramica {cidade}',   placeType:'tourist_attraction', min:2, relevancia:/mirante|vista|panoram|belvedere/i, prioridade:5 },
   { id:'gastronomy', label:'Gastronomia',   icon:'ti-cheese',         tipo:'textSearch', query:'queijo vinho frios coloniais {cidade}', placeType:'store',            min:2, prioridade:6 },
   { id:'experience', label:'Experiências',  icon:'ti-sparkles',       tipo:'textSearch', query:'atelie degustacao experiencia {cidade}', placeType:'tourist_attraction', min:2, prioridade:6 },
   { id:'culture',    label:'Cultura',       icon:'ti-palette',        tipo:'textSearch', query:'museu arte cultura {cidade}',         placeType:'museum',             min:2, prioridade:7 },
   { id:'transport',  label:'Passeios',      icon:'ti-train',          tipo:'textSearch', query:'bonde trem teleférico passeio {cidade}', placeType:'tourist_attraction', min:2, prioridade:8 },
   { id:'events',     label:'Eventos',       icon:'ti-calendar-event', tipo:'textSearch', query:'festival evento show {cidade}',       placeType:'tourist_attraction', min:3, prioridade:9 },
   { id:'shopping_mall', label:'Compras',    icon:'ti-shopping-bag',   tipo:'nearbySearch', placeType:'shopping_mall',               min:2, prioridade:9 },
-  { id:'vineyard',   label:'Vinícolas',     icon:'ti-grape',          tipo:'textSearch', query:'vinicola vinho uva {cidade}',        placeType:'tourist_attraction', min:3, prioridade:5 },
-  { id:'waterfall',  label:'Cachoeiras',    icon:'ti-droplets',       tipo:'textSearch', query:'cachoeira queda dagua {cidade}',     placeType:'tourist_attraction', min:2, prioridade:4 },
-  { id:'thermal',    label:'Termas',        icon:'ti-droplet',        tipo:'textSearch', query:'termas spa aguas termais {cidade}',  placeType:'tourist_attraction', min:2, prioridade:4 },
+  { id:'vineyard',   label:'Vinícolas',     icon:'ti-grape',          tipo:'textSearch', query:'vinicola vinho uva {cidade}',        placeType:'tourist_attraction', min:3, relevancia:/viníc|vinho|cantina|uva|adega/i, prioridade:5 },
+  { id:'waterfall',  label:'Cachoeiras',    icon:'ti-droplets',       tipo:'textSearch', query:'cachoeira queda dagua {cidade}',     placeType:'tourist_attraction', min:2, relevancia:/cachoeira|queda|cascata|salto/i, prioridade:4 },
+  { id:'thermal',    label:'Termas',        icon:'ti-droplet',        tipo:'textSearch', query:'termas spa aguas termais {cidade}',  placeType:'tourist_attraction', min:2, relevancia:/terma|thermal|balneário|águas termais/i, prioridade:4 },
   { id:'farm',       label:'Fazendas',      icon:'ti-tractor',        tipo:'textSearch', query:'fazenda agriturismo {cidade}',       placeType:'tourist_attraction', min:2, prioridade:6 },
   { id:'craft',      label:'Artesanato',    icon:'ti-scissors',       tipo:'textSearch', query:'artesanato feiras craft {cidade}',   placeType:'store',              min:2, prioridade:8 },
 ];
@@ -2130,7 +2210,13 @@ async function descobrirCategorias(cidade){
       service.textSearch(
         {query: cat.query.replace('{cidade}', cidade.nome), location: center, radius: cidade.raio},
         (results, status) => {
-          const count = (status === google.maps.places.PlacesServiceStatus.OK && results) ? results.length : 0;
+          let count = 0;
+          if(status === google.maps.places.PlacesServiceStatus.OK && results){
+            // Filtra por relevância se tiver padrão definido
+            count = cat.relevancia
+              ? results.filter(r => cat.relevancia.test(r.name||'')).length
+              : results.length;
+          }
           resolve({cat, count, ok: count >= (cat.min||2)});
         }
       );
@@ -5214,6 +5300,136 @@ async function gerarRoteiroInteligente(){
     if(i) i.className   = `ti ${icon}`;
   };
 })();
+
+/* ================================================
+   SELETOR DE CIDADE
+================================================ */
+const CIDADES_POPULARES = [
+  { id:'campos-jordao', nome:'Campos do Jordão', estado:'SP', lat:-22.7389, lng:-45.5908, raio:15000, icon:'ti-mountain', badge:'Atual' },
+  { id:'gramado',       nome:'Gramado',           estado:'RS', lat:-29.3764, lng:-50.8747, raio:12000, icon:'ti-tree',     badge:'' },
+  { id:'paraty',        nome:'Paraty',            estado:'RJ', lat:-23.2192, lng:-44.7121, raio:10000, icon:'ti-anchor',   badge:'' },
+  { id:'tiradentes',    nome:'Tiradentes',        estado:'MG', lat:-21.1059, lng:-44.1744, raio:8000,  icon:'ti-building-arch', badge:'' },
+  { id:'bonito',        nome:'Bonito',            estado:'MS', lat:-21.1260, lng:-56.4838, raio:15000, icon:'ti-droplets', badge:'' },
+  { id:'chapada',       nome:'Chapada Diamantina',estado:'BA', lat:-12.4571, lng:-41.3314, raio:20000, icon:'ti-mountain-2', badge:'' },
+  { id:'florianopolis', nome:'Florianópolis',     estado:'SC', lat:-27.5954, lng:-48.5480, raio:20000, icon:'ti-beach',    badge:'' },
+  { id:'ouro-preto',    nome:'Ouro Preto',        estado:'MG', lat:-20.3855, lng:-43.5035, raio:10000, icon:'ti-palette',  badge:'' },
+  { id:'angra',         nome:'Angra dos Reis',    estado:'RJ', lat:-23.0067, lng:-44.3181, raio:15000, icon:'ti-ship',     badge:'' },
+  { id:'holambra',      nome:'Holambra',          estado:'SP', lat:-22.6374, lng:-47.0604, raio:8000,  icon:'ti-tulip',    badge:'' },
+];
+
+let _cidadesFiltered = [...CIDADES_POPULARES];
+
+function abrirModalCidade(){
+  _cidadesFiltered = [...CIDADES_POPULARES];
+  renderCidadeLista(_cidadesFiltered);
+  document.getElementById('cidade-search-input').value = '';
+  document.getElementById('modal-cidade').classList.add('open');
+}
+
+function fecharModalCidade(){
+  document.getElementById('modal-cidade').classList.remove('open');
+}
+
+function renderCidadeLista(cidades){
+  const el = document.getElementById('cidade-lista');
+  el.innerHTML = cidades.map(c => `
+    <div class="cidade-item" onclick="selecionarCidade('${c.id}')">
+      <div class="cidade-item-icon"><i class="ti ${c.icon}"></i></div>
+      <div class="cidade-item-info">
+        <div class="cidade-item-nome">${c.nome}</div>
+        <div class="cidade-item-estado">${c.estado}</div>
+      </div>
+      ${c.badge ? `<span class="cidade-item-badge">${c.badge}</span>` : ''}
+    </div>
+  `).join('');
+}
+
+function filtrarCidades(q){
+  const filtered = CIDADES_POPULARES.filter(c =>
+    c.nome.toLowerCase().includes(q.toLowerCase()) ||
+    c.estado.toLowerCase().includes(q.toLowerCase())
+  );
+  renderCidadeLista(filtered.length ? filtered : CIDADES_POPULARES);
+}
+
+function buscarCidadeCustom(){
+  const nome = prompt('Digite o nome da cidade:');
+  if(!nome || nome.trim().length < 3) return;
+  // Usa Geocoding para encontrar as coordenadas
+  const geocoder = new google.maps.Geocoder();
+  geocoder.geocode({address: nome + ', Brasil'}, (results, status) => {
+    if(status === 'OK' && results[0]){
+      const loc    = results[0].geometry.location;
+      const partes = results[0].address_components;
+      const estado = partes.find(p => p.types.includes('administrative_area_level_1'))?.short_name || 'BR';
+      const cidadeNome = partes.find(p => p.types.includes('locality'))?.long_name || nome;
+
+      const novaCidade = {
+        id:     'custom_'+Date.now(),
+        nome:   cidadeNome,
+        estado: estado,
+        lat:    loc.lat(),
+        lng:    loc.lng(),
+        raio:   15000,
+      };
+      aplicarCidade(novaCidade);
+    } else {
+      alert('Cidade não encontrada. Tente o nome completo.');
+    }
+  });
+}
+
+function selecionarCidade(id){
+  const cidade = CIDADES_POPULARES.find(c => c.id === id);
+  if(cidade) aplicarCidade(cidade);
+}
+
+async function aplicarCidade(cidade){
+  fecharModalCidade();
+
+  // Feedback visual imediato
+  document.getElementById('loc-text').textContent = cidade.nome + ', ' + cidade.estado;
+  document.getElementById('featured-cards').innerHTML = '<div class="loading-box" style="width:200px;height:200px;border-radius:16px;flex-shrink:0"><div class="spinner"></div></div>';
+  document.getElementById('near-list').innerHTML = '<div class="loading-box" style="height:120px"><div class="spinner"></div></div>';
+
+  // Atualiza cidade atual
+  CIDADE_ATUAL = {
+    ...CIDADE_CONFIG,
+    ...cidade,
+    categorias: CIDADE_CONFIG.categorias // mantém estrutura base
+  };
+
+  // Atualiza coordenadas globais
+  CJ.lat = cidade.lat;
+  CJ.lng = cidade.lng;
+
+  // Limpa dados anteriores
+  allPlaces    = [];
+  homeMarkers.forEach(m => m.setMap(null));
+  homeMarkers  = [];
+
+  // Atualiza mapa
+  if(mapHome){
+    mapHome.setCenter({lat: cidade.lat, lng: cidade.lng});
+    mapHome.setZoom(13);
+  }
+
+  // Atualiza clima
+  fetchWeather().then(data => { weatherData = data; updateChip(data); }).catch(()=>{});
+
+  // Busca lugares da nova cidade
+  fetchPlaces('all');
+
+  // Descobre categorias após carregar
+  setTimeout(() => descobrirCategorias(CIDADE_ATUAL), 2000);
+
+  // Toast confirmação
+  const toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#1C4A35;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2);display:flex;align-items:center;gap:8px';
+  toast.innerHTML = `<i class="ti ti-map-pin" style="font-size:14px"></i>Explorando ${cidade.nome}`;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
 
 /* ================================================
    INIT GOOGLE MAPS CALLBACK
