@@ -11,10 +11,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Rotera">
-<meta name="description" content="Descubra cada destino. Guia turístico inteligente de Campos do Jordão.">
+<meta name="description" content="Descubra cada destino. Guia turístico inteligente.">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-apple.png">
-<title>Rotera — Guia Turístico de Campos do Jordão</title>
+<title>Rotera — Guia Turístico Inteligente</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1142,7 +1142,7 @@ img,svg,video,canvas{max-width:100%;}
         <div>
           <div class="hdr-loc">
             <i class="ti ti-map-pin"></i>
-            <span id="loc-text">Campos do Jordão, SP</span>
+            <span id="loc-text">Carregando...</span>
           </div>
         <!-- LOGO ROTERA — SVG estático -->
         <div id="rotera-logo-wrap" style="margin-top:4px">
@@ -1194,7 +1194,7 @@ img,svg,video,canvas{max-width:100%;}
             <div style="position:absolute;right:30px;bottom:-30px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.04)"></div>
             <div class="home-banner-icon"><i class="ti ti-cloud-sun" id="banner-clima-icon"></i></div>
             <div class="home-banner-text">
-              <p id="banner-clima-titulo">Confira o clima em Campos do Jordão</p>
+              <p id="banner-clima-titulo">Confira o clima</p>
               <p id="banner-clima-sub">Toque para ver a previsão dos próximos 7 dias</p>
             </div>
             <i class="ti ti-arrow-right home-banner-arrow"></i>
@@ -1207,7 +1207,7 @@ img,svg,video,canvas{max-width:100%;}
             <div class="home-banner-icon"><i class="ti ti-users"></i></div>
             <div class="home-banner-text">
               <p>Roteiros da comunidade</p>
-              <p>Veja o que outros viajantes recomendam em Campos do Jordão</p>
+              <p>Veja o que outros viajantes recomendam</p>
             </div>
             <i class="ti ti-arrow-right home-banner-arrow"></i>
           </div>
@@ -1349,7 +1349,7 @@ img,svg,video,canvas{max-width:100%;}
   <!-- ===== MAP ===== -->
   <div class="screen" id="screen-map" style="padding-bottom:70px">
     <div class="map-full-hdr">
-      <h2>Mapa de Campos do Jordão</h2>
+      <h2 id="map-title">Mapa</h2>
       <div class="mfrow" id="map-filters">
         <div class="mfpill active" data-type="all">Todos</div>
         <div class="mfpill" data-type="tourist_attraction">Pontos turísticos</div>
@@ -1395,7 +1395,7 @@ img,svg,video,canvas{max-width:100%;}
     <div class="plan-body" id="plan-body-planejamento">
       <!-- Input de datas -->
       <div style="background:var(--card);border-radius:14px;border:.5px solid var(--border);padding:14px;margin-bottom:14px" id="plan-date-picker">
-        <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:12px">Quando você vai a Campos do Jordão?</div>
+        <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:12px">Quando você vai visitar?</div>
         <div style="display:flex;gap:10px">
           <div style="flex:1">
             <label class="form-label" style="margin-bottom:5px;display:block">Chegada</label>
@@ -1475,7 +1475,7 @@ img,svg,video,canvas{max-width:100%;}
       <div class="prof-edit-btn" id="prof-edit-btn"><i class="ti ti-edit"></i></div>
       <div class="prof-avatar" id="prof-avatar"><i class="ti ti-user" id="prof-av-icon"></i></div>
       <div class="prof-name-d" id="prof-name-d">Visitante</div>
-      <div class="prof-sub-d" id="prof-sub-d">Bem-vindo a Campos do Jordão</div>
+      <div class="prof-sub-d" id="prof-sub-d">Bem-vindo ao Rotera</div>
       <div class="prof-stats">
         <div class="pstat" style="cursor:pointer" onclick="document.getElementById('prof-visited-grid').scrollIntoView({behavior:'smooth'})"><div class="psn" id="ps-visited">0</div><div class="psl">Visitados</div></div>
         <div class="pstat"><div class="psn" id="ps-saved">0</div><div class="psl">Salvos</div></div>
@@ -1586,7 +1586,7 @@ img,svg,video,canvas{max-width:100%;}
               <option>Outro</option>
             </select>
           </div>
-          <div class="form-field"><label class="form-label">Endereço completo *</label><input class="form-input" id="cad-endereco" type="text" placeholder="Rua, número, bairro — Campos do Jordão"/></div>
+          <div class="form-field"><label class="form-label">Endereço completo *</label><input class="form-input" id="cad-endereco" type="text" placeholder="Rua, número, bairro"/></div>
           <div class="form-field"><label class="form-label">Link do Google Maps</label><input class="form-input" id="cad-gmaps" type="url" placeholder="maps.google.com/..."/></div>
           <div class="cad-tip"><i class="ti ti-info-circle"></i>Cole o link do seu estabelecimento no Google Maps. Usamos para verificar sua identidade.</div>
           <button class="modal-btn save" style="width:100%;padding:12px;border-radius:12px" onclick="cadNext(2)">Próximo →</button>
@@ -2078,39 +2078,105 @@ function buildCatMenu(cidade){
 }
 
 // Descobre automaticamente quais categorias têm resultados suficientes
-// Oculta categorias com menos de MIN_RESULTS resultados
-async function descobrirCategorias(cidade){
-  const MIN_RESULTS = 2;
-  const service     = new google.maps.places.PlacesService(mapHome);
-  const center      = new google.maps.LatLng(cidade.lat, cidade.lng);
+// Catálogo universal de categorias turísticas
+// Para cada cidade, busca quais existem e monta o menu automaticamente
+const CATALOGO_CATEGORIAS = [
+  // Sempre incluídas (nearbySearch — qualquer cidade tem)
+  { id:'tourist_attraction', label:'Turístico',    icon:'ti-building-arch', tipo:'nearbySearch', placeType:'tourist_attraction', prioridade:1 },
+  { id:'restaurant',         label:'Restaurantes', icon:'ti-tools-kitchen-2', tipo:'nearbySearch', placeType:'restaurant',        prioridade:2 },
+  { id:'park',               label:'Natureza',     icon:'ti-trees',         tipo:'nearbySearch', placeType:'park',                prioridade:3 },
+  { id:'cafe',               label:'Cafés',        icon:'ti-coffee',        tipo:'nearbySearch', placeType:'cafe',                prioridade:6 },
+  { id:'bar',                label:'Bares',        icon:'ti-beer',          tipo:'nearbySearch', placeType:'bar',                 prioridade:7 },
+  { id:'lodging',            label:'Onde ficar',   icon:'ti-home-2',        tipo:'nearbySearch', placeType:'lodging',             prioridade:8 },
 
-  const checks = cidade.descoberta.map(catId => new Promise(resolve => {
-    const cat = cidade.categorias.find(c => c.id === catId);
-    if(!cat || cat.tipo !== 'textSearch'){ resolve({catId, ok:true}); return; }
-    service.textSearch(
-      {query: cat.query.replace('{cidade}', cidade.nome), location: center, radius: cidade.raio},
-      (results, status) => {
-        const count = (status === google.maps.places.PlacesServiceStatus.OK && results) ? results.length : 0;
-        resolve({catId, ok: count >= MIN_RESULTS, count});
-      }
-    );
+  // Descobertas por textSearch — só aparecem se tiver resultados na cidade
+  { id:'praia',      label:'Praias',        icon:'ti-beach',          tipo:'textSearch', query:'praia {cidade}',                    placeType:'tourist_attraction', min:3, prioridade:2 },
+  { id:'chocolate',  label:'Chocolate',     icon:'ti-box',            tipo:'textSearch', query:'fábrica chocolate {cidade}',         placeType:'store',              min:2, prioridade:4 },
+  { id:'adventure',  label:'Aventura',      icon:'ti-parachute',      tipo:'textSearch', query:'aventura tirolesa arvorismo {cidade}', placeType:'tourist_attraction', min:2, prioridade:5 },
+  { id:'viewpoint',  label:'Mirantes',      icon:'ti-eye',            tipo:'textSearch', query:'mirante vista panoramica {cidade}',   placeType:'tourist_attraction', min:2, prioridade:5 },
+  { id:'gastronomy', label:'Gastronomia',   icon:'ti-cheese',         tipo:'textSearch', query:'queijo vinho frios coloniais {cidade}', placeType:'store',            min:2, prioridade:6 },
+  { id:'experience', label:'Experiências',  icon:'ti-sparkles',       tipo:'textSearch', query:'atelie degustacao experiencia {cidade}', placeType:'tourist_attraction', min:2, prioridade:6 },
+  { id:'culture',    label:'Cultura',       icon:'ti-palette',        tipo:'textSearch', query:'museu arte cultura {cidade}',         placeType:'museum',             min:2, prioridade:7 },
+  { id:'transport',  label:'Passeios',      icon:'ti-train',          tipo:'textSearch', query:'bonde trem teleférico passeio {cidade}', placeType:'tourist_attraction', min:2, prioridade:8 },
+  { id:'events',     label:'Eventos',       icon:'ti-calendar-event', tipo:'textSearch', query:'festival evento show {cidade}',       placeType:'tourist_attraction', min:3, prioridade:9 },
+  { id:'shopping_mall', label:'Compras',    icon:'ti-shopping-bag',   tipo:'nearbySearch', placeType:'shopping_mall',               min:2, prioridade:9 },
+  { id:'vineyard',   label:'Vinícolas',     icon:'ti-grape',          tipo:'textSearch', query:'vinicola vinho uva {cidade}',        placeType:'tourist_attraction', min:3, prioridade:5 },
+  { id:'waterfall',  label:'Cachoeiras',    icon:'ti-droplets',       tipo:'textSearch', query:'cachoeira queda dagua {cidade}',     placeType:'tourist_attraction', min:2, prioridade:4 },
+  { id:'thermal',    label:'Termas',        icon:'ti-droplet',        tipo:'textSearch', query:'termas spa aguas termais {cidade}',  placeType:'tourist_attraction', min:2, prioridade:4 },
+  { id:'farm',       label:'Fazendas',      icon:'ti-tractor',        tipo:'textSearch', query:'fazenda agriturismo {cidade}',       placeType:'tourist_attraction', min:2, prioridade:6 },
+  { id:'craft',      label:'Artesanato',    icon:'ti-scissors',       tipo:'textSearch', query:'artesanato feiras craft {cidade}',   placeType:'store',              min:2, prioridade:8 },
+];
+
+// Descobre e constrói menu de categorias dinamicamente para qualquer cidade
+async function descobrirCategorias(cidade){
+  const service = new google.maps.places.PlacesService(mapHome);
+  const center  = new google.maps.LatLng(cidade.lat, cidade.lng);
+
+  // Separa fixas (nearbySearch sem min) das descobertas (textSearch ou com min)
+  const fixas    = CATALOGO_CATEGORIAS.filter(c => c.tipo==='nearbySearch' && !c.min);
+  const descobrir= CATALOGO_CATEGORIAS.filter(c => c.tipo==='textSearch' || c.min);
+
+  // Verifica descobertas em paralelo
+  const checks = descobrir.map(cat => new Promise(resolve => {
+    if(cat.tipo === 'nearbySearch'){
+      service.nearbySearch(
+        {location: center, radius: cidade.raio, type: cat.placeType},
+        (results, status) => {
+          const count = (status === google.maps.places.PlacesServiceStatus.OK && results) ? results.length : 0;
+          resolve({cat, count, ok: count >= (cat.min||2)});
+        }
+      );
+    } else {
+      service.textSearch(
+        {query: cat.query.replace('{cidade}', cidade.nome), location: center, radius: cidade.raio},
+        (results, status) => {
+          const count = (status === google.maps.places.PlacesServiceStatus.OK && results) ? results.length : 0;
+          resolve({cat, count, ok: count >= (cat.min||2)});
+        }
+      );
+    }
   }));
 
-  const results = await Promise.all(checks);
-  results.forEach(({catId, ok, count}) => {
-    if(!ok){
-      // Oculta categoria sem resultados suficientes
-      const el = document.querySelector(`#cats [data-type="${catId}"]`);
-      if(el) el.style.display = 'none';
-      console.log(`[Rotera] Categoria "${catId}" ocultada (${count||0} resultados)`);
-    } else {
-      console.log(`[Rotera] Categoria "${catId}" ativa (${count} resultados)`);
-    }
+  const resultados = await Promise.all(checks);
+
+  // Monta lista final: fixas + descobertas com resultados suficientes
+  const ativas = [
+    ...fixas,
+    ...resultados.filter(r => r.ok).map(r => r.cat)
+  ].sort((a,b) => a.prioridade - b.prioridade);
+
+  // Log para debug
+  resultados.forEach(({cat, count, ok}) => {
+    console.log(`[Rotera] ${ok?'✓':'✗'} ${cat.label}: ${count} resultados`);
   });
+
+  // Atualiza SPECIAL_CATS com as categorias descobertas
+  SPECIAL_CATS = {};
+  ativas.filter(c => c.tipo === 'textSearch').forEach(c => {
+    SPECIAL_CATS[c.id] = {
+      query:     c.query.replace('{cidade}', cidade.nome),
+      placeType: c.placeType,
+      label:     c.label,
+      icon:      c.icon
+    };
+  });
+
+  // Reconstrói menu com categorias ativas
+  const container = document.getElementById('cats');
+  if(container){
+    container.innerHTML =
+      `<div class="cat-new active" data-type="all"><i class="ti ti-layout-grid"></i><span>Tudo</span></div>` +
+      ativas.map(c =>
+        `<div class="cat-new" data-type="${c.id}"><i class="ti ${c.icon}"></i><span>${c.label}</span></div>`
+      ).join('');
+    console.log(`[Rotera] Menu montado: ${ativas.length} categorias para ${cidade.nome}`);
+  }
 }
 
 // Atualiza textos de cidade na UI
 function atualizarTextoCidade(cidade){
+  const mapTitle = document.getElementById('map-title');
+  if(mapTitle) mapTitle.textContent = 'Mapa de '+cidade.nome;
   const els = document.querySelectorAll('[data-city-name]');
   els.forEach(el => el.textContent = `${cidade.nome}, ${cidade.estado}`);
   document.getElementById('loc-text').textContent = `${cidade.nome}, ${cidade.estado}`;
@@ -2477,7 +2543,7 @@ function fetchSubfilter(sf, callback) {
   const center  = new google.maps.LatLng(userLat, userLng);
   // textSearch com query = keyword + Campos do Jordão, rankBy=DISTANCE
   service.textSearch({
-    query: sf.kw + ' Campos do Jordao',
+    query: sf.kw + ' ' + (CIDADE_ATUAL?.nome||'Campos do Jordão'),
     location: center,
     radius: searchRadius,
     type: sf.placeType
@@ -2668,7 +2734,7 @@ function openDetail(pid){
 function renderDetailBody(p){
   const pid = p.place_id;
   const c   = cfg(p.types, p._specialType);
-  const addr=p.vicinity||'Campos do Jordão, SP';
+  const addr=p.vicinity||((CIDADE_ATUAL?.nome||'Campos do Jordão')+', '+(CIDADE_ATUAL?.estado||'SP'));
   const d=dist(userLat,userLng,latVal(p),lngVal(p));
   // Horário — trata todos os casos com segurança
   let openStr = '<span style="color:#888">Horário não disponível</span>';
@@ -2776,7 +2842,7 @@ function renderDetailBody(p){
     </div>
     ${p._featured?`<div class="coupon-banner" onclick="openCoupon('${pid}')"><i class="ti ti-ticket"></i><div class="coupon-banner-text"><p>Cupom exclusivo disponível</p><p>${p._coupon_desc||'Desconto especial para usuários do app'}</p></div><i class="ti ti-arrow-right" style="margin-left:auto;color:rgba(255,255,255,.6)"></i></div>`:''}
     <div class="det-section-ttl">Sobre o lugar</div>
-    <div class="det-desc">Localizado em Campos do Jordão, ${p.name} é um dos destinos mais procurados da região. ${p.rating&&p.rating>=4.5?'Altamente recomendado pelos visitantes com nota excelente no Google.':p.rating&&p.rating>=4.0?'Muito bem avaliado pelos turistas que visitaram.':'Um destino interessante para incluir no roteiro.'}</div>
+    <div class="det-desc">Localizado em ${CIDADE_ATUAL?.nome||"Campos do Jordão"}, ${p.name} é um dos destinos mais procurados da região. ${p.rating&&p.rating>=4.5?'Altamente recomendado pelos visitantes com nota excelente no Google.':p.rating&&p.rating>=4.0?'Muito bem avaliado pelos turistas que visitaram.':'Um destino interessante para incluir no roteiro.'}</div>
     ${revsHtml}
   `;
 }
@@ -3368,7 +3434,7 @@ function renderRoteiro(){
 ================================================ */
 function refreshProfile(){
   document.getElementById('prof-name-d').textContent=profile.name||'Visitante';
-  document.getElementById('prof-sub-d').textContent=profile.city?`${profile.city} · Bem-vindo!`:'Bem-vindo a Campos do Jordão';
+  document.getElementById('prof-sub-d').textContent=profile.city?`${profile.city} · Bem-vindo!`:`Bem-vindo a ${CIDADE_ATUAL?.nome||'Campos do Jordão'}`;
   document.getElementById('ps-saved').textContent=savedIds.size;
   document.getElementById('ps-visited').textContent=checkedInIds.size;
 
@@ -3519,7 +3585,7 @@ function fetchPlaces(type){
   }
 
   baseTypes.forEach(t=>{
-    service.nearbySearch({location:center,radius:searchRadius,type:t,keyword:'Campos do Jordão'},(results,status)=>{
+    service.nearbySearch({location:center,radius:searchRadius,type:t,keyword:CIDADE_ATUAL?.nome||'Campos do Jordão'},(results,status)=>{
       done(status===google.maps.places.PlacesServiceStatus.OK?results:[]);
     });
   });
@@ -3670,7 +3736,7 @@ function renderWeatherPopup(data){
   }).join('');
   document.getElementById('weather-content').innerHTML=`
     <div class="w-hero">
-      <div class="w-hero-loc"><i class="ti ti-map-pin"></i>Campos do Jordão, SP · 1.628m de altitude</div>
+      <div class="w-hero-loc"><i class="ti ti-map-pin"></i>${CIDADE_ATUAL?.nome||"Campos do Jordão"}, ${CIDADE_ATUAL?.estado||"SP"}</div>
       <div class="w-hero-main">
         <div>
           <div class="w-big-temp">${temp}<sup>°C</sup></div>
@@ -3766,7 +3832,7 @@ function shareRoteiro(){
   const ids=roteiroPlaces.map(p=>p.place_id).join(',');
   const url=window.location.origin+window.location.pathname+'?roteiro='+encodeURIComponent(ids);
   if(navigator.share){
-    navigator.share({title:'Meu Roteiro em Campos do Jordão',text:'Veja o roteiro que montei!',url});
+    navigator.share({title:`Meu Roteiro em ${CIDADE_ATUAL?.nome||'Campos do Jordão'}`,text:'Veja o roteiro que montei!',url});
   } else {
     navigator.clipboard.writeText(url).then(()=>{
       alert('Link copiado!\n'+url);
@@ -3830,7 +3896,7 @@ const DEMO_FEATURED={
   _coupon_desc:'15% OFF em toda a loja para usuários do app',
   rating:4.8,
   user_ratings_total:2041,
-  vicinity:'Av. Dr. Adhemar de Barros, 3900 — Campos do Jordão',
+  vicinity:'Av. Dr. Adhemar de Barros, 3900',
   opening_hours:{isOpen:()=>true},
   geometry:{location:{lat:()=>-22.7312,lng:()=>-45.6001}},
   photos: null,
@@ -4511,7 +4577,7 @@ function publishRoteiro() {
   if(!roteiroPlaces.length) return;
   // Pede nome e título antes de publicar
   const nome  = profile.name !== 'Visitante' ? profile.name : prompt('Seu nome (como vai aparecer):') || 'Visitante';
-  const title = prompt('Dê um nome para seu roteiro:', 'Meu roteiro em Campos do Jordão') || 'Meu roteiro';
+  const title = prompt('Dê um nome para seu roteiro:', `Meu roteiro em ${CIDADE_ATUAL?.nome||'Campos do Jordão'}`) || 'Meu roteiro';
   if(!title) return;
 
   const newRoteiro = {
@@ -5143,7 +5209,7 @@ async function gerarRoteiroInteligente(){
     const t = document.getElementById('banner-clima-titulo');
     const s = document.getElementById('banner-clima-sub');
     const i = document.getElementById('banner-clima-icon');
-    if(t) t.textContent = `${temp}°C — ${desc} em Campos do Jordão`;
+    if(t) t.textContent = `${temp}°C — ${desc} em ${CIDADE_ATUAL?.nome||'Campos do Jordão'}`;
     if(s) s.textContent = 'Toque para ver a previsão dos próximos 7 dias';
     if(i) i.className   = `ti ${icon}`;
   };
@@ -5163,7 +5229,7 @@ window.initMap=function(){
   document.getElementById('pref-radius-val').textContent=`${searchRadius/1000} km`;
   if(profile.name&&profile.name!=='Visitante'){
     document.getElementById('prof-name-d').textContent=profile.name;
-    document.getElementById('prof-sub-d').textContent=profile.city?`${profile.city} · Bem-vindo!`:'Bem-vindo a Campos do Jordão';
+    document.getElementById('prof-sub-d').textContent=profile.city?`${profile.city} · Bem-vindo!`:`Bem-vindo a ${CIDADE_ATUAL?.nome||'Campos do Jordão'}`;
   }
   document.getElementById('ps-saved').textContent=savedIds.size;
   document.getElementById('ps-visited').textContent=checkedInIds.size;
@@ -5179,7 +5245,7 @@ window.initMap=function(){
       });
       document.getElementById('geo-status').textContent='Geolocalização ativa — mostrando lugares ao redor de você';
     },()=>{
-      document.getElementById('geo-status').textContent='Usando localização central de Campos do Jordão';
+      document.getElementById('geo-status').textContent=`Usando localização central de ${CIDADE_ATUAL?.nome||'Campos do Jordão'}`;
     });
   }
 
@@ -5199,18 +5265,25 @@ window.initMap=function(){
     document.querySelectorAll('.cat-new').forEach(c=>c.classList.remove('active'));
     cat.classList.add('active');
     const t=cat.dataset.type;
-    // Filtro dinâmico por categoria — textSearch usa _specialType, nearbySearch usa types Google
+    // Filtro dinâmico: categorias textSearch usam _specialType, nearbySearch usa types do Google
     const catFilterMap = {
-      chocolate: p => p._specialType==='chocolate' || (p.name||'').toLowerCase().match(/chocol|cacau|trufa/),
-      adventure: p => p._specialType==='adventure' || (p.name||'').toLowerCase().match(/teleférico|tirolesa|escalada|rafting|trilha|aventura|arvorismo|canion|pedra do baú/),
-      culture:   p => p._specialType==='culture'   || (p.types||[]).includes('museum') || (p.types||[]).includes('art_gallery'),
-      transport: p => p._specialType==='transport'  || (p.name||'').toLowerCase().match(/trem|bonde|teleférico/),
-      lodging:   p => p._specialType==='lodging'    || (p.types||[]).includes('lodging'),
-      experience:p => p._specialType==='experience',
-      gastronomy:p => p._specialType==='gastronomy',
-      events:    p => p._specialType==='events',
-      viewpoint: p => p._specialType==='viewpoint'  || (p.name||'').toLowerCase().match(/mirante|vista|belvedere/),
-      // Categorias adicionais de outras cidades podem ser adicionadas aqui dinamicamente
+      chocolate:  p => p._specialType==='chocolate' || (p.name||'').toLowerCase().match(/chocol|cacau|trufa/),
+      adventure:  p => p._specialType==='adventure' || (p.name||'').toLowerCase().match(/teleférico|tirolesa|escalada|rafting|trilha|aventura|arvorismo|canion/),
+      culture:    p => p._specialType==='culture'   || (p.types||[]).includes('museum') || (p.types||[]).includes('art_gallery'),
+      transport:  p => p._specialType==='transport'  || (p.name||'').toLowerCase().match(/trem|bonde|teleférico/),
+      lodging:    p => p._specialType==='lodging'    || (p.types||[]).includes('lodging'),
+      experience: p => p._specialType==='experience',
+      gastronomy: p => p._specialType==='gastronomy',
+      events:     p => p._specialType==='events',
+      viewpoint:  p => p._specialType==='viewpoint'  || (p.name||'').toLowerCase().match(/mirante|vista|belvedere/),
+      // Novas categorias do catálogo universal
+      praia:      p => p._specialType==='praia'      || (p.name||'').toLowerCase().match(/praia|beach/),
+      vineyard:   p => p._specialType==='vineyard'   || (p.name||'').toLowerCase().match(/viníc|vinho|uva|cantina/),
+      waterfall:  p => p._specialType==='waterfall'  || (p.name||'').toLowerCase().match(/cachoeira|queda|cascata/),
+      thermal:    p => p._specialType==='thermal'    || (p.name||'').toLowerCase().match(/termas?|thermal|águas termais/),
+      farm:       p => p._specialType==='farm'       || (p.name||'').toLowerCase().match(/fazenda|sítio|agritur/),
+      craft:      p => p._specialType==='craft'      || (p.name||'').toLowerCase().match(/artesanato|feira|craft/),
+      // Extensões específicas de cada cidade via config
       ...(CIDADE_ATUAL.catFiltros || {}),
     };
 
