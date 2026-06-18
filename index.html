@@ -2429,15 +2429,17 @@ function buildSubfilters(catType) {
 }
 
 function openListAll(title, places, initialCat) {
-  listPlaces = places;
+  listPlaces = [...allPlaces]; // sempre usa todos os lugares, ordena por reviews
   listCatFilter = initialCat || 'all';
   listSubFilter = null;
   listSubfilterPlaces = null;
   document.getElementById('list-title').textContent = title;
   document.getElementById('list-search-input').value = '';
-  listSort = 'rating';
-  document.querySelectorAll('.sort-pill').forEach(p => p.classList.toggle('active', p.dataset.sort === 'rating'));
-  // sync cat pills
+  listSort = 'reviews';
+  // Força pill "Mais avaliados" visualmente
+  document.querySelectorAll('.sort-pill').forEach(p => {
+    p.classList.toggle('active', p.dataset.sort === 'reviews');
+  });
   document.querySelectorAll('.list-cat-pill').forEach(p => p.classList.toggle('active', p.dataset.type === listCatFilter));
   buildSubfilters(listCatFilter);
   renderList();
