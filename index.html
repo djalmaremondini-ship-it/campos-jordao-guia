@@ -3659,12 +3659,25 @@ function fetchPlaces(type){
     collected=[...collected,...(results||[])];
     pending--;
     if(pending===0){
-      allPlaces=collected.filter((p,i,a)=>a.findIndex(x=>x.place_id===p.place_id)===i);
-      if(!allPlaces.find(p=>p.place_id==='DEMO_CHOCOLAND_001')) allPlaces.unshift(DEMO_FEATURED);
+      // Filtra resultados DENTRO do raio da cidade — elimina lugares de outras cidades
+      const filtered = collected.filter(p => {
+        const d = dist(cidadeLat, cidadeLng, latVal(p), lngVal(p));
+        return d <= (cidadeRaio / 1000) * 1.5; // 50% de margem sobre o raio em km
+      });
+
+      allPlaces = filtered.filter((p,i,a) => a.findIndex(x=>x.place_id===p.place_id)===i);
+
+      // Demo do Chocoland só aparece em Campos do Jordão
+      if(CIDADE_ATUAL?.id === 'campos-jordao' && !allPlaces.find(p=>p.place_id==='DEMO_CHOCOLAND_001')){
+        allPlaces.unshift(DEMO_FEATURED);
+      }
+
+      console.log(`[Rotera] ${allPlaces.length} lugares em ${CIDADE_ATUAL?.nome} (filtrados de ${collected.length})`);
+
       // Destaque: ordena por quantidade de avaliações
       const sorted=[...allPlaces].sort((a,b)=>((b.user_ratings_total||0)-(a.user_ratings_total||0)));
       renderFeatured(sorted.filter(p=>photoUrl(p)));
-      // Mais próximos: ordena por distância DO CENTRO DA CIDADE (não do usuário)
+      // Mais próximos: por distância do centro da cidade
       const nearAll=[...allPlaces].sort((a,b)=>
         dist(cidadeLat,cidadeLng,latVal(a),lngVal(a))-dist(cidadeLat,cidadeLng,latVal(b),lngVal(b))
       );
@@ -5408,10 +5421,13 @@ async function aplicarCidade(cidade){
   CJ.lat = cidade.lat;
   CJ.lng = cidade.lng;
 
-  // Limpa dados anteriores
-  allPlaces    = [];
+  // Limpa TODOS os dados anteriores
+  allPlaces = [];
+  SPECIAL_CATS = {};
   homeMarkers.forEach(m => m.setMap(null));
-  homeMarkers  = [];
+  homeMarkers = [];
+  fullMarkers.forEach(m => m.setMap(null));
+  fullMarkers = [];
 
   // Atualiza mapa
   if(mapHome){
