@@ -4,7 +4,7 @@
    O index.html NUNCA é cacheado — sempre vem da rede
    ============================================================ */
 
-const CACHE_NAME   = 'rotera-v29';
+const CACHE_NAME   = 'rotera-v30';
 const CACHE_STATIC = []; // não pré-cacheia nada no install
 
 // ── INSTALL ──────────────────────────────────────────────────

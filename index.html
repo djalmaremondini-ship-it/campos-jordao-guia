@@ -1029,31 +1029,31 @@ img,svg,video,canvas{max-width:100%;}
 .home-banner{
   min-width:100%;
   border-radius:0;
-  padding:14px 18px;
+  padding:20px 20px;
   display:flex;
   align-items:center;
-  gap:14px;
+  gap:16px;
   cursor:pointer;
   position:relative;
   overflow:hidden;
-  min-height:72px;
+  min-height:120px;
 }
 .home-banner.tipo-proprio{background:linear-gradient(135deg,#1C4A35,#2D6A4F)}
 .home-banner.tipo-clima{background:linear-gradient(135deg,#1a4a6b,#2d7ab5)}
 .home-banner.tipo-parceiro{background:linear-gradient(135deg,#7B3F00,#C4892A)}
 .home-banner-icon{
-  width:44px;height:44px;border-radius:12px;
+  width:56px;height:56px;border-radius:14px;
   background:rgba(255,255,255,.15);
   display:flex;align-items:center;justify-content:center;
   flex-shrink:0;
 }
-.home-banner-icon i{font-size:22px;color:rgba(255,255,255,.9)}
+.home-banner-icon i{font-size:28px;color:rgba(255,255,255,.9)}
 .home-banner-text{flex:1}
 .home-banner-text p:first-child{
-  font-size:13px;font-weight:500;color:#fff;margin-bottom:2px;line-height:1.3
+  font-size:15px;font-weight:500;color:#fff;margin-bottom:4px;line-height:1.3
 }
-.home-banner-text p:last-child{font-size:11px;color:rgba(255,255,255,.65)}
-.home-banner-arrow{font-size:18px;color:rgba(255,255,255,.4)}
+.home-banner-text p:last-child{font-size:12px;color:rgba(255,255,255,.65);line-height:1.4}
+.home-banner-arrow{font-size:20px;color:rgba(255,255,255,.4)}
 .home-banner-dots{
   display:flex;justify-content:center;gap:5px;
   padding:8px 0 4px;
@@ -1178,16 +1178,20 @@ img,svg,video,canvas{max-width:100%;}
 
           <!-- Banner 1: Criar roteiro -->
           <div class="home-banner tipo-proprio" onclick="document.getElementById('criar-rot-btn')?.click()">
+            <div style="position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.06)"></div>
+            <div style="position:absolute;right:30px;bottom:-30px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.04)"></div>
             <div class="home-banner-icon"><i class="ti ti-route"></i></div>
             <div class="home-banner-text">
               <p>Monte seu roteiro personalizado</p>
-              <p>IA sugere os melhores lugares para o seu perfil</p>
+              <p>IA sugere os melhores lugares para o seu perfil e horário disponível</p>
             </div>
             <i class="ti ti-arrow-right home-banner-arrow"></i>
           </div>
 
           <!-- Banner 2: Clima -->
           <div class="home-banner tipo-clima" id="banner-clima" onclick="document.getElementById('weather-chip-btn')?.click()">
+            <div style="position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.06)"></div>
+            <div style="position:absolute;right:30px;bottom:-30px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.04)"></div>
             <div class="home-banner-icon"><i class="ti ti-cloud-sun" id="banner-clima-icon"></i></div>
             <div class="home-banner-text">
               <p id="banner-clima-titulo">Confira o clima em Campos do Jordão</p>
@@ -1198,10 +1202,12 @@ img,svg,video,canvas{max-width:100%;}
 
           <!-- Banner 3: Comunidade -->
           <div class="home-banner tipo-proprio" onclick="showScreen('roteiro');setPlanTab('comunidade')">
+            <div style="position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.06)"></div>
+            <div style="position:absolute;right:30px;bottom:-30px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.04)"></div>
             <div class="home-banner-icon"><i class="ti ti-users"></i></div>
             <div class="home-banner-text">
               <p>Roteiros da comunidade</p>
-              <p>Veja o que outros viajantes recomendam</p>
+              <p>Veja o que outros viajantes recomendam em Campos do Jordão</p>
             </div>
             <i class="ti ti-arrow-right home-banner-arrow"></i>
           </div>
