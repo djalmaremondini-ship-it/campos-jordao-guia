@@ -1239,9 +1239,9 @@ img,svg,video,canvas{max-width:100%;}
     </div>
     <!-- ORDENAÇÃO -->
     <div class="sort-row" id="sort-row">
-      <div class="sort-pill active" data-sort="rating">Melhor avaliados</div>
+      <div class="sort-pill" data-sort="rating">Melhor avaliados</div>
       <div class="sort-pill" data-sort="dist">Mais próximos</div>
-      <div class="sort-pill" data-sort="reviews">Mais avaliados</div>
+      <div class="sort-pill active" data-sort="reviews">Mais avaliados</div>
       <div class="sort-pill" data-sort="az">A–Z</div>
     </div>
     <div class="list-grid" id="list-grid"></div>
@@ -2109,7 +2109,7 @@ let checkedInDates={};
 let prevScreen='home';
 let currentScreen='home';
 let searchRadius=5000;
-let listPlaces=[], listSort='rating';
+let listPlaces=[], listSort='reviews';
 let listCatFilter='all', listSubFilter=null, listSubfilterPlaces=null;
 let profile={name:'Visitante',city:'',bio:''};
 let weatherData=null;
